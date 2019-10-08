@@ -1,18 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEditor;
 
-public class BuildWebGLPlayer : MonoBehaviour
+// ReSharper disable InconsistentNaming
+
+public static class BuildWebGLPlayer
 {
-    // Start is called before the first frame update
-    void Start()
+    public static void Build()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        string[] scenes =
+        {
+            "Assets/Scenes/Title.unity"
+        };
+        BuildPipeline.BuildPlayer(scenes, "artifact/", BuildTarget.WebGL, BuildOptions.None);
     }
 }
