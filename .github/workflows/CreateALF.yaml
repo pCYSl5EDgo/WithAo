@@ -28,3 +28,13 @@ jobs:
       with:
         path: artifact
         name: build
+    - name: Push GitHub Pages
+      run: |
+        cd WithAo
+        git config --local user.name "pCYSl5EDgo"
+        git config --local user.email "pCYSl5EDgo@yahoo.co.jp"
+        git checkout -b gh-pages
+        cp -r ../artifact ./
+        git add .
+        git commit -a -m "[update]DLL Update of $GITHUB_SHA"
+        git push -v
