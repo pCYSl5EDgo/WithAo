@@ -37,8 +37,9 @@ jobs:
         git config --local user.name "pCYSl5EDgo"
         git config --local user.email "pCYSl5EDgo@yahoo.co.jp"
         git stash
-        git checkout -b pages origin/gh-pages
+        git checkout -b gh-pages origin/gh-pages
         cp -r ../artifact ./
+        ls -l
         git add .
         git commit -a -m "[update]DLL Update of $GITHUB_SHA"
         git push -u origin gh-pages
