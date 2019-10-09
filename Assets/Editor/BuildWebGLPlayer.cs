@@ -10,6 +10,6 @@ public static class BuildWebGLPlayer
         {
             "Assets/Scenes/Title.unity"
         };
-        BuildPipeline.BuildPlayer(scenes, "../artifact/", BuildTarget.WebGL, BuildOptions.None);
+        BuildPipeline.BuildPlayer(scenes, "../artifact", BuildTarget.WebGL, BuildOptions.None);
     }
 }
