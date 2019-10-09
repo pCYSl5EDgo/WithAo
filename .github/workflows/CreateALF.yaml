@@ -8,7 +8,7 @@ on:
 jobs:
   BuildJob:
     runs-on: ubuntu-latest
-    container: docker://gableroux/unity3d:2018.4.9f1-webgl
+    #container: docker://gableroux/unity3d:2018.4.9f1-webgl
     steps:
     - run: echo $netrc > ~/.netrc
       env:
@@ -17,28 +17,30 @@ jobs:
       run: |
         mkdir artifact
         git clone https://github.com/pCYSl5EDgo/WithAo
-        cd WithAo
-        openssl aes-256-cbc -d -in Unity_v2018.x.ulf-cipher -k ${CYPHER_KEY} >> Unity_v2018.x.ulf
-        /opt/Unity/Editor/Unity -buildTarget WebGL -logFile -manualLicenseFile Unity_v2018.x.ulf -batchmode -nographics -quit || exit 0
+        #cd WithAo
+        #openssl aes-256-cbc -d -in Unity_v2018.x.ulf-cipher -k ${CYPHER_KEY} >> Unity_v2018.x.ulf
+        #/opt/Unity/Editor/Unity -buildTarget WebGL -logFile -manualLicenseFile Unity_v2018.x.ulf -batchmode -nographics -quit || exit 0
       env:
         CYPHER_KEY: ${{ secrets.cypher_key }}
-    - name: Build
-      run: /opt/Unity/Editor/Unity -quit -batchMode -noGraphics -silent-crashes -projectPath WithAo -logFile -buildTarget WebGL -executeMethod BuildWebGLPlayer.Build || exit 0
+    #- name: Build
+     # run: /opt/Unity/Editor/Unity -quit -batchMode -noGraphics -silent-crashes -projectPath WithAo -logFile -buildTarget WebGL -executeMethod BuildWebGLPlayer.Build || exit 0
     - run: |
         ls -l WithAo
-        ls -l artifact
-    - uses: actions/upload-artifact@master
-      with:
-        path: artifact
-        name: build
+        #ls -l artifact
+    #- uses: actions/upload-artifact@master
+     # with:
+      #  path: artifact
+       # name: build
     - name: Push GitHub Pages
       run: |
         cd WithAo
         git config --local user.name "pCYSl5EDgo"
         git config --local user.email "pCYSl5EDgo@yahoo.co.jp"
         git checkout -b gh-pages
+        ls -l
         git pull origin gh-pages
-        cp -r ../artifact ./
-        git add .
-        git commit -a -m "[update]DLL Update of $GITHUB_SHA"
-        git push -u origin gh-pages
+        ls -l
+        #cp -r ../artifact ./
+        #git add .
+        #git commit -a -m "[update]DLL Update of $GITHUB_SHA"
+        #git push -u origin gh-pages
