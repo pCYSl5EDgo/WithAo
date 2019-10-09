@@ -43,6 +43,7 @@ jobs:
         git config --local user.name "pCYSl5EDgo"
         git config --local user.email "pCYSl5EDgo@yahoo.co.jp"
         git checkout -b gh-pages origin/gh-pages
+        git clean -d -f
     - uses: actions/download-artifact@master
       with:
         path: WithAo
