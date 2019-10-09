@@ -10,9 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     container: docker://gableroux/unity3d:2018.4.9f1-webgl
     steps:
-    - run: echo $netrc > ~/.netrc
-      env:
-        netrc: ${{ secrets.netrc }}
     - name: Initialize
       run: |
         mkdir artifact
@@ -31,15 +28,27 @@ jobs:
       with:
         path: artifact
         name: build
-    - name: Push GitHub Pages
-      run: |
+
+  PushJob:
+    runs-on: ubuntu-latest
+    needs: BuildJob
+    steps:
+    - name: Initialize netrc
+      run: echo $netrc > ~/.netrc
+      env:
+        netrc: ${{ secrets.netrc }}
+    - run: |
+        git clone https://github.com/pCYSl5EDgo/WithAo
         cd WithAo
         git config --local user.name "pCYSl5EDgo"
         git config --local user.email "pCYSl5EDgo@yahoo.co.jp"
-        git stash
         git checkout -b gh-pages origin/gh-pages
-        cp -r ../artifact ./
+    - uses: actions/download-artifact@master
+      with:
+        path: WithAo
+        name: build
+    - run: |
         ls -l
         git add .
         git commit -a -m "[update]DLL Update of $GITHUB_SHA"
-        git push -u origin gh-pages
+        git push origin gh-pages
