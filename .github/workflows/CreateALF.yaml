@@ -5,6 +5,7 @@ on:
     branches:
     - master
 
+
 jobs:
   BuildJob:
     runs-on: ubuntu-latest
