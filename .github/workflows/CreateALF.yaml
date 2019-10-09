@@ -36,9 +36,8 @@ jobs:
         cd WithAo
         git config --local user.name "pCYSl5EDgo"
         git config --local user.email "pCYSl5EDgo@yahoo.co.jp"
-        git checkout -b gh-pages
         ls -l
-        git pull origin gh-pages
+        git checkout -b pages origin/gh-pages
         ls -l
         #cp -r ../artifact ./
         #git add .
