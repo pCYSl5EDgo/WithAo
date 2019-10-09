@@ -36,6 +36,7 @@ jobs:
         cd WithAo
         git config --local user.name "pCYSl5EDgo"
         git config --local user.email "pCYSl5EDgo@yahoo.co.jp"
+        git stash
         git checkout -b pages origin/gh-pages
         cp -r ../artifact ./
         git add .
