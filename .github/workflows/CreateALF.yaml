@@ -48,6 +48,7 @@ jobs:
         path: WithAo
         name: build
     - run: |
+        cd WithAo
         ls -l
         git add .
         git commit -a -m "[update]DLL Update of $GITHUB_SHA"
