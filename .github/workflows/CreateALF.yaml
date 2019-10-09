@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     container: docker://gableroux/unity3d:2018.4.9f1-webgl
     steps:
+    - run: echo $netrc > ~/.netrc
+      env:
+        netrc: ${{ secrets.netrc }}
     - name: Initialize
       run: |
         mkdir artifact
