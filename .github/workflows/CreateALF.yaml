@@ -11,5 +11,5 @@ jobs:
     #needs: PushJob
     steps:
     - run: |
-        printf '{"content":"Build Complete!","embeds":{[{"title":"Master Branch Build Complete!","url":"https://github.com/pCYSl5EDgo/WithAo/tree/gh-pages", "timestamp":"%s",""description":"%s"}]}}' $(date "+%Y%m%d-%H%M%S") $GITHUB_SHA > json
+        printf '{"content":"Build Complete!"}' > json
         curl -X POST -H "Content-Type:application/json" -d $(cat json)  https://discordapp.com/api/webhooks/631669163525668894/E1qFbhGKeD9fYNBx85S4UvcuOa3qFowMlunSByJCMEN6-tdiM6CF3YrKIeid5h9A6Jpi
