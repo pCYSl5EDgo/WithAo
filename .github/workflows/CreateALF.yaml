@@ -58,7 +58,7 @@ jobs:
 
   ReportJob:
     runs-on: ubuntu-latest
-    needs: ReportJob
+    needs: PushJob
     steps:
     - run: |
         printf '{"content":"Build Complete!","embeds":{[{"title":"Master Branch Build Complete!","url":"https://github.com/pCYSl5EDgo/WithAo/tree/gh-pages", "timestamp":"' > json
