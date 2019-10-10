@@ -14,8 +14,8 @@ jobs:
       run: |
         mkdir artifact
         git clone https://github.com/pCYSl5EDgo/WithAo
-        git checkout $GITHUB_SHA
         cd WithAo
+        git checkout $GITHUB_SHA
         openssl aes-256-cbc -d -in Unity_v2018.x.ulf-cipher -k ${CYPHER_KEY} >> Unity_v2018.x.ulf
         /opt/Unity/Editor/Unity -buildTarget WebGL -logFile -manualLicenseFile Unity_v2018.x.ulf -batchmode -nographics -quit || exit 0
       env:
