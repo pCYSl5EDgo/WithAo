@@ -61,4 +61,4 @@ jobs:
     runs-on: ubuntu-latest
     needs: PushJob
     steps:
-    - run: curl https://discordapp.com/api/webhooks/631669163525668894/E1qFbhGKeD9fYNBx85S4UvcuOa3qFowMlunSByJCMEN6-tdiM6CF3YrKIeid5h9A6Jpi -X POST -H "Content-Type:application/json" -d "{\"content\":\"Build Complete!\\nCheck Repository!\"}"
+    - run: curl https://discordapp.com/api/webhooks/631669163525668894/E1qFbhGKeD9fYNBx85S4UvcuOa3qFowMlunSByJCMEN6-tdiM6CF3YrKIeid5h9A6Jpi -X POST -H "Content-Type:application/json" -d "{\"content\":\"Build Complete!\\nCheck Repository! https://pCYSl5EDgo/WithAo/actions \\nPlay https://pCYSl5EDgo.gtihub.io/WithAo\"}"
