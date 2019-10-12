@@ -6,6 +6,11 @@ on:
     - master
 
 jobs:
+  BuildStartReportJob:
+    runs-on: ubuntu-latest
+    steps:
+    - run: curl https://discordapp.com/api/webhooks/631669163525668894/E1qFbhGKeD9fYNBx85S4UvcuOa3qFowMlunSByJCMEN6-tdiM6CF3YrKIeid5h9A6Jpi -X POST -H "Content-Type:application/json" -d "{\"content\":\"Start Building\"}"
+
   BuildJob:
     runs-on: ubuntu-latest
     container: docker://gableroux/unity3d:2018.4.9f1-webgl
