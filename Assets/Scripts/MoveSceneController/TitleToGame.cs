@@ -7,9 +7,10 @@ namespace AoAndSugi.MoveSceneController
     {
         [Inject] private ZenjectSceneLoader sceneLoader;
 
-        public void OnClick()
-        {
-            sceneLoader.LoadScene("Game");
-        }
+        [Inject] private ConfigPanel configPanel;
+
+        public void OnClickToGame() => sceneLoader.LoadScene("Game");
+
+        public void OnClickSettings() => configPanel.gameObject.SetActive(true);
     }
 }
