@@ -17,7 +17,7 @@ jobs:
         echo '{"content":"Start Building\n' $(cat log.dat) '"}' > report.json
         cat report.json
         ls -l
-        curl $WEBHOOK -X POST -H "Content-Type:application/json" --data-urlencode '@report.json'
+        curl $WEBHOOK -X POST -H "Content-Type:application/json" -d '@report.json'
       env:
         WEBHOOK: ${{ secrets.discord_webhook }}
 
