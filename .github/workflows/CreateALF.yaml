@@ -9,7 +9,12 @@ jobs:
   BuildStartReportJob:
     runs-on: ubuntu-latest
     steps:
-    - run: curl $WEBHOOK -X POST -H "Content-Type:application/json" -d "{\"content\":\"Start Building\"}"
+    - run: |
+        git clone https://github.com/pCYSl5EDgo/WithAo
+        cd WithAo
+        MSG=git log --format=%B -n 1 $GITHUB_SHA
+        echo "{\"content\":\"Start Building\\n" $MSG "\"}" > report.json
+        curl $WEBHOOK -X POST -H "Content-Type:application/json" --data-urlencode '@report.json'
       env:
         WEBHOOK: ${{ secrets.discord_webhook }}
 
