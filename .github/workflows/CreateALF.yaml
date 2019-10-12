@@ -12,8 +12,8 @@ jobs:
     - run: |
         git clone https://github.com/pCYSl5EDgo/WithAo
         cd WithAo
-        MSG=git log --format=%B -n 1 $GITHUB_SHA
-        echo "{\"content\":\"Start Building\\n" $MSG "\"}" > report.json
+        git log --format=%B -n 1 $GITHUB_SHA > log.dat
+        echo '{"content":"Start Building\n' $(cat log.dat) '"}"' > report.json
         curl $WEBHOOK -X POST -H "Content-Type:application/json" --data-urlencode '@report.json'
       env:
         WEBHOOK: ${{ secrets.discord_webhook }}
