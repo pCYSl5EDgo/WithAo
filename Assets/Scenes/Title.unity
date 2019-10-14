@@ -232,7 +232,7 @@ PrefabInstance:
     - target: {fileID: 1782178687, guid: a8f3bc8c0affcd84589e99d487074777, type: 3}
       propertyPath: _components.Array.data[0]
       value: 
-      objectReference: {fileID: 179567952}
+      objectReference: {fileID: 179567953}
     - target: {fileID: 1782178687, guid: a8f3bc8c0affcd84589e99d487074777, type: 3}
       propertyPath: m_Enabled
       value: 1
