@@ -1,0 +1,14 @@
+{
+    "name": "AoAndSugi.Game.Models.ScriptableObjects",
+    "references": [
+        "AoAndSugi.Game.Models"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

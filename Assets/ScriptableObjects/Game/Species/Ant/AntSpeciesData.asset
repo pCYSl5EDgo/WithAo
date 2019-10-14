@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57654153c449a1c4abfcf78270017423, type: 3}
+  m_Name: AntSpeciesData
+  m_EditorClassIdentifier: 
+  UnitCommonData:
+  - {fileID: 11400000, guid: 1f58299d2e7ad834fa96b4945f1fcd15, type: 2}
+  - {fileID: 11400000, guid: 9295f367de0c74147a091665124d344a, type: 2}
+  - {fileID: 11400000, guid: f99c74f450f96584b95508f5b49639da, type: 2}
