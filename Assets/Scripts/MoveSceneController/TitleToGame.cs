@@ -9,7 +9,8 @@ namespace AoAndSugi.MoveSceneController
 
         [Inject] private ConfigPanel configPanel;
 
-        [Inject] private MatchingPanel matchingPanel;
+        [SerializeField] MatchingPanel matchingPanel;
+        //[Inject] private MatchingPanel matchingPanel;
 
         public void OnClickToGame() => sceneLoader.LoadScene("Game");
 
