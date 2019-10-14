@@ -20,7 +20,15 @@ namespace AoAndSugi.MoveSceneController
 
         private void Start()
         {
-            PhotonNetwork.ConnectUsingSettings();
+            PhotonNetwork.ConnectUsingSettings(); 
+        }
+
+        private void JoinLobby()
+        {
+            if (PhotonNetwork.IsConnected)
+            {
+                PhotonNetwork.JoinLobby();
+            }
         }
     }
 }

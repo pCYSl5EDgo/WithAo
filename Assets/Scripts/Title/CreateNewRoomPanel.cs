@@ -5,10 +5,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Zenject;
+using System.Collections.Generic;
 
 namespace AoAndSugi
 {
-    public sealed class CreateNewRoomPanel : MonoBehaviour
+    public sealed class CreateNewRoomPanel : MonoBehaviourPunCallbacks
     {
         [SerializeField] TMP_InputField field;
 
@@ -71,7 +72,10 @@ namespace AoAndSugi
             }
         }
 
-       
+        public override void OnRoomListUpdate(List<RoomInfo> roomList)
+        {
+            Debug.Log("通知がきたよ");
+        }
     }
 }
 
