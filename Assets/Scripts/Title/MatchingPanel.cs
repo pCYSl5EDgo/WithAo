@@ -1,11 +1,15 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
-public sealed class MatchingPanel : MonoBehaviour
+namespace AoAndSugi
 {
-
-    public void OnClickClose()
+    public sealed class MatchingPanel : MonoBehaviour
     {
-        gameObject.SetActive(false);
+        [Inject] private CreateNewRoomPanel matchingPanel;
+
+        public void OnClickCreateNewRoom() => matchingPanel.gameObject.SetActive(true);
+
+        public void OnClickClose() => gameObject.SetActive(false);
     }
 }
