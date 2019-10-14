@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Photon.Pun;
+using UnityEngine;
 using Zenject;
 
 namespace AoAndSugi.MoveSceneController
@@ -16,5 +17,10 @@ namespace AoAndSugi.MoveSceneController
         public void OnClickSettings() => configPanel.gameObject.SetActive(true);
 
         public void OnClickMatching() => matchingPanel.gameObject.SetActive(true);
+
+        private void Start()
+        {
+            PhotonNetwork.ConnectUsingSettings();
+        }
     }
 }

@@ -33,26 +33,42 @@ namespace AoAndSugi
             {
                 var panel = Instantiate(messagePanel, this.transform);
                 panel.Initialized("Please enter between 1 and 7 characters", null);
+                return;
             }
+            CreateNewRoom(match.ToString());
         }
 
-        private void CreateNewRoom()
+        public void OnClickAutoButton()
         {
-            PhotonNetwork.CreateRoom(
-                   null, // 自動的にユニークなルーム名を生成する
-               new RoomOptions()
-               {
-                   MaxPlayers = 4,
-                   CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() {
-                    { "DisplayName", $"{PhotonNetwork.NickName}の部屋" },
+            CreateNewRoom(null);
+        }
+
+        private void CreateNewRoom(string roomName)
+        {
+            //オプション設定
+            var option = new RoomOptions()
+            {
+                MaxPlayers = 20,
+                IsVisible = true,
+                CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() {
+                    { "DisplayName", $"test" },
                     { "Message", "誰でも参加OK!" }
                    },
-                   CustomRoomPropertiesForLobby = new[] {
+                CustomRoomPropertiesForLobby = new[] {
                     "DisplayName",
                     "Message"
                    }
-               }
-           );
+            };
+
+            var a = PhotonNetwork.CreateRoom(roomName, option);
+            if (a)
+            {
+                Debug.Log("成功");
+            }
+            else
+            {
+                Debug.Log("失敗");
+            }
         }
 
        
