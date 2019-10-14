@@ -4,12 +4,15 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Zenject;
 
 namespace AoAndSugi
 {
     public sealed class CreateNewRoomPanel : MonoBehaviour
     {
         [SerializeField] TMP_InputField field;
+
+        [SerializeField] MessagePanel messagePanel;
 
         public void OnClickClose() => gameObject.SetActive(false);
 
@@ -21,19 +24,15 @@ namespace AoAndSugi
         public void OnEndEdit()
         {
             var inputText = field.text;
-            Debug.Log($"text:{inputText}");
 
             //取り敢えず英数字のみ許容、文字数は1～7
             var firstLength = inputText.Length;
             var pattern = new Regex(@"^[a-z0-9]+$");
             var match = pattern.Match(inputText);
-            if (match.Length <= 0 || 7 < match.Length)
+            if (!(1 <= match.Length && match.Length <= 7))
             {
-                //入力し直してね
-            }
-            else if (match.Length < firstLength)
-            {
-                //文字消したよ
+                var panel = Instantiate(messagePanel, this.transform);
+                panel.Initialized("Please enter between 1 and 7 characters", null);
             }
         }
 
