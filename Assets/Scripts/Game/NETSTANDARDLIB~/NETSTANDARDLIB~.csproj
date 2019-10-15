@@ -18,7 +18,7 @@
     </Reference>
 
     <Reference Include="UniNativeLinqDll">
-      <HintPath Condition="Exists('C:\Program Files\Unity\Hub\Editor\2018.4.9f1\Editor\Data\Managed\UnityEngine')">$(ProjectDir)../../../Plugins/UniNativeLinqDll.dll</HintPath>
+      <HintPath>$(ProjectDir)../../../Plugins/UniNativeLinqDll.dll</HintPath>
     </Reference>
   </ItemGroup>
 
