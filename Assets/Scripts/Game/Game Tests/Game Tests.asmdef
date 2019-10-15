@@ -1,7 +1,7 @@
 {
     "name": "GameTests",
     "references": [
-        "AoAndSugi.Game.Models"
+        "Unity.Mathematics"
     ],
     "optionalUnityReferences": [
         "TestAssemblies"
@@ -11,8 +11,11 @@
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
-    "overrideReferences": false,
-    "precompiledReferences": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "AoAndSugi.Game.Model.dll",
+        "UniNativeLinqDll.dll"
+    ],
     "autoReferenced": true,
     "defineConstraints": []
 }

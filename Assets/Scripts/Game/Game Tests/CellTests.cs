@@ -1,10 +1,9 @@
 ﻿using System;
 using NUnit.Framework;
-using UnityEngine;
 
 namespace AoAndSugi.Game.Models
 {
-    public class CellTests
+    public sealed class CellTests
     {
         [Test]
         public void CellTestsSimplePasses()
