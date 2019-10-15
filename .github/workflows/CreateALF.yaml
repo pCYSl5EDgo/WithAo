@@ -35,6 +35,20 @@ jobs:
         /opt/Unity/Editor/Unity -buildTarget WebGL -logFile -manualLicenseFile Unity_v2018.x.ulf -batchmode -nographics -quit || exit 0
       env:
         CYPHER_KEY: ${{ secrets.cypher_key }}
+
+    - uses: actions/setup-dotnet@v1.0.2 # >= v1.1.0 だと dotnet run に失敗する
+      with:
+        dotnet-version: 3.0.100
+
+    - name: Warm Up
+      run: /opt/Unity/Editor/Unity -quit -batchMode -noGraphics -logFile -projectPath WithAo || exit 0
+
+    - name: Build .NET Standard 2.0 project
+      run: |
+        ls -l WithAo
+        cd WithAo/Assets/Scripts/Game/NETSTANDARDLIB~
+        dotnet build -c Release
+
     - name: Build
       run: /opt/Unity/Editor/Unity -quit -batchMode -noGraphics -silent-crashes -projectPath WithAo -logFile -buildTarget WebGL -executeMethod BuildWebGLPlayer.Build || exit 0
     - run: |

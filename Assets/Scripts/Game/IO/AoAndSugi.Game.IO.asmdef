@@ -1,0 +1,14 @@
+{
+    "name": "AoAndSugi.Game.IO",
+    "references": [],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "AoAndSugi.Game.Model.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

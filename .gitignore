@@ -5,6 +5,16 @@
 [Bb]uilds/*
 [Tt]emp/*
 .vs/*
+.idea/*
+.vscode/*
+
+Assets/Plugins/Editor/JetBrains*
+Assets/Scripts/Game/NETSTANDARDLIB~/.idea/
+Assets/Scripts/Game/NETSTANDARDLIB~/.vs/
+Assets/Scripts/Game/NETSTANDARDLIB~/.vscode/
+Assets/Scripts/Game/NETSTANDARDLIB~/obj/
+Assets/Scripts/Game/NETSTANDARDLIB~/bin/
 
 *.sln
 *.csproj
+!Assets/Scripts/Game/NETSTANDARDLIB~/NETSTANDARDLIB~.csproj
