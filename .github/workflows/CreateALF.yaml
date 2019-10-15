@@ -46,9 +46,9 @@ jobs:
     steps:
     - run: mkdir Dll
     - uses: actions/download-artifact@v1
-        with:
-          name: Dll
-          path: Dll/
+      with:
+        name: Dll
+        path: Dll/
     - name: Initialize
       run: |
         mkdir artifact
