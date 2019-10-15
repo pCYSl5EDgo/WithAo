@@ -30,13 +30,12 @@ jobs:
         mkdir artifact
         git clone https://github.com/pCYSl5EDgo/WithAo
         cd WithAo
-        cp -f ../Dll/AoAndSugi.Game.Model.dll Assets/Scripts/Game/
         git checkout $GITHUB_SHA
         openssl aes-256-cbc -d -in Unity_v2018.x.ulf-cipher -k ${CYPHER_KEY} >> Unity_v2018.x.ulf
         /opt/Unity/Editor/Unity -buildTarget WebGL -logFile -manualLicenseFile Unity_v2018.x.ulf -batchmode -nographics -quit || exit 0
       env:
         CYPHER_KEY: ${{ secrets.cypher_key }}
-        
+
     - uses: actions/setup-dotnet@v1.0.2 # >= v1.1.0 だと dotnet run に失敗する
       with:
         dotnet-version: 3.0.100
