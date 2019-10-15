@@ -21,34 +21,10 @@ jobs:
       env:
         WEBHOOK: ${{ secrets.discord_webhook }}
 
-  PreBuildJob:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/setup-dotnet@v1.0.2 # >= v1.1.0 だと dotnet run に失敗する
-      with:
-        dotnet-version: 3.0.100
-    - run: git clone https://github.com/pCYSl5EDgo/WithAo
-    - run: |
-        cd WithAo/Assets/Scripts/Game/NETSTANDARDLIB~
-        dotnet build -c Release
-        cd ..
-        mkdir Dll
-        cp AoAndSugi.Game.Model.dll Dll/
-    - uses: actions/upload-artifact@v1
-      with:
-        name: Dll
-        path: WithAo/Assets/Scripts/Game/Dll/
-
   BuildJob:
     runs-on: ubuntu-latest
-    needs: PreBuildJob
     container: docker://gableroux/unity3d:2018.4.9f1-webgl
     steps:
-    - run: mkdir Dll
-    - uses: actions/download-artifact@v1
-      with:
-        name: Dll
-        path: Dll/
     - name: Initialize
       run: |
         mkdir artifact
@@ -60,6 +36,16 @@ jobs:
         /opt/Unity/Editor/Unity -buildTarget WebGL -logFile -manualLicenseFile Unity_v2018.x.ulf -batchmode -nographics -quit || exit 0
       env:
         CYPHER_KEY: ${{ secrets.cypher_key }}
+        
+    - uses: actions/setup-dotnet@v1.0.2 # >= v1.1.0 だと dotnet run に失敗する
+      with:
+        dotnet-version: 3.0.100
+
+    - name: Build .NET Standard 2.0 project
+      run: |
+        cd WithAo/Assets/Scripts/Game/NETSTANDARDLIB~
+        dotnet build -c Release
+
     - name: Build
       run: /opt/Unity/Editor/Unity -quit -batchMode -noGraphics -silent-crashes -projectPath WithAo -logFile -buildTarget WebGL -executeMethod BuildWebGLPlayer.Build || exit 0
     - run: |
