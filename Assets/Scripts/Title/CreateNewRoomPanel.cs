@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace AoAndSugi
 {
-    public sealed class CreateNewRoomPanel : MonoBehaviourPunCallbacks
+    public sealed class CreateNewRoomPanel : MonoBehaviour
     {
         [SerializeField] TMP_InputField field;
 
@@ -22,9 +22,13 @@ namespace AoAndSugi
             field.ActivateInputField();
         }
 
+        //TODO:後でまとめる
         public void OnEndEdit()
         {
             var inputText = field.text;
+            if(string.IsNullOrEmpty(inputText)){
+                return;
+            }
 
             //取り敢えず英数字のみ許容、文字数は1～7
             var firstLength = inputText.Length;
@@ -70,11 +74,6 @@ namespace AoAndSugi
             {
                 Debug.Log("失敗");
             }
-        }
-
-        public override void OnRoomListUpdate(List<RoomInfo> roomList)
-        {
-            Debug.Log("通知がきたよ");
         }
     }
 }
