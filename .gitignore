@@ -5,6 +5,10 @@
 [Bb]uilds/*
 [Tt]emp/*
 .vs/*
+.idea/*
+.vscode/*
+
+Assets/Plugins/Editor/JetBrains*
 
 *.sln
 *.csproj
