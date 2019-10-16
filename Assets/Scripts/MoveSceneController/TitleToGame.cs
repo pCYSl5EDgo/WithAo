@@ -1,4 +1,6 @@
 ﻿using Photon.Pun;
+using Photon.Realtime;
+using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -12,25 +14,10 @@ namespace AoAndSugi.MoveSceneController
 
         [Inject] private NameSettingPanel nameSettingPanel;
 
-        //[Inject] private MatchingPanel matchingPanel;
-
         public void OnClickToGame() => sceneLoader.LoadScene("Game");
 
         public void OnClickSettings() => configPanel.gameObject.SetActive(true);
 
         public void OnClickMatching() => nameSettingPanel.gameObject.SetActive(true);
-
-        private void Start()
-        {
-            PhotonNetwork.ConnectUsingSettings(); 
-        }
-
-        private void JoinLobby()
-        {
-            if (PhotonNetwork.IsConnected)
-            {
-                PhotonNetwork.JoinLobby();
-            }
-        }
     }
 }

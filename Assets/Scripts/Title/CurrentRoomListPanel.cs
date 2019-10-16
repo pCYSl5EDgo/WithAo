@@ -15,15 +15,16 @@ namespace AoAndSugi
 
         [SerializeField] CurrentRoomIcon currentRoomIcon;
 
+        [Inject] private PunNetwork punNetwork;
+
         public void OnClickClose() => gameObject.SetActive(false);
 
         private Dictionary<string, CurrentRoomIcon> activeEntries = new Dictionary<string, CurrentRoomIcon>();
         private Stack<CurrentRoomIcon> inactiveEntries = new Stack<CurrentRoomIcon>();
 
-        // ルームリストが更新された時に呼ばれるコールバック
-        public override void OnRoomListUpdate(List<RoomInfo> roomList)
+        private void OnEnable()
         {
-            Debug.Log("作られました！");
+            var roomList = punNetwork.RoomList;
             foreach (var info in roomList)
             {
                 CurrentRoomIcon entry;

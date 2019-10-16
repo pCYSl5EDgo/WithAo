@@ -75,6 +75,12 @@ namespace AoAndSugi
                 Debug.Log("失敗");
             }
         }
+
+        public void OnClickLeave() {
+
+            Debug.Log("部屋を出ます");
+            PhotonNetwork.LeaveRoom();
+        }
     }
 }
 
