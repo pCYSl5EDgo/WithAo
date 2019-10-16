@@ -1,96 +1,62 @@
-﻿using UnityEngine;
+﻿using AoAndSugi.Game.Models;
+using UnityEngine;
 
 namespace AoAndSugi.Game
 {
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
     [CreateAssetMenu(menuName = "AoAndSugi/UnitCommonData")]
-#endif
+    #endif
     public sealed class UnitCommonData
-        : ScriptableObject
+        : ScriptableObject,
+            ISpeciesUnitInfoProvider
     {
-        public string SpeciesName;
-        public uint SpeciesType;
+        [SerializeField] private int attackCost;
+        [SerializeField] private int attackPoint;
+        [SerializeField] private int attackCalculationFormulaIndex;
+        [SerializeField] private int attackInterval;
+        [SerializeField] private int paintCost;
+        [SerializeField] private int paintPoint;
+        [SerializeField] private int paintInterval;
+        [SerializeField] private uint initialHp;
+        [SerializeField] private uint maxHp;
+        [SerializeField] private int livingCost;
+        [SerializeField] private int livingCostInterval;
+        [SerializeField] private string speciesName;
+        [SerializeField] private uint speciesType;
+        [SerializeField] private UnitType unitType;
+        [SerializeField] private int generationCost;
+        [SerializeField] private int generationInterval;
 
-        public UnitType UnitType;
+        public int AttackCost => attackCost;
 
-        public uint InitialHP;
-        public uint MaxHP;
+        public int AttackPoint => attackPoint;
 
-        public int AttackCost;
-        public int AttackPoint;
-        public int AttackCalculationFormulaIndex;
-        public int AttackInterval;
+        public int AttackCalculationFormulaIndex => attackCalculationFormulaIndex;
 
-        public MoveType MoveType;
+        public int AttackInterval => attackInterval;
 
-        public int PaintCost;
-        public int PaintPoint;
-        public int PaintInterval;
+        public int PaintCost => paintCost;
 
-        public int LivingCost;
-        public int LivingInterval;
+        public int PaintPoint => paintPoint;
 
-        public static implicit operator UnitCommonDataProvider(UnitCommonData @this) 
-            => new UnitCommonDataProvider(
-                @this.SpeciesName, @this.SpeciesType, @this.UnitType,
-                @this.InitialHP, @this.MaxHP, 
-                @this.AttackCost, @this.AttackPoint, @this.AttackCalculationFormulaIndex, @this.AttackInterval, 
-                @this.MoveType, 
-                @this.PaintCost, @this.PaintPoint, @this.PaintInterval,
-                @this.LivingCost, @this.LivingInterval
-            );
-    }
+        public int PaintInterval => paintInterval;
 
-    public sealed class UnitCommonDataProvider
-        : ScriptableObject, ISpeciesUnitInfoProvider
-    {
-        public string SpeciesName { get; }
-        public uint SpeciesType { get; }
-        
-        public UnitType UnitType { get; }
+        public uint InitialHP => initialHp;
 
-        public uint InitialHP { get; }
-        public uint MaxHP { get; }
+        public uint MaxHP => maxHp;
 
-        public int AttackCost { get; }
-        public int AttackPoint { get; }
-        public int AttackCalculationFormulaIndex { get; }
-        public int AttackInterval { get; } 
-        
-        public MoveType MoveTypeValue;
+        public int LivingCost => livingCost;
 
-        public int PaintCost { get; }
-        public int PaintPoint { get; }
-        public int PaintInterval { get; }
+        public int LivingCostInterval => livingCostInterval;
 
-        public int LivingCost { get; }
-        public int LivingCostInterval { get; }
+        public string SpeciesName => speciesName;
 
-        public UnitCommonDataProvider(
-            string speciesName, uint speciesType,  UnitType unitType,
-            uint initialHp, uint maxHp, 
-            int attackCost, int attackPoint, int attackCalculationFormulaIndex, int attackInterval, 
-            MoveType moveTypeValue, 
-            int paintCost, int paintPoint, int paintInterval,
-            int livingCost,
-            int livingCostInterval)
-        {
-            SpeciesName = speciesName;
-            SpeciesType = speciesType;
-            UnitType = unitType;
-            InitialHP = initialHp;
-            MaxHP = maxHp;
-            AttackCost = attackCost;
-            AttackPoint = attackPoint;
-            AttackCalculationFormulaIndex = attackCalculationFormulaIndex;
-            AttackInterval = attackInterval;
-            MoveTypeValue = moveTypeValue;
-            PaintCost = paintCost;
-            PaintPoint = paintPoint;
-            PaintInterval = paintInterval;
-            LivingCost = livingCost;
-            LivingCostInterval = livingCostInterval;
-        }
+        public uint SpeciesType => speciesType;
 
+        public UnitType UnitType => unitType;
+
+        public int GenerationCost => generationCost;
+
+        public int GenerationInterval => generationInterval;
     }
 }

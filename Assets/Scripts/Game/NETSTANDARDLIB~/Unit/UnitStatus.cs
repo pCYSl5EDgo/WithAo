@@ -15,9 +15,13 @@
         /// </summary>
         Ordered,
         /// <summary>
-        /// 進軍
+        /// 進軍(後種族行動)
         /// </summary>
-        Advance,
+        AdvanceAndJob,
+        /// <summary>
+        /// 進軍後命令待機状態移行
+        /// </summary>
+        AdvanceAndStop,
         /// <summary>
         /// 索敵
         /// </summary>

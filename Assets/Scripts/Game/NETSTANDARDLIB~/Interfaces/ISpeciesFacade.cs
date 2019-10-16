@@ -1,4 +1,4 @@
-﻿namespace AoAndSugi.Game
+﻿namespace AoAndSugi.Game.Models
 {
     public interface ISpeciesFacade
     {
