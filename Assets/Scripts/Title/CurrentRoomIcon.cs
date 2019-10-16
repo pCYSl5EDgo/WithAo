@@ -21,7 +21,7 @@ namespace AoAndSugi
         public void Activate(RoomInfo info)
         {
             roomName.text = info.Name;
-            count.text = $"{info.PlayerCount}/ 20";
+            count.text = $"{info.PlayerCount}/{info.MaxPlayers}";
         }
 
         public void Deactivate()
