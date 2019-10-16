@@ -1,5 +1,6 @@
 ﻿using AoAndSugi.Game.Models;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace AoAndSugi.Game
 {
@@ -20,7 +21,7 @@ namespace AoAndSugi.Game
         [SerializeField] private uint initialHp;
         [SerializeField] private uint maxHp;
         [SerializeField] private int livingCost;
-        [SerializeField] private int livingCostInterval;
+        [SerializeField] private int livingInterval;
         [SerializeField] private string speciesName;
         [SerializeField] private uint speciesType;
         [SerializeField] private UnitType unitType;
@@ -46,8 +47,8 @@ namespace AoAndSugi.Game
         public uint MaxHP => maxHp;
 
         public int LivingCost => livingCost;
-
-        public int LivingCostInterval => livingCostInterval;
+        
+        public int LivingInterval => livingInterval;
 
         public string SpeciesName => speciesName;
 

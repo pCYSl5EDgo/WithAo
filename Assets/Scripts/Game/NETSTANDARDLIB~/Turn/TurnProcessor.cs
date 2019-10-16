@@ -6,23 +6,34 @@ namespace AoAndSugi.Game.Models
     using Unit;
     public struct TurnProcessor
     {
-        public void ProcessOrderCollection<TEnumerable, TEnumerator>(ref Turn turn, ref TEnumerable enumerable)
+        public void ProcessOrderCollection<TEnumerable, TEnumerator>(ref GameMasterData master, ref Turn turn, ref TEnumerable enumerable)
             where TEnumerator : struct, IRefEnumerator<Order>
             where TEnumerable : struct, IRefEnumerable<TEnumerator, Order>
         {
-            foreach (ref var order in enumerable)
+            foreach (ref var order in new WhereEnumerable<TEnumerable, TEnumerator, Order, TurnIdEquality>(enumerable, new TurnIdEquality(turn.Id)))
             {
-                if (!turn.Id.Equals(order.TurnId)) continue;
-                ProcessEachOrder(ref turn, ref order);
+                ProcessEachOrder(ref master, ref turn, ref order);
             }
         }
 
-        private static void ProcessEachOrder(ref Turn turn, ref Order order)
+        private readonly struct TurnIdEquality : IRefFunc<Order, bool>
+        {
+            private readonly uint turnId;
+
+            public TurnIdEquality(TurnId turnId)
+            {
+                this.turnId = turnId.Value;
+            }
+
+            public bool Calc(ref Order arg0) => arg0.TurnId.Value == turnId;
+        }
+
+        private static void ProcessEachOrder(ref GameMasterData master, ref Turn turn, ref Order order)
         {
             switch (order.Kind)
             {
                 case OrderKind.AdvanceAndStop:
-                    ProcessAdvanceAndStopOrder(ref turn, ref order);
+                    ProcessAdvanceAndStopOrder(ref master, ref turn, ref order);
                     return;
                 case OrderKind.AdvanceAndExecuteJobOfEachType:
                     break;
@@ -35,21 +46,30 @@ namespace AoAndSugi.Game.Models
             }
         }
 
-        private static void ProcessAdvanceAndStopOrder(ref Turn turn, ref Order order)
+        private readonly struct OrderEquality : IRefFunc<UnitId, bool>
+        {
+            private readonly uint unitId;
+
+            public OrderEquality(UnitId unitId)
+            {
+                this.unitId = unitId.Value;
+            }
+
+            public bool Calc(ref UnitId arg0) => arg0.Value == unitId;
+        }
+
+        private static void ProcessAdvanceAndStopOrder(ref GameMasterData master, ref Turn turn, ref Order order)
         {
             ref var power = ref turn[order.Power];
 
-            var index = -1;
-            for (var i = 0; i < power.TeamCount; i++)
-            {
-                if (!power.UnitIds[i].Equals(order.UnitId)) continue;
-                index = i;
-                break;
-            }
+            power.UnitIds.TryGetFirstIndexOf(out var index, new OrderEquality(order.UnitId));
+
             if (index == -1) throw new InvalidOperationException(order.ToString());
+
+            
         }
 
-        private static void ProcessAdvanceAndExecuteJobOrder(ref Turn turn, ref Order order)
+        private static void ProcessAdvanceAndExecuteJobOrder(ref GameMasterData master, ref Turn turn, ref Order order)
         {
             ref var power = ref turn[order.Power];
 
