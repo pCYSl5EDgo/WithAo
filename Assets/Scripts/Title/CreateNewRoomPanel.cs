@@ -20,6 +20,8 @@ namespace AoAndSugi
         [SerializeField] TextMeshProUGUI npcCountText;
         [SerializeField] TextMeshProUGUI widthText;
         [SerializeField] TextMeshProUGUI heightText;
+        [SerializeField] TextMeshProUGUI trueText;
+        [SerializeField] TextMeshProUGUI falseText;
 
         [SerializeField] Button playerCountNext;
         [SerializeField] Button playerCountPrev;
@@ -29,6 +31,7 @@ namespace AoAndSugi
         [SerializeField] Button widthPrev;
         [SerializeField] Button heightNext;
         [SerializeField] Button heightPrev;
+        [SerializeField] Button isPrivateButton;
 
         [SerializeField] MessagePanel messagePanel;
 
@@ -36,6 +39,7 @@ namespace AoAndSugi
         ReactiveProperty<int> npcCount = new ReactiveProperty<int>();
         ReactiveProperty<int> width = new ReactiveProperty<int>();
         ReactiveProperty<int> height = new ReactiveProperty<int>();
+        ReactiveProperty<bool> isPrivate = new ReactiveProperty<bool>();
 
         public void OnClickClose() => gameObject.SetActive(false);
 
@@ -47,6 +51,10 @@ namespace AoAndSugi
             npcCount.SkipLatestValueOnSubscribe().Subscribe(_count => { npcCountText.text = _count.ToString(); });
             width.SkipLatestValueOnSubscribe().Subscribe(_count => { widthText.text = _count.ToString(); });
             height.SkipLatestValueOnSubscribe().Subscribe(_count => { heightText.text = _count.ToString(); });
+            isPrivate.SkipLatestValueOnSubscribe().Subscribe(_isPrivate => {
+                trueText.gameObject.SetActive(_isPrivate);
+                falseText.gameObject.SetActive(!_isPrivate);
+            });
 
             playerCountNext.onClick.AddListener(() => playerCount.Value++);
             playerCountPrev.onClick.AddListener(() => playerCount.Value--);
@@ -56,6 +64,7 @@ namespace AoAndSugi
             widthPrev.onClick.AddListener(() => width.Value--);
             heightNext.onClick.AddListener(() => height.Value++);
             heightPrev.onClick.AddListener(() => height.Value--);
+            isPrivateButton.onClick.AddListener(() => isPrivate.Value = !isPrivate.Value);
         }
 
         //TODO:後でまとめる
@@ -85,7 +94,7 @@ namespace AoAndSugi
             var option = new RoomOptions()
             {
                 MaxPlayers = playerCount.Value,
-                IsVisible = true,
+                IsVisible = !isPrivate.Value,
                 CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() {
                     { "DisplayName", $"{ roomName }" },
                     { "PlayerCount", $"{ playerCount.Value }"},
