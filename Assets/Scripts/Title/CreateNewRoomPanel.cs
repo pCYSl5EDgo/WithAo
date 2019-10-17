@@ -30,7 +30,10 @@ namespace AoAndSugi
 
         [SerializeField] MessagePanel messagePanel;
 
-        ReactiveProperty<int> playerCount = new ReactiveProperty<int>();
+        ReactiveProperty<byte> playerCount = new ReactiveProperty<byte>();
+        ReactiveProperty<int> npcCount = new ReactiveProperty<int>();
+        ReactiveProperty<int> width = new ReactiveProperty<int>();
+        ReactiveProperty<int> height = new ReactiveProperty<int>();
 
         public void OnClickClose() => gameObject.SetActive(false);
 
@@ -39,8 +42,18 @@ namespace AoAndSugi
             field.ActivateInputField();
 
             playerCount.SkipLatestValueOnSubscribe().Subscribe(_count => { playerCountText.text = _count.ToString(); });
+            npcCount.SkipLatestValueOnSubscribe().Subscribe(_count => { npcCountText.text = _count.ToString(); });
+            width.SkipLatestValueOnSubscribe().Subscribe(_count => { widthText.text = _count.ToString(); });
+            height.SkipLatestValueOnSubscribe().Subscribe(_count => { heightText.text = _count.ToString(); });
 
             playerCountNext.onClick.AddListener(() => playerCount.Value++);
+            playerCountPrev.onClick.AddListener(() => playerCount.Value--);
+            npcCountNext.onClick.AddListener(() => npcCount.Value++);
+            npcCountPrev.onClick.AddListener(() => npcCount.Value--);
+            widthNext.onClick.AddListener(() => width.Value++);
+            widthPrev.onClick.AddListener(() => width.Value--);
+            heightNext.onClick.AddListener(() => height.Value++);
+            heightPrev.onClick.AddListener(() => height.Value--);
         }
 
         //TODO:後でまとめる
@@ -61,7 +74,7 @@ namespace AoAndSugi
                 panel.Initialized("Please enter between 1 and 7 characters", null);
                 return;
             }
-            CreateNewRoom(match.ToString(), 1, 1, 1, 1);
+            CreateNewRoom(match.ToString());
         }
 
         public void OnClickAutoButton()
@@ -71,19 +84,19 @@ namespace AoAndSugi
 
 
 
-        private void CreateNewRoom(string roomName, byte playerCount, int npcCount, int height, int width)
+        private void CreateNewRoom(string roomName)
         {
             //オプション設定
             var option = new RoomOptions()
             {
-                MaxPlayers = playerCount,
+                MaxPlayers = playerCount.Value,
                 IsVisible = true,
                 CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() {
                     { "DisplayName", $"{ roomName }" },
-                    { "PlayerCount", $"{ playerCount }"},
-                    { "NpcCount", $"{ npcCount }" },
-                    { "Height", $"{ height }" },
-                    { "Width", $"{ width }" },
+                    { "PlayerCount", $"{ playerCount.Value }"},
+                    { "NpcCount", $"{ npcCount.Value }" },
+                    { "Height", $"{ height.Value }" },
+                    { "Width", $"{ width.Value }" },
                    },
                 CustomRoomPropertiesForLobby = new[] {
                     "DisplayName",
