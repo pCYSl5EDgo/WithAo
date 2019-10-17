@@ -6,25 +6,50 @@ using UnityEngine.UI;
 using TMPro;
 using Zenject;
 using System.Collections.Generic;
+using UniRx;
 
 namespace AoAndSugi
 {
-    public sealed class CreateNewRoomPanel : MonoBehaviourPunCallbacks
+    public sealed class CreateNewRoomPanel : MonoBehaviour
     {
         [SerializeField] TMP_InputField field;
 
+        [SerializeField] TextMeshProUGUI playerCountText;
+        [SerializeField] TextMeshProUGUI npcCountText;
+        [SerializeField] TextMeshProUGUI widthText;
+        [SerializeField] TextMeshProUGUI heightText;
+
+        [SerializeField] Button playerCountNext;
+        [SerializeField] Button playerCountPrev;
+        [SerializeField] Button npcCountNext;
+        [SerializeField] Button npcCountPrev;
+        [SerializeField] Button widthNext;
+        [SerializeField] Button widthPrev;
+        [SerializeField] Button heightNext;
+        [SerializeField] Button heightPrev;
+
         [SerializeField] MessagePanel messagePanel;
+
+        ReactiveProperty<int> playerCount = new ReactiveProperty<int>();
 
         public void OnClickClose() => gameObject.SetActive(false);
 
         private void Start()
         {
             field.ActivateInputField();
+
+            playerCount.SkipLatestValueOnSubscribe().Subscribe(_count => { playerCountText.text = _count.ToString(); });
+
+            playerCountNext.onClick.AddListener(() => playerCount.Value++);
         }
 
+        //TODO:後でまとめる
         public void OnEndEdit()
         {
             var inputText = field.text;
+            if(string.IsNullOrEmpty(inputText)){
+                return;
+            }
 
             //取り敢えず英数字のみ許容、文字数は1～7
             var firstLength = inputText.Length;
@@ -36,29 +61,37 @@ namespace AoAndSugi
                 panel.Initialized("Please enter between 1 and 7 characters", null);
                 return;
             }
-            CreateNewRoom(match.ToString());
+            CreateNewRoom(match.ToString(), 1, 1, 1, 1);
         }
 
         public void OnClickAutoButton()
         {
-            CreateNewRoom(null);
+            //なくす
         }
 
-        private void CreateNewRoom(string roomName)
+
+
+        private void CreateNewRoom(string roomName, byte playerCount, int npcCount, int height, int width)
         {
             //オプション設定
             var option = new RoomOptions()
             {
-                MaxPlayers = 20,
+                MaxPlayers = playerCount,
                 IsVisible = true,
                 CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() {
-                    { "DisplayName", $"test" },
-                    { "Message", "誰でも参加OK!" }
+                    { "DisplayName", $"{ roomName }" },
+                    { "PlayerCount", $"{ playerCount }"},
+                    { "NpcCount", $"{ npcCount }" },
+                    { "Height", $"{ height }" },
+                    { "Width", $"{ width }" },
                    },
                 CustomRoomPropertiesForLobby = new[] {
                     "DisplayName",
-                    "Message"
-                   }
+                    "PlayerCount",
+                    "NpcCount",
+                    "Height",
+                    "Width"
+                }
             };
 
             var a = PhotonNetwork.CreateRoom(roomName, option);
@@ -72,9 +105,10 @@ namespace AoAndSugi
             }
         }
 
-        public override void OnRoomListUpdate(List<RoomInfo> roomList)
-        {
-            Debug.Log("通知がきたよ");
+        public void OnClickLeave() {
+
+            Debug.Log("部屋を出ます");
+            PhotonNetwork.LeaveRoom();
         }
     }
 }
