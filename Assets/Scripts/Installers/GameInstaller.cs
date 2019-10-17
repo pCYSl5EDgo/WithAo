@@ -6,6 +6,7 @@ namespace AoAndSugi.Installer
     {
         public override void InstallBindings()
         {
+            
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using UniNativeLinq;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using UnsafeUtilityEx = UniNativeLinq.UnsafeUtilityEx;
 
 namespace AoAndSugi.Game
 {

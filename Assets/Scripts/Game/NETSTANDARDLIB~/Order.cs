@@ -53,11 +53,11 @@ namespace AoAndSugi.Game.Models
                         Value |= 1;
                         Value &= ~2U;
                         break;
-                    case OrderKind.AdvanceSearchAndDestroy:
+                    case OrderKind.None:
                         Value |= 2;
                         Value &= ~1U;
                         break;
-                    case OrderKind.Generate:
+                    case OrderKind.Prepare:
                         Value |= 3;
                         break;
                     default:
@@ -110,7 +110,7 @@ namespace AoAndSugi.Game.Models
     {
         AdvanceAndStop,
         AdvanceAndExecuteJobOfEachType,
-        AdvanceSearchAndDestroy,
-        Generate,
+        None,
+        Prepare,
     }
 }

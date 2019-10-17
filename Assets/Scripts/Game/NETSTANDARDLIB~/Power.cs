@@ -150,6 +150,11 @@ namespace AoAndSugi.Game.Models
             ref var sourceCount = ref InitialCounts[sourceIndex];
             if (count.Value > sourceCount.Value) return -1;
 
+            if (sourceCount.Value == count.Value)
+            {
+                return RewriteStatus(sourceIndex, status, destination);
+            }
+
             sourceCount.Value -= count.Value;
 
             var index = TeamCount++;
@@ -176,6 +181,13 @@ namespace AoAndSugi.Game.Models
             NextUnitId.Value++;
 
             return index;
+        }
+
+        public int RewriteStatus(int sourceIndex, UnitStatus status, UnitDestination destination)
+        {
+            Statuses[sourceIndex] = status;
+            Destinations[sourceIndex] = destination;
+            return sourceIndex;
         }
     }
 }

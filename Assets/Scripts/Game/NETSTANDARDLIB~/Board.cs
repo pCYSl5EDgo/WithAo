@@ -5,6 +5,7 @@ using UniNativeLinq;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
+using UnsafeUtilityEx = UniNativeLinq.UnsafeUtilityEx;
 
 namespace AoAndSugi.Game.Models
 {
