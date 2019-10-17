@@ -5,17 +5,21 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using Zenject;
 
 namespace AoAndSugi
 {
     public sealed class CurrentRoomIcon : MonoBehaviour
     {
+        [Inject] private WaitPanel waitPanel;
+
         [SerializeField] RectTransform rectTransform;
         [SerializeField] TextMeshProUGUI roomName;
         [SerializeField] TextMeshProUGUI count;
 
         public void OnClickButton() {
             PhotonNetwork.JoinRoom(roomName.text);
+            waitPanel.gameObject.SetActive(true);
         }
 
         public void Activate(RoomInfo info)
