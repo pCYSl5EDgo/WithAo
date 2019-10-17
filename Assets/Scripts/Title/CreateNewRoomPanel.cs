@@ -12,6 +12,8 @@ namespace AoAndSugi
 {
     public sealed class CreateNewRoomPanel : MonoBehaviour
     {
+        [Inject] private WaitPanel waitPanel;
+
         [SerializeField] TMP_InputField field;
 
         [SerializeField] TextMeshProUGUI playerCountText;
@@ -77,13 +79,6 @@ namespace AoAndSugi
             CreateNewRoom(match.ToString());
         }
 
-        public void OnClickAutoButton()
-        {
-            //なくす
-        }
-
-
-
         private void CreateNewRoom(string roomName)
         {
             //オプション設定
@@ -116,6 +111,8 @@ namespace AoAndSugi
             {
                 Debug.Log("失敗");
             }
+
+            waitPanel.gameObject.SetActive(true);
         }
 
         public void OnClickLeave() {

@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using Photon.Realtime;
 using UnityEngine;
+using Zenject;
 
 namespace AoAndSugi
 {
     public class PunNetwork : MonoBehaviourPunCallbacks
     {
+        [Inject] private WaitPanel waitPanel;
+
         public List<RoomInfo> RoomList{ get; private set; }
 
         private void Start()
@@ -35,6 +38,29 @@ namespace AoAndSugi
                 Debug.Log(room.Name);
             }
             RoomList = roomList;
+        }
+
+        // 部屋に入室した時
+        public override void OnJoinedRoom()
+        {
+            Debug.Log("OnJoinedRoom");
+            waitPanel.UpdatePlayerCount();
+        }
+
+        // 他のプレイヤーが入室してきた時
+        public override void OnPlayerEnteredRoom(Player newPlayer)
+        {
+            Debug.Log("新しくプレイヤーが入室しました！");
+            Debug.Log($"現在の人数:{PhotonNetwork.CurrentRoom.PlayerCount}");
+            waitPanel.UpdatePlayerCount();
+        }
+
+        // 他のプレイヤーが退室した時
+        public override void OnPlayerLeftRoom(Player otherPlayer)
+        {
+            Debug.Log("プレイヤーが退出しました");
+            Debug.Log($"現在の人数:{PhotonNetwork.CurrentRoom.PlayerCount}");
+            waitPanel.UpdatePlayerCount();
         }
     }
 }
