@@ -14,6 +14,7 @@ namespace AoAndSugi
 
         private void Start()
         {
+            DontDestroyOnLoad(this);
             Debug.Log("接続");
             PhotonNetwork.ConnectUsingSettings();
         }

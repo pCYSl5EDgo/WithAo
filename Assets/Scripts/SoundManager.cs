@@ -18,6 +18,11 @@ public class SoundManager : SingletonMonoBehaviour<SoundManager>
         }
     }
 
+    private void Awake()
+    {
+        DontDestroyOnLoad(this);
+    }
+
     public void PlayBgm()
     {
         bgmSource.Play();
