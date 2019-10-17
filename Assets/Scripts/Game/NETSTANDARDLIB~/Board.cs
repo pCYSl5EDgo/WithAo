@@ -5,6 +5,7 @@ using UniNativeLinq;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
+using UnsafeUtilityEx = UniNativeLinq.UnsafeUtilityEx;
 
 namespace AoAndSugi.Game.Models
 {
@@ -17,7 +18,7 @@ namespace AoAndSugi.Game.Models
         public Board(int2 size)
         {
             var count = size.x * size.y;
-            #if UNITY_EDITOR
+            #if DEBUG
             if (math.any(size < 0)) throw new ArgumentOutOfRangeException(size.x + ", " + size.y + " should not be less than 0!");
             #endif
             if (math.any(size == 0))

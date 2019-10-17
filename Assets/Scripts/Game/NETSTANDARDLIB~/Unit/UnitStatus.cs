@@ -15,13 +15,25 @@
         /// </summary>
         Ordered,
         /// <summary>
-        /// 進軍
+        /// 進軍(後種族行動)
         /// </summary>
-        Advance,
+        AdvanceAndRole,
+        /// <summary>
+        /// 進軍後命令待機状態移行
+        /// </summary>
+        AdvanceAndStop,
         /// <summary>
         /// 索敵
         /// </summary>
         Scouting,
+        /// <summary>
+        /// 索敵中に敵を見つけたからロックオン
+        /// </summary>
+        LockOn,
+        /// <summary>
+        /// 女王専用の状態、子どもを生産する
+        /// </summary>
+        Generate,
         /// <summary>
         /// 戦闘状態
         /// </summary>

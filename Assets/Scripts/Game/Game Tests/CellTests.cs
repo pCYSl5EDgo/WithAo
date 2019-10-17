@@ -45,7 +45,7 @@ namespace AoAndSugi.Game.Models
             }
         }
 
-        [Test]
+        /*[Test]
         public void SimpleSetOutOfRangeTest()
         {
             for (var i = 0; i < 20; i++)
@@ -71,7 +71,7 @@ namespace AoAndSugi.Game.Models
                     cell[i] = int.MaxValue;
                 });
             }
-        }
+        }*/
 
         [Test]
         public void SimpleAddTest()
@@ -135,15 +135,15 @@ namespace AoAndSugi.Game.Models
                         if (i == k || j == k) continue;
                         Cell cell = default;
                         cell.AddPaint(i, 128);
-                        Assert.IsTrue(128 == cell[i]);
+                        Assert.AreEqual(128, cell[i]);
                         cell.AddPaint(j, 128);
                         Assert.AreEqual(128, cell[i]);
                         Assert.AreEqual(128, cell[j]);
                         Assert.AreEqual(256, cell.Sum());
                         cell.AddPaint(k, 128);
-                        Assert.IsTrue(64 == cell[i]);
-                        Assert.IsTrue(64 == cell[j]);
-                        Assert.IsTrue(128 == cell[k]);
+                        Assert.AreEqual(64, cell[i]);
+                        Assert.AreEqual(64, cell[j]);
+                        Assert.AreEqual(128, cell[k]);
                     }
                 }
             }

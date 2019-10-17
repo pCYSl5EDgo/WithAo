@@ -12,18 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 343c26ffb093b544fa369bcc43f55930, type: 3}
   m_Name: PorterAntUnitData
   m_EditorClassIdentifier: 
-  SpeciesName: Camponotus japonicus
-  SpeciesType: 0
-  UnitType: 2
-  InitialHP: 2000
-  MaxHP: 8000
-  AttackCost: 10
-  AttackPoint: 5
-  AttackCalculationFormulaIndex: 0
-  AttackInterval: 29
-  MoveType: 0
-  PaintCost: 1
-  PaintPoint: 1
-  PaintInterval: 14
-  LivingCost: 1
-  LivingInterval: 29
+  attackCost: 10
+  attackPoint: 5
+  attackCalculationFormulaIndex: 0
+  attackInterval: 29
+  paintCost: 1
+  paintPoint: 1
+  paintInterval: 14
+  initialHp: 2000
+  maxHp: 16000
+  livingCost: 1
+  livingCostInterval: 0
+  speciesName: Camponotus japonicus
+  speciesType: 0
+  unitType: 2
+  generationCost: 1
+  generationInterval: 14

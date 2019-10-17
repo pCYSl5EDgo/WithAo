@@ -10,6 +10,7 @@
     "com.unity.render-pipelines.lightweight": "4.10.0-preview",
     "com.unity.textmeshpro": "1.4.1",
     "unienumextension": "https://github.com/pCYSl5EDgo/UniEnumExtension.git",
+    "uninativelinq": "https://github.com/pCYSl5EDgo/UniNativeLinq-EditorExtension.git",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
     "com.unity.modules.assetbundle": "1.0.0",
@@ -44,6 +45,10 @@
   "lock": {
     "unienumextension": {
       "hash": "a8972567b8865c247e72edae2eed243412dc367e",
+      "revision": "HEAD"
+    },
+    "uninativelinq": {
+      "hash": "a4a1df83434cb14af95b2452804e9d02c9e5072d",
       "revision": "HEAD"
     }
   }

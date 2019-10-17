@@ -15,6 +15,6 @@ Assets/Scripts/Game/NETSTANDARDLIB~/.vscode/
 Assets/Scripts/Game/NETSTANDARDLIB~/obj/
 Assets/Scripts/Game/NETSTANDARDLIB~/bin/
 
-*.sln
-*.csproj
+*.sln*
+*.csproj*
 !Assets/Scripts/Game/NETSTANDARDLIB~/NETSTANDARDLIB~.csproj

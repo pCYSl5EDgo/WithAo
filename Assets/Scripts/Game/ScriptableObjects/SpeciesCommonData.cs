@@ -1,12 +1,15 @@
 ﻿using System;
+using AoAndSugi.Game.Models;
 using UnityEngine;
 
 namespace AoAndSugi.Game
 {
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
     [CreateAssetMenu(menuName = "AoAndSugi/SpeciesCommonData")]
-#endif
-    public sealed class SpeciesCommonData : ScriptableObject, ISpeciesFacade
+    #endif
+    public sealed class SpeciesCommonData
+        : ScriptableObject,
+            ISpeciesFacade
     {
         public UnitCommonData[] UnitCommonData;
         private ISpeciesUnitInfoProvider[] unitInfoProviders;
@@ -25,7 +28,7 @@ namespace AoAndSugi.Game
                     unitInfoProviders = new ISpeciesUnitInfoProvider[UnitCommonData.Length];
                     for (var i = 0; i < UnitCommonData.Length; i++)
                     {
-                        unitInfoProviders[i] = (UnitCommonDataProvider)UnitCommonData[i];
+                        unitInfoProviders[i] = UnitCommonData[i];
                     }
                 }
                 return unitInfoProviders;
