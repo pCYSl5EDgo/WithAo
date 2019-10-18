@@ -504,6 +504,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee40f65fe5efb9643a61cb8db9690210, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SpeciesUnitInfoProviders:
+  - {fileID: 11400000, guid: ea26b9a0190f4da4b9e6896c42c6bcf6, type: 2}
+  UnitMovePowerDataProviders:
+  - {fileID: 11400000, guid: b719e37eb2dfcc446892b2029cce61a1, type: 2}
+  - {fileID: 11400000, guid: bf40675300f078643889fb2cee83d986, type: 2}
+  - {fileID: 11400000, guid: bcf6003e27ad9d7499897dd4bb8d67c6, type: 2}
+  - {fileID: 11400000, guid: 25616cf1a3d43d14ebd54f6b65151279, type: 2}
 --- !u!224 &2078029351 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5036383822470159798, guid: c8307cc0243a1e9468b112127060c4e7,

@@ -43,6 +43,10 @@
         /// </summary>
         Return,
         /// <summary>
+        /// 食事中
+        /// </summary>
+        Eating,
+        /// <summary>
         /// 死亡アニメーション中
         /// </summary>
         Dying,

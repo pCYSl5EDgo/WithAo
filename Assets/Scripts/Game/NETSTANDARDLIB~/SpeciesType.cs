@@ -2,9 +2,11 @@
 
 namespace AoAndSugi.Game.Models
 {
-    public struct SpeciesType : IEquatable<SpeciesType>
+    public struct SpeciesType : IEquatable<SpeciesType>, IComparable<SpeciesType>
     {
-        public int Value;
+        public uint Value;
+
+        public SpeciesType(uint value) => Value = value;
 
         public bool Equals(SpeciesType other)
         {
@@ -16,9 +18,11 @@ namespace AoAndSugi.Game.Models
             return obj is SpeciesType other && Equals(other);
         }
 
-        public override int GetHashCode()
+        public override int GetHashCode() => (int)Value;
+
+        public int CompareTo(SpeciesType other)
         {
-            return Value;
+            return Value.CompareTo(other.Value);
         }
     }
 }

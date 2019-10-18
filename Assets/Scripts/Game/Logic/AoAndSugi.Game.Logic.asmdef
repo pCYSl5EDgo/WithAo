@@ -1,21 +1,18 @@
 {
-    "name": "GameTests",
+    "name": "AoAndSugi.Game.Logic",
     "references": [
-        "Unity.Mathematics",
-        "AoAndSugi.Game.Logic",
-        "AoAndSugi.Game.Models.ScriptableObjects"
+        "Zenject",
+        "AoAndSugi.Game.Models.ScriptableObjects",
+        "Unity.Mathematics"
     ],
-    "optionalUnityReferences": [
-        "TestAssemblies"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
     "overrideReferences": true,
     "precompiledReferences": [
         "AoAndSugi.Game.Model.dll",
+        "Zenject-usage.dll",
         "UniNativeLinqDll.dll"
     ],
     "autoReferenced": true,

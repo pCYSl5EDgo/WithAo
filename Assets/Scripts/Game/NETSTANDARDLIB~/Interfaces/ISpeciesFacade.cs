@@ -1,7 +1,10 @@
-﻿namespace AoAndSugi.Game.Models
+﻿using System;
+
+namespace AoAndSugi.Game.Models
 {
-    public interface ISpeciesFacade
+    public interface ISpeciesFacade : IComparable<ISpeciesFacade>
     {
+        SpeciesType SpeciesType { get; }
         ISpeciesUnitInfoProvider[] UnitInfoProviders { get; }
     }
 }

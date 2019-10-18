@@ -7,7 +7,8 @@
     "allowUnsafeCode": true,
     "overrideReferences": true,
     "precompiledReferences": [
-        "AoAndSugi.Game.Model.dll"
+        "AoAndSugi.Game.Model.dll",
+        "UniNativeLinqDll.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": []

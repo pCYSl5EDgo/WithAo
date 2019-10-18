@@ -22,9 +22,10 @@ MonoBehaviour:
   initialHp: 500
   maxHp: 1000000
   livingCost: 1
-  livingCostInterval: 4
+  livingInterval: 0
   speciesName: Camponotus japonicus
   speciesType: 0
   unitType: 3
-  generationCost: 1
+  generationCost: 5000
   generationInterval: 1800
+  generationRequiredHp: 50000

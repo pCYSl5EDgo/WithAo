@@ -9,13 +9,14 @@ namespace AoAndSugi.Game.Models
     public struct GameMasterData : IDisposable
     {
         private NativeEnumerable<UnitInitialHp> initialHpTable;
-        private NativeEnumerable<UnitMovePower> movePowerTable;
         private NativeEnumerable<UnitMaxHp> maxHpTable;
+        private NativeEnumerable<UnitMovePower> movePowerTable;
         private NativeEnumerable<UnitPaintPoint> paintPointTable;
         private NativeEnumerable<UnitPaintCost> paintCostTable;
         private NativeEnumerable<UnitPaintInterval> paintIntervalTable;
         private NativeEnumerable<UnitGenerationCost> generationCostTable;
         private NativeEnumerable<UnitGenerationInterval> generationIntervalTable;
+        private NativeEnumerable<UnitGenerationRequiredHp> generationRequiredHpTable;
         private NativeEnumerable<UnitAttackPoint> attackPointTable;
         private NativeEnumerable<UnitAttackCost> attackCostTable;
         private NativeEnumerable<UnitAttackInterval> attackIntervalTable;
@@ -27,8 +28,22 @@ namespace AoAndSugi.Game.Models
         private readonly int unitTypeCount;
         private readonly int cellTypeCount;
         public readonly int Width;
+        public readonly int Height;
+        public readonly int MaxTeamCount;
 
-        public GameMasterData(int speciesTypeCount, int unitTypeCount, int cellTypeCount, NativeEnumerable<UnitInitialHp> initialHpTable, NativeEnumerable<UnitMovePower> movePowerTable, NativeEnumerable<UnitMaxHp> maxHpTable, NativeEnumerable<UnitPaintCost> paintCostTable, NativeEnumerable<UnitPaintPoint> paintPointTable, NativeEnumerable<UnitPaintInterval> paintIntervalTable, NativeEnumerable<UnitGenerationCost> generationCostTable, NativeEnumerable<UnitGenerationInterval> generationIntervalTable, NativeEnumerable<UnitAttackPoint> attackPointTable, NativeEnumerable<UnitAttackCost> attackCostTable, NativeEnumerable<UnitAttackInterval> attackIntervalTable, NativeEnumerable<UnitLivingCost> livingCostTable, NativeEnumerable<UnitLivingInterval> livingIntervalTable, int width, NativeEnumerable<CellMoveCost> cellMoveCostTable)
+        public GameMasterData(int speciesTypeCount, 
+            int unitTypeCount,
+            int cellTypeCount,
+            int width,
+            int height,
+            int maxTeamCount,
+            NativeEnumerable<UnitInitialHp> initialHpTable,
+            NativeEnumerable<UnitMaxHp> maxHpTable,
+            NativeEnumerable<UnitMovePower> movePowerTable,
+            NativeEnumerable<UnitPaintCost> paintCostTable, NativeEnumerable<UnitPaintPoint> paintPointTable, NativeEnumerable<UnitPaintInterval> paintIntervalTable,
+            NativeEnumerable<UnitGenerationCost> generationCostTable, NativeEnumerable<UnitGenerationInterval> generationIntervalTable, NativeEnumerable<UnitGenerationRequiredHp> generationRequiredHpTable,
+            NativeEnumerable<UnitAttackPoint> attackPointTable, NativeEnumerable<UnitAttackCost> attackCostTable, NativeEnumerable<UnitAttackInterval> attackIntervalTable, NativeEnumerable<UnitLivingCost> livingCostTable, NativeEnumerable<UnitLivingInterval> livingIntervalTable,
+            NativeEnumerable<CellMoveCost> cellMoveCostTable)
         {
             this.speciesTypeCount = speciesTypeCount;
             this.unitTypeCount = unitTypeCount;
@@ -41,13 +56,16 @@ namespace AoAndSugi.Game.Models
             this.paintIntervalTable = paintIntervalTable;
             this.generationCostTable = generationCostTable;
             this.generationIntervalTable = generationIntervalTable;
+            this.generationRequiredHpTable = generationRequiredHpTable;
             this.attackPointTable = attackPointTable;
             this.attackCostTable = attackCostTable;
             this.attackIntervalTable = attackIntervalTable;
             this.livingCostTable = livingCostTable;
             this.livingIntervalTable = livingIntervalTable;
-            Width = width;
             this.cellMoveCostTable = cellMoveCostTable;
+            Width = width;
+            Height = height;
+            MaxTeamCount = maxTeamCount;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -76,6 +94,9 @@ namespace AoAndSugi.Game.Models
 
         public readonly ref readonly UnitGenerationCost GetGenerationCost(SpeciesType speciesType, UnitType unitType)
             => ref generationCostTable[IndexFrom2(speciesType, unitType)];
+
+        public readonly ref readonly UnitGenerationRequiredHp GetGenerationRequiredHp(SpeciesType speciesType, UnitType unitType)
+            => ref generationRequiredHpTable[IndexFrom2(speciesType, unitType)];
 
         public readonly ref readonly UnitGenerationInterval GetGenerationInterval(SpeciesType speciesType, UnitType unitType)
             => ref generationIntervalTable[IndexFrom2(speciesType, unitType)];
@@ -108,6 +129,7 @@ namespace AoAndSugi.Game.Models
             paintIntervalTable.Dispose(Allocator.Persistent);
             generationCostTable.Dispose(Allocator.Persistent);
             generationIntervalTable.Dispose(Allocator.Persistent);
+            generationCostTable.Dispose(Allocator.Persistent);
             attackCostTable.Dispose(Allocator.Persistent);
             attackPointTable.Dispose(Allocator.Persistent);
             attackIntervalTable.Dispose(Allocator.Persistent);
