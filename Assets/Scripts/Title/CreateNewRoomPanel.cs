@@ -7,6 +7,8 @@ using TMPro;
 using Zenject;
 using System.Collections.Generic;
 using UniRx;
+using Unity.Mathematics;
+using AoAndSugi.Game.Models;
 
 namespace AoAndSugi
 {
@@ -97,10 +99,9 @@ namespace AoAndSugi
                 IsVisible = !isPrivate.Value,
                 CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() {
                     { "DisplayName", $"{ roomName }" },
-                    { "PlayerCount", $"{ playerCount.Value }"},
-                    { "NpcCount", $"{ npcCount.Value }" },
-                    { "Height", $"{ height.Value }" },
-                    { "Width", $"{ width.Value }" },
+                    { "PlayerCount", new MaxTeamCount(){ Value = playerCount.Value } },
+                    { "NpcCount", new MaxTeamCount(){ Value = npcCount.Value } },
+                    { "BordSize", new BoardSize(){ Value = new int2(){x = width.Value, y = height.Value }} },
                    },
                 CustomRoomPropertiesForLobby = new[] {
                     "DisplayName",
