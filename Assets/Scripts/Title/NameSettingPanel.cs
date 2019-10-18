@@ -19,6 +19,11 @@ namespace AoAndSugi
 
         public void OnClickClose() => gameObject.SetActive(false);
 
+        public void OnClickNext() {
+            OnEndEdit();
+            matchingPanel.gameObject.SetActive(true);
+        }
+
         //TODO:後でまとめる
         public void OnEndEdit()
         {
