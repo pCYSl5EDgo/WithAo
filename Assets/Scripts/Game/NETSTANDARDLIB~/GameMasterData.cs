@@ -129,7 +129,7 @@ namespace AoAndSugi.Game.Models
             paintIntervalTable.Dispose(Allocator.Persistent);
             generationCostTable.Dispose(Allocator.Persistent);
             generationIntervalTable.Dispose(Allocator.Persistent);
-            generationCostTable.Dispose(Allocator.Persistent);
+            generationRequiredHpTable.Dispose(Allocator.Persistent);
             attackCostTable.Dispose(Allocator.Persistent);
             attackPointTable.Dispose(Allocator.Persistent);
             attackIntervalTable.Dispose(Allocator.Persistent);

@@ -1,19 +1,11 @@
 ﻿using System;
 using AoAndSugi.Game.Models.Unit;
-using Unity.Burst;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Mathematics;
 
 namespace AoAndSugi.Game.Models
 {
-    [BurstCompile(FloatPrecision.Standard, FloatMode.Deterministic, CompileSynchronously = false, Debug =
-#if DEBUG
-            true
-#else
-            false
-#endif
-    )]
     public unsafe struct AdvanceJob : IJobParallelFor
     {
         [NativeDisableUnsafePtrRestriction] private readonly GameMasterData* master;

@@ -1,21 +1,12 @@
 ﻿using System;
-using System.IO.Pipes;
 using System.Runtime.CompilerServices;
 using AoAndSugi.Game.Models.Unit;
 using UniNativeLinq;
-using Unity.Burst;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 
 namespace AoAndSugi.Game.Models
 {
-    [BurstCompile(FloatPrecision.Standard, FloatMode.Deterministic, CompileSynchronously = false, Debug =
-#if DEBUG
-            true
-#else
-            false
-#endif
-    )]
     public unsafe struct OrderJob : IJobParallelFor
     {
         [NativeDisableUnsafePtrRestriction] private readonly GameMasterData* master;

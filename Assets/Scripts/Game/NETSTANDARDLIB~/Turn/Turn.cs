@@ -1,4 +1,3 @@
-using System;
 using UniNativeLinq;
 
 namespace AoAndSugi.Game.Models

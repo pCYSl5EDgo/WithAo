@@ -21,6 +21,7 @@ namespace AoAndSugi.Game.Models
                 return ((provider.TargetSpecies.Value * unitTypeCount) + (uint) provider.TargetUnitType) * cellTypeCount + (uint) provider.TargetCellType;
             }
 
+            var providers = unitMovePowerDataProviders.OrderBy(MovePowerKeySelector).ToArray();
             return new GameMasterData(
                 speciesTypeCount,
                 unitTypeCount,
@@ -28,21 +29,19 @@ namespace AoAndSugi.Game.Models
                 size.x,
                 size.y,
                 maxTeamCount,
-                new NativeArray<UnitInitialHp>(
-                    speciesUnitInfoProviders.SelectMany(
-                        x => x.UnitInfoProviders.Select(
-                            y => new UnitInitialHp()
-                            {
-                                Value = y.InitialHP
-                            })).ToArray(), Allocator.Persistent).AsRefEnumerable(),
-                new NativeArray<UnitMaxHp>(
-                    speciesUnitInfoProviders.SelectMany(
-                        x => x.UnitInfoProviders.Select(
-                            y => new UnitMaxHp()
-                            {
-                                Value = y.MaxHP
-                            })).ToArray(), Allocator.Persistent).AsRefEnumerable(),
-                new NativeArray<UnitMovePower>(unitMovePowerDataProviders.OrderBy(MovePowerKeySelector).SelectMany(x => new UnitMovePower[]
+                speciesUnitInfoProviders.SelectMany(
+                    x => x.UnitInfoProviders.Select(
+                        y => new UnitInitialHp()
+                        {
+                            Value = y.InitialHP
+                        })).ToArray().AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                speciesUnitInfoProviders.SelectMany(
+                    x => x.UnitInfoProviders.Select(
+                        y => new UnitMaxHp()
+                        {
+                            Value = y.MaxHP
+                        })).ToArray().AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                providers.SelectMany(x => new UnitMovePower[]
                 {
                     new UnitMovePower
                     {
@@ -52,89 +51,82 @@ namespace AoAndSugi.Game.Models
                     {
                         Value = x.EarnPowerOther,
                     },
-                }).ToArray(), Allocator.Persistent).AsRefEnumerable(),
-                new NativeArray<UnitPaintCost>(
-                    speciesUnitInfoProviders.SelectMany(
-                        x => x.UnitInfoProviders.Select(
-                            y => new UnitPaintCost()
-                            {
-                                Value = y.PaintCost
-                            })).ToArray(), Allocator.Persistent).AsRefEnumerable(),
-                new NativeArray<UnitPaintPoint>(
-                    speciesUnitInfoProviders.SelectMany(
-                        x => x.UnitInfoProviders.Select(
-                            y => new UnitPaintPoint()
-                            {
-                                Value = y.PaintPoint
-                            })).ToArray(), Allocator.Persistent).AsRefEnumerable(),
-                new NativeArray<UnitPaintInterval>(
-                    speciesUnitInfoProviders.SelectMany(
-                        x => x.UnitInfoProviders.Select(
-                            y => new UnitPaintInterval()
-                            {
-                                Value = y.PaintInterval
-                            })).ToArray(), Allocator.Persistent).AsRefEnumerable(),
-                new NativeArray<UnitGenerationCost>(
-                    speciesUnitInfoProviders.SelectMany(
-                        x => x.UnitInfoProviders.Select(
-                            y => new UnitGenerationCost()
-                            {
-                                Value = y.GenerationCost
-                            })).ToArray(), Allocator.Persistent).AsRefEnumerable(),
-                new NativeArray<UnitGenerationInterval>(
-                    speciesUnitInfoProviders.SelectMany(
-                        x => x.UnitInfoProviders.Select(
-                            y => new UnitGenerationInterval()
-                            {
-                                Value = y.GenerationInterval
-                            })).ToArray(), Allocator.Persistent).AsRefEnumerable(),
-                new NativeArray<UnitGenerationRequiredHp>(
-                    speciesUnitInfoProviders.SelectMany(
+                }).ToArray().AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                speciesUnitInfoProviders.SelectMany(
+                    x => x.UnitInfoProviders.Select(
+                        y => new UnitPaintCost()
+                        {
+                            Value = y.PaintCost
+                        })).ToArray().AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                speciesUnitInfoProviders.SelectMany(
+                    x => x.UnitInfoProviders.Select(
+                        y => new UnitPaintPoint()
+                        {
+                            Value = y.PaintPoint
+                        })).ToArray().AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                speciesUnitInfoProviders.SelectMany(
+                    x => x.UnitInfoProviders.Select(
+                        y => new UnitPaintInterval()
+                        {
+                            Value = y.PaintInterval
+                        })).ToArray().AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                speciesUnitInfoProviders.SelectMany(
+                    x => x.UnitInfoProviders.Select(
+                        y => new UnitGenerationCost()
+                        {
+                            Value = y.GenerationCost
+                        })).ToArray().AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                speciesUnitInfoProviders.SelectMany(
+                    x => x.UnitInfoProviders.Select(
+                        y => new UnitGenerationInterval()
+                        {
+                            Value = y.GenerationInterval
+                        })).ToArray().AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                speciesUnitInfoProviders.SelectMany(
                         x => x.UnitInfoProviders.Select(
                             y => new UnitGenerationRequiredHp()
                             {
                                 Value = y.GenerationRequiredHp
-                            })).ToArray(), Allocator.Persistent).AsRefEnumerable(),
-                new NativeArray<UnitAttackPoint>(
-                    speciesUnitInfoProviders.SelectMany(
+                            })).ToArray()
+                    .AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                speciesUnitInfoProviders.SelectMany(
                         x => x.UnitInfoProviders.Select(
                             y => new UnitAttackPoint()
                             {
                                 Value = y.AttackPoint
-                            })).ToArray(), Allocator.Persistent).AsRefEnumerable(),
-                new NativeArray<UnitAttackCost>(
-                    speciesUnitInfoProviders.SelectMany(
+                            })).ToArray()
+                    .AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                speciesUnitInfoProviders.SelectMany(
                         x => x.UnitInfoProviders.Select(
                             y => new UnitAttackCost()
                             {
                                 Value = y.AttackCost
-                            })).ToArray(), Allocator.Persistent).AsRefEnumerable(),
-                new NativeArray<UnitAttackInterval>(
-                    speciesUnitInfoProviders.SelectMany(
+                            })).ToArray()
+                    .AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                speciesUnitInfoProviders.SelectMany(
                         x => x.UnitInfoProviders.Select(
                             y => new UnitAttackInterval()
                             {
                                 Value = y.AttackInterval
-                            })).ToArray(), Allocator.Persistent).AsRefEnumerable(),
-                new NativeArray<UnitLivingCost>(
-                    speciesUnitInfoProviders.SelectMany(
+                            })).ToArray()
+                    .AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                speciesUnitInfoProviders.SelectMany(
                         x => x.UnitInfoProviders.Select(
                             y => new UnitLivingCost()
                             {
                                 Value = y.LivingCost
-                            })).ToArray(), Allocator.Persistent).AsRefEnumerable(),
-                new NativeArray<UnitLivingInterval>(
-                    speciesUnitInfoProviders.SelectMany(
+                            })).ToArray()
+                    .AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                speciesUnitInfoProviders.SelectMany(
                         x => x.UnitInfoProviders.Select(
                             y => new UnitLivingInterval()
                             {
                                 Value = y.LivingInterval
-                            })).ToArray(), Allocator.Persistent).AsRefEnumerable(),
-                new NativeArray<CellMoveCost>(
-                    unitMovePowerDataProviders.OrderBy(MovePowerKeySelector).Select(
-                        x => new CellMoveCost(x.Cost))
-                        .ToArray(), Allocator.Persistent)
-                    .AsRefEnumerable()
+                            })).ToArray()
+                    .AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                providers.Select(x => new CellMoveCost(x.Cost))
+                    .ToArray()
+                    .AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent)
             );
         }
     }

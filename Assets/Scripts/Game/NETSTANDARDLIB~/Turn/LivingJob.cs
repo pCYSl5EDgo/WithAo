@@ -1,16 +1,8 @@
-﻿using Unity.Burst;
-using Unity.Collections.LowLevel.Unsafe;
+﻿using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 
 namespace AoAndSugi.Game.Models
 {
-    [BurstCompile(FloatPrecision.Standard, FloatMode.Deterministic, CompileSynchronously = false, Debug =
-#if DEBUG
-            true
-#else
-            false
-#endif
-    )]
     public unsafe struct LivingJob : IJobParallelFor
     {
         [NativeDisableUnsafePtrRestriction] private readonly GameMasterData* master;
