@@ -10,9 +10,13 @@ namespace AoAndSugi
 
         [Inject] private CurrentRoomListPanel currentRoomListPanel;
 
+        [Inject] private EnterPrivateRoomPanel enterPrivateRoomPanel;
+
         public void OnClickCreateNewRoom() => matchingPanel.gameObject.SetActive(true);
 
         public void OnClickCurrentRoom() => currentRoomListPanel.gameObject.SetActive(true);
+
+        public void OnClickEnterPrivateRoom() => enterPrivateRoomPanel.gameObject.SetActive(true);
 
         public void OnClickClose() => gameObject.SetActive(false);
     }

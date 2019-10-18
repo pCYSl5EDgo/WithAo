@@ -101,14 +101,13 @@ namespace AoAndSugi
                     { "DisplayName", $"{ roomName }" },
                     { "PlayerCount", new MaxTeamCount(){ Value = playerCount.Value } },
                     { "NpcCount", new MaxTeamCount(){ Value = npcCount.Value } },
-                    { "BordSize", new BoardSize(){ Value = new int2(){x = width.Value, y = height.Value }} },
+                    { "BordSize", new BoardSize(){ Value = new int2(){ x = width.Value, y = height.Value }} },
                    },
                 CustomRoomPropertiesForLobby = new[] {
                     "DisplayName",
                     "PlayerCount",
                     "NpcCount",
-                    "Height",
-                    "Width"
+                    "BordSize",
                 }
             };
 
