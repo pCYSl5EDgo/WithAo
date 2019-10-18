@@ -61,13 +61,13 @@ namespace AoAndSugi.Game.Models
             Assert.AreEqual(height, datum0.Height);
             Assert.AreEqual(maxTeamCount, datum0.MaxTeamCount);
             var units = (UnitType[]) Enum.GetValues(typeof(UnitType));
-            foreach (var speciesType in Enumerable.Range(datum0.))
+            foreach (var speciesType in Enumerable.Range(0U, 1))
             {
                 Debug.Log("Species : " + speciesType.ToString());
                 foreach (var unitType in units)
                 {
                     Debug.Log("Unit : " + unitType.ToString());
-                    Debug.Log("AttackCost" + datum0.GetAttackCost(speciesType, unitType));
+                    Debug.Log("AttackCost" + datum0.GetAttackCost(new SpeciesType(speciesType), unitType));
                 }
             }
             Dispose(masters);
