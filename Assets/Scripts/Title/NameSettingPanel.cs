@@ -13,33 +13,25 @@ namespace AoAndSugi
     {
         [Inject] private MatchingPanel matchingPanel;
 
-        [SerializeField] MessagePanel messagePanel;
+        [Inject] private InputValidation inputValidation;
 
         [SerializeField] TMP_InputField field;
 
         public void OnClickClose() => gameObject.SetActive(false);
 
-        //TODO:後でまとめる
+        public void OnClickNext() {
+            OnEndEdit();
+            matchingPanel.gameObject.SetActive(true);
+        }
+        
         public void OnEndEdit()
         {
-            var inputText = field.text;
-            if (string.IsNullOrEmpty(inputText))
+            var correctText = inputValidation.CheckInputString(field.text, this.gameObject);
+            if (!string.IsNullOrEmpty(correctText))
             {
-                return;
+                PhotonNetwork.LocalPlayer.NickName = correctText;
+                matchingPanel.gameObject.SetActive(true);
             }
-
-            //取り敢えず英数字のみ許容、文字数は1～7
-            var firstLength = inputText.Length;
-            var pattern = new Regex(@"^[a-z0-9]+$");
-            var match = pattern.Match(inputText);
-            if (!(1 <= match.Length && match.Length <= 7))
-            {
-                var panel = Instantiate(messagePanel, this.transform);
-                panel.Initialized("Please enter between 1 and 7 characters", null);
-                return;
-            }
-            PhotonNetwork.LocalPlayer.NickName = match.ToString();
-            matchingPanel.gameObject.SetActive(true);
         }
     }
 }
