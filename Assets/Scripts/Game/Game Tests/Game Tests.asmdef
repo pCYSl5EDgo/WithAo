@@ -1,7 +1,9 @@
 {
     "name": "GameTests",
     "references": [
-        "Unity.Mathematics"
+        "Unity.Mathematics",
+        "AoAndSugi.Game.Logic",
+        "AoAndSugi.Game.Models.ScriptableObjects"
     ],
     "optionalUnityReferences": [
         "TestAssemblies"

@@ -1,4 +1,6 @@
-﻿namespace AoAndSugi.Game.Models
+﻿using System;
+
+namespace AoAndSugi.Game.Models
 {
     public interface ISpeciesUnitInfoProvider
         : IAttackInfoProvider,
@@ -8,7 +10,7 @@
             IGenerationCostInfoProvider
     {
         string SpeciesName { get; }
-        uint SpeciesType { get; }
+        SpeciesType SpeciesType { get; }
 
         UnitType UnitType { get; }
     }

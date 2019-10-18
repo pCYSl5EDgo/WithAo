@@ -14,6 +14,8 @@ namespace AoAndSugi.Game
         public UnitCommonData[] UnitCommonData;
         private ISpeciesUnitInfoProvider[] unitInfoProviders;
 
+        public SpeciesType SpeciesType => new SpeciesType(UnitCommonData[0].SpeciesType);
+
         public ISpeciesUnitInfoProvider[] UnitInfoProviders
         {
             get
@@ -34,5 +36,7 @@ namespace AoAndSugi.Game
                 return unitInfoProviders;
             }
         }
+
+        public int CompareTo(ISpeciesFacade other) => other is null ? 1 : SpeciesType.CompareTo(other.SpeciesType);
     }
 }

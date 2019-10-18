@@ -2,7 +2,9 @@
 {
     public struct UnitInitialCount
     {
-        public int Value;
+        public uint Value;
+
+        public UnitInitialCount(uint value) => Value = value;
 
         public override string ToString() => Value.ToString();
     }

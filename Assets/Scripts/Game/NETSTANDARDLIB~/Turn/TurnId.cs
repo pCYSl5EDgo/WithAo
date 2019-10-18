@@ -6,6 +6,8 @@ namespace AoAndSugi.Game.Models
     {
         public uint Value;
 
+        public TurnId(uint value) => Value = value;
+
         public bool Equals(TurnId other)
         {
             return Value == other.Value;

@@ -53,7 +53,7 @@ namespace AoAndSugi.Game.Models
                         Value |= 1;
                         Value &= ~2U;
                         break;
-                    case OrderKind.None:
+                    case OrderKind.Generate:
                         Value |= 2;
                         Value &= ~1U;
                         break;
@@ -80,7 +80,7 @@ namespace AoAndSugi.Game.Models
         // 2bit 4, 5
         public UnitType Type
         {
-            get { return (UnitType)((Value >> 4) & 0x3); }
+            get => (UnitType)((Value >> 4) & 0x3);
             set
             {
                 switch (value)
@@ -104,13 +104,41 @@ namespace AoAndSugi.Game.Models
                 }
             }
         }
+
+        // 2bit 6, 7
+        public UnitType ForQueenGenerateType
+        {
+            get => (UnitType)((Value >> 6) & 0x3);
+            set
+            {
+                switch (value)
+                {
+                case UnitType.Soldier:
+                    Value &= ~192U;
+                    break;
+                case UnitType.Worker:
+                    Value |= 64U;
+                    Value &= ~128U;
+                    break;
+                case UnitType.Porter:
+                    Value |= 128U;
+                    Value &= ~64U;
+                    break;
+                case UnitType.Queen:
+                    Value |= 192U;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
+                }
+            }
+        }
     }
 
     public enum OrderKind
     {
         AdvanceAndStop,
         AdvanceAndExecuteJobOfEachType,
-        None,
+        Generate,
         Prepare,
     }
 }

@@ -1,4 +1,5 @@
-﻿using AoAndSugi.Game.Models;
+﻿using System;
+using AoAndSugi.Game.Models;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -14,19 +15,21 @@ namespace AoAndSugi.Game
         [SerializeField] private int attackCost;
         [SerializeField] private int attackPoint;
         [SerializeField] private int attackCalculationFormulaIndex;
-        [SerializeField] private int attackInterval;
+        [SerializeField] private uint attackInterval;
         [SerializeField] private int paintCost;
         [SerializeField] private int paintPoint;
-        [SerializeField] private int paintInterval;
+        [SerializeField] private uint paintInterval;
         [SerializeField] private uint initialHp;
         [SerializeField] private uint maxHp;
         [SerializeField] private int livingCost;
-        [SerializeField] private int livingInterval;
+        [SerializeField] private uint livingInterval;
         [SerializeField] private string speciesName;
         [SerializeField] private uint speciesType;
         [SerializeField] private UnitType unitType;
         [SerializeField] private int generationCost;
-        [SerializeField] private int generationInterval;
+        [SerializeField] private uint generationInterval;
+        [SerializeField] private int generationRequiredHp;
+        private SpeciesType speciesType1;
 
         public int AttackCost => attackCost;
 
@@ -34,23 +37,25 @@ namespace AoAndSugi.Game
 
         public int AttackCalculationFormulaIndex => attackCalculationFormulaIndex;
 
-        public int AttackInterval => attackInterval;
+        public uint AttackInterval => attackInterval;
 
         public int PaintCost => paintCost;
 
         public int PaintPoint => paintPoint;
 
-        public int PaintInterval => paintInterval;
+        public uint PaintInterval => paintInterval;
 
         public uint InitialHP => initialHp;
 
         public uint MaxHP => maxHp;
 
         public int LivingCost => livingCost;
-        
-        public int LivingInterval => livingInterval;
+
+        public uint LivingInterval => livingInterval;
 
         public string SpeciesName => speciesName;
+
+        SpeciesType ISpeciesUnitInfoProvider.SpeciesType => speciesType1;
 
         public uint SpeciesType => speciesType;
 
@@ -58,6 +63,8 @@ namespace AoAndSugi.Game
 
         public int GenerationCost => generationCost;
 
-        public int GenerationInterval => generationInterval;
+        public uint GenerationInterval => generationInterval;
+
+        public int GenerationRequiredHp => generationRequiredHp;
     }
 }

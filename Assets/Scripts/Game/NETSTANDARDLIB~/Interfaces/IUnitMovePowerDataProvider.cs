@@ -8,5 +8,6 @@
 
         int EarnPowerInItsTerritory { get; }
         int EarnPowerOther { get; }
+        int Cost { get; }
     }
 }

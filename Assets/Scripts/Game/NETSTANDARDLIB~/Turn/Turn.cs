@@ -1,11 +1,10 @@
-using System;
 using UniNativeLinq;
 
 namespace AoAndSugi.Game.Models
 {
     public struct Turn
     {
-        public TurnId Id;
+        public TurnId TurnId;
         public Board Board;
         public NativeEnumerable<Power> Powers;
         public NativeEnumerable<EnergySupplier> EnergySuppliers;

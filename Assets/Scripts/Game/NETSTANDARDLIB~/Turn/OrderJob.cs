@@ -2,19 +2,11 @@
 using System.Runtime.CompilerServices;
 using AoAndSugi.Game.Models.Unit;
 using UniNativeLinq;
-using Unity.Burst;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 
 namespace AoAndSugi.Game.Models
 {
-    [BurstCompile(FloatPrecision.Standard, FloatMode.Deterministic, CompileSynchronously = false, Debug =
-#if DEBUG
-            true
-#else
-            false
-#endif
-    )]
     public unsafe struct OrderJob : IJobParallelFor
     {
         [NativeDisableUnsafePtrRestriction] private readonly GameMasterData* master;
@@ -37,7 +29,7 @@ namespace AoAndSugi.Game.Models
         {
             this.master = master;
             this.turn = turn;
-            this.orders = orders.Where(new TurnIdEquality(turn->Id));
+            this.orders = orders.Where(new TurnIdEquality(turn->TurnId));
         }
 
         private readonly struct PowerEquality : IRefFunc<Order, bool>
@@ -61,12 +53,27 @@ namespace AoAndSugi.Game.Models
                     case OrderKind.AdvanceAndExecuteJobOfEachType:
                         ProcessAdvance(ref order, UnitStatus.AdvanceAndRole);
                         break;
-                    case OrderKind.None:
+                    case OrderKind.Generate:
+                        Generate(ref order);
+                        break;
                     case OrderKind.Prepare:
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
             }
+        }
+
+        private void Generate(ref Order order)
+        {
+            ref var power = ref (*turn)[order.Power];
+
+            if (!power.UnitIds.TryGetFirstIndexOf(out var index, new OrderEquality(order.UnitId)) || index == -1)
+            {
+                throw new InvalidOperationException();
+            }
+
+            power.Statuses[index] = UnitStatus.Generate;
+            power.MiscellaneousData[index] = (ulong)order.ForQueenGenerateType;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -81,7 +88,7 @@ namespace AoAndSugi.Game.Models
 
             var speciesType = power.SpeciesTypes[index];
             var unitType = power.UnitTypes[index];
-            power.DivideNewUnitFromOriginal((int)index, order.InitialCount, master->GetInitialHp(speciesType, unitType), advance, order.Destination);
+            power.DivideNewUnitFromOriginal((int)index, order.InitialCount, master->GetInitialHp(speciesType, unitType), advance, order.Destination, turn->TurnId);
         }
 
         private readonly struct OrderEquality : IRefFunc<UnitId, bool>

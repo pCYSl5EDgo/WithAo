@@ -11,6 +11,6 @@
         /// <summary>
         /// If this is zero, every turn they attack their enemies.
         /// </summary>
-        int AttackInterval { get; }
+        uint AttackInterval { get; }
     }
 }

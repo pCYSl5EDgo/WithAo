@@ -1,21 +1,11 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using AoAndSugi.Game.Models.Unit;
-using UniNativeLinq;
-using Unity.Burst;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Mathematics;
 
 namespace AoAndSugi.Game.Models
 {
-    [BurstCompile(FloatPrecision.Standard, FloatMode.Deterministic, CompileSynchronously = false, Debug =
-#if DEBUG
-            true
-#else
-            false
-#endif
-    )]
     public unsafe struct AdvanceJob : IJobParallelFor
     {
         [NativeDisableUnsafePtrRestriction] private readonly GameMasterData* master;
@@ -46,21 +36,32 @@ namespace AoAndSugi.Game.Models
             ref var unitPosition = ref power.Positions[i];
             ref var cell = ref turn->Board[master->Width, unitPosition.Value];
 
-            var movePower = master->GetMovePower(speciesType, unitType, cell.CellTypeValue, cell.IsTerritoryOf((int)power.Id.Value));
-
             ref var unitMovePower = ref power.MovePowers[i];
-            unitMovePower.Value += movePower.Value;
-
-            var moveCost = master->GetCellMoveCost(cell.CellTypeValue);
-            var unitDestination = power.Destinations[i];
-            while (unitMovePower.Value >= moveCost.Value)
+            
             {
-                unitMovePower.Value -= moveCost.Value;
+                var movePower = master->GetMovePower(speciesType, unitType, cell.CellTypeValue, cell.IsTerritoryOf((int) power.PowerId.Value));
+                unitMovePower.Value += movePower.Value;
+            }
+
+            var unitDestination = power.Destinations[i];
+            while (true)
+            {
+                var moveCost = master->GetCellMoveCost(cell.CellTypeValue).Value;
+                if(unitMovePower.Value < moveCost) break;
+                unitMovePower.Value -= moveCost;
                 var diff = unitDestination.Value - unitPosition.Value;
                 AdvanceUnitPositionToDestination(diff, ref unitPosition);
+                cell = ref turn->Board[master->Width, unitPosition.Value];
             }
             if (math.any(unitPosition.Value != unitDestination.Value))
                 return;
+
+            WhenReachingTheDestination(ref unitStatus, unitType);
+            power.GenerationTurns[i] = turn->TurnId;
+        }
+
+        private static void WhenReachingTheDestination(ref UnitStatus unitStatus, UnitType unitType)
+        {
             if (unitStatus != UnitStatus.AdvanceAndRole)
             {
                 unitStatus = UnitStatus.Idle;
@@ -104,7 +105,7 @@ namespace AoAndSugi.Game.Models
                     unitPosition.Value.x++;
                 }
             }
-            else if (((diff.x + diff.y) & 1) == 0)
+            else if ((math.csum(diff) & 1) == 0)
             {
                 if (diff.x < 0)
                 {

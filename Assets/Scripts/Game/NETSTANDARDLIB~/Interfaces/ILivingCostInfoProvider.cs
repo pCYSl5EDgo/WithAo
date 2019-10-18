@@ -6,6 +6,6 @@
         /// <summary>
         /// If this is zero, every turn they attack their enemies.
         /// </summary>
-        int LivingInterval { get; }
+        uint LivingInterval { get; }
     }
 }

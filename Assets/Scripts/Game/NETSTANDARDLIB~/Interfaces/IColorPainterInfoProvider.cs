@@ -7,6 +7,6 @@
         /// <summary>
         /// If this is zero, every turn they attack their enemies.
         /// </summary>
-        int PaintInterval { get; }
+        uint PaintInterval { get; }
     }
 }
