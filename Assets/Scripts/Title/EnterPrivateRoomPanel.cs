@@ -16,9 +16,9 @@ namespace AoAndSugi
     {
         [Inject] private WaitPanel waitPanel;
 
-        [SerializeField] TMP_InputField field;
+        [Inject] private InputValidation inputValidation;
 
-        [SerializeField] MessagePanel messagePanel;
+        [SerializeField] TMP_InputField field;
 
         public void OnClickClose() => gameObject.SetActive(false);
 
@@ -30,23 +30,11 @@ namespace AoAndSugi
         //TODO:後でまとめる
         public void OnEndEdit()
         {
-            var inputText = field.text;
-            if (string.IsNullOrEmpty(inputText))
+            var correctText = inputValidation.CheckInputString(field.text, this.gameObject);
+            if (!string.IsNullOrEmpty(correctText))
             {
-                return;
+                EnterPrivateRoom(correctText);
             }
-
-            //取り敢えず英数字のみ許容、文字数は1～7
-            var firstLength = inputText.Length;
-            var pattern = new Regex(@"^[a-z0-9]+$");
-            var match = pattern.Match(inputText);
-            if (!(1 <= match.Length && match.Length <= 7))
-            {
-                var panel = Instantiate(messagePanel, this.transform);
-                panel.Initialized("Please enter between 1 and 7 characters", null);
-                return;
-            }
-            EnterPrivateRoom(match.ToString());
         }
 
         private void EnterPrivateRoom(string roomName)

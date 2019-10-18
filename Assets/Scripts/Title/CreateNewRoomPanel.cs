@@ -15,6 +15,7 @@ namespace AoAndSugi
     public sealed class CreateNewRoomPanel : MonoBehaviour
     {
         [Inject] private WaitPanel waitPanel;
+        [Inject] private InputValidation inputValidation;
 
         [SerializeField] TMP_InputField field;
 
@@ -34,8 +35,6 @@ namespace AoAndSugi
         [SerializeField] Button heightNext;
         [SerializeField] Button heightPrev;
         [SerializeField] Button isPrivateButton;
-
-        [SerializeField] MessagePanel messagePanel;
 
         ReactiveProperty<byte> playerCount = new ReactiveProperty<byte>();
         ReactiveProperty<int> npcCount = new ReactiveProperty<int>();
@@ -68,26 +67,14 @@ namespace AoAndSugi
             heightPrev.onClick.AddListener(() => height.Value--);
             isPrivateButton.onClick.AddListener(() => isPrivate.Value = !isPrivate.Value);
         }
-
-        //TODO:後でまとめる
+        
         public void OnEndEdit()
         {
-            var inputText = field.text;
-            if(string.IsNullOrEmpty(inputText)){
-                return;
-            }
-
-            //取り敢えず英数字のみ許容、文字数は1～7
-            var firstLength = inputText.Length;
-            var pattern = new Regex(@"^[a-z0-9]+$");
-            var match = pattern.Match(inputText);
-            if (!(1 <= match.Length && match.Length <= 7))
+            var correctText = inputValidation.CheckInputString(field.text, this.gameObject);
+            if (!string.IsNullOrEmpty(correctText))
             {
-                var panel = Instantiate(messagePanel, this.transform);
-                panel.Initialized("Please enter between 1 and 7 characters", null);
-                return;
+                CreateNewRoom(correctText);
             }
-            CreateNewRoom(match.ToString());
         }
 
         private void CreateNewRoom(string roomName)
