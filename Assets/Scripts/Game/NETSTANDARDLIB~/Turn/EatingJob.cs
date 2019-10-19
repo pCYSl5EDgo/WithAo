@@ -50,13 +50,14 @@ namespace AoAndSugi.Game.Models
             var supplierIndex = (long)datum;
             var unitPosition = power.Positions[teamIndex].Value;
             ref var energySuppliers = ref turn->EnergySuppliers;
-            ref var energySupplier = ref energySuppliers[supplierIndex];
-            for (; supplierIndex >= 0; energySupplier = ref energySuppliers[--supplierIndex])
+            if (supplierIndex >= energySuppliers.Length)
+                supplierIndex = energySuppliers.Length - 1;
+            for (; supplierIndex >= 0; --supplierIndex)
             {
-                if (energySupplier.Position.Equals(unitPosition))
+                if (energySuppliers[supplierIndex].Position.Equals(unitPosition))
                     break;
             }
-            if (supplierIndex == -1 || energySupplier.Value <= 0)
+            if (supplierIndex == -1 || energySuppliers[supplierIndex].Value <= 0)
             {
                 status = UnitStatus.Idle;
                 datum = default;
@@ -77,15 +78,9 @@ namespace AoAndSugi.Game.Models
                 status = UnitStatus.Idle;
                 return;
             }
-            var eatingNeeds = (int)((ulong)(diff + 1) >> 1);
-
-            var actuallyEaten = energySupplier.Provide(eatingNeeds);
+            var actuallyEaten = energySuppliers[supplierIndex].Provide((int)diff);
             hp += actuallyEaten;
-
-            if (hp == maxHp)
-            {
-                status = UnitStatus.Idle;
-            }
+            power.SetStatusIdle(teamIndex, turn->TurnId);
         }
     }
 }

@@ -214,7 +214,6 @@ namespace AoAndSugi.Game.Models
             sourceCount.Value -= count.Value;
 
             var index = TeamCount++;
-
             ReAlloc(TeamCount);
 
             SpeciesTypes[index] = SpeciesTypes[sourceIndex];
@@ -266,6 +265,19 @@ namespace AoAndSugi.Game.Models
             if (answer > initial)
                 return initial;
             return (uint)answer;
+        }
+
+        public void SetStatusIdle(int teamIndex, TurnId turnId)
+        {
+            var pos = Positions[teamIndex].Value;
+            for (var i = 0; i < TeamCount; i++)
+            {
+                if(i == teamIndex || Statuses[i] != UnitStatus.Idle || !Positions[i].Value.Equals(pos)) continue;
+                MergeUnits(i, teamIndex, turnId);
+                return;
+            }
+            Statuses[teamIndex] = UnitStatus.Idle;
+            GenerationTurns[teamIndex] = turnId;
         }
     }
 }

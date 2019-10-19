@@ -24,12 +24,12 @@ namespace AoAndSugi.Game.Models
             {
                 for (var i = 0; i < power.TeamCount; i++)
                 {
-                    ProcessTeams(ref power, i, turn->TurnId.Value);
+                    ProcessTeams(ref power, i);
                 }
             }
         }
 
-        private void ProcessTeams(ref Power power, int teamIndex, uint turnValue)
+        private void ProcessTeams(ref Power power, int teamIndex)
         {
             ref var unitStatus = ref power.Statuses[teamIndex];
             if (unitStatus != UnitStatus.AdvanceAndRole && unitStatus != UnitStatus.AdvanceAndStop) return;
@@ -77,26 +77,59 @@ namespace AoAndSugi.Game.Models
         private void WhenReachingTheDestination(ref Power power, int teamIndex, UnitType unitType, int2 position)
         {
             power.GenerationTurns[teamIndex] = turn->TurnId;
-            ref UnitStatus unitStatus = ref power.Statuses[teamIndex];
+            ref var unitStatus = ref power.Statuses[teamIndex];
+
+            if (WhenReachEnergySupplier(ref power, teamIndex, position)) return;
+            if (IfStatusIsAdvanceAndStop(ref power, teamIndex, unitStatus)) return;
+            switch (unitType)
+            {
+                case UnitType.Queen:
+                    unitStatus = UnitStatus.Generate;
+                    break;
+                case UnitType.Soldier:
+                    unitStatus = UnitStatus.Scouting;
+                    break;
+                case UnitType.Porter:
+                case UnitType.Worker:
+                    if (power.UnitTypes.TryGetFirstIndexOf(out var queenIndex, new IsQueen()))
+                    {
+                        unitStatus = UnitStatus.AdvanceAndStop;
+                        power.Destinations[teamIndex].Value = power.Positions[queenIndex].Value;
+                    }
+                    else
+                    {
+                        power.SetStatusIdle(teamIndex, turn->TurnId);
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private bool IfStatusIsAdvanceAndStop(ref Power power, int teamIndex, UnitStatus unitStatus)
+        {
+            if (unitStatus == UnitStatus.AdvanceAndStop)
+            {
+                power.SetStatusIdle(teamIndex, turn->TurnId);
+                return true;
+            }
+            return false;
+        }
+
+        private bool WhenReachEnergySupplier(ref Power power, int teamIndex, int2 position)
+        {
             if (turn->EnergySuppliers.TryGetFirstIndexOf(out var supplierIndex, new SamePosition(position)))
             {
-                unitStatus = UnitStatus.Eating;
-                power.MiscellaneousData[teamIndex] = (ulong)supplierIndex;
-                return;
+                power.Statuses[teamIndex] = UnitStatus.Eating;
+                power.MiscellaneousData[teamIndex] = (ulong) supplierIndex;
+                return true;
             }
-            if (unitStatus != UnitStatus.AdvanceAndRole)
-            {
-                unitStatus = UnitStatus.Idle;
-                return;
-            }
-            unitStatus = unitType switch
-            {
-                UnitType.Porter => UnitStatus.Return,
-                UnitType.Queen => UnitStatus.Generate,
-                UnitType.Soldier => UnitStatus.Scouting,
-                UnitType.Worker => UnitStatus.Return,
-                _ => throw new ArgumentOutOfRangeException()
-            };
+            return false;
+        }
+
+        private readonly struct IsQueen : IRefFunc<UnitType, bool>
+        {
+            public bool Calc(ref UnitType arg0) => arg0 == UnitType.Queen;
         }
 
         private static void AdvanceUnitPositionToDestination(int2 diff, ref UnitPosition unitPosition)

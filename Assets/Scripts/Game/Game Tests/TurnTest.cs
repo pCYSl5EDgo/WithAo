@@ -135,7 +135,7 @@ namespace AoAndSugi.Game.Models
             var masters = CreateMaster(width, height, maxTeamCount);
             using (var powerArray = new NativeArray<Power>(maxTeamCount, Allocator.Persistent))
             using (var energyArray = new NativeArray<EnergySupplier>(energyCount, Allocator.Persistent))
-            using (var orderArray = new NativeArray<Order>(1, Allocator.Persistent)
+            using (var orderArray = new NativeArray<Order>(3, Allocator.Persistent)
             {
                 [0] = new Order()
                 {
@@ -145,6 +145,24 @@ namespace AoAndSugi.Game.Models
                     InitialCount = new UnitInitialCount(1),
                     TurnId = default,
                     UnitId = default,
+                },
+                [1] = new Order()
+                {
+                    Kind = OrderKind.AdvanceAndStop,
+                    Power = default,
+                    InitialCount = new UnitInitialCount(4),
+                    Destination = new UnitDestination(new int2(3, 0)),
+                    TurnId = new TurnId(30),
+                    UnitId = new UnitId(1),
+                },
+                [2] = new Order()
+                {
+                    Kind = OrderKind.AdvanceAndStop,
+                    Power = default,
+                    InitialCount = new UnitInitialCount(4),
+                    Destination = new UnitDestination(new int2(1, 0)),
+                    TurnId = new TurnId(40),
+                    UnitId = new UnitId(1),
                 }
             })
             using (var board = new Board(new int2(width, height)))
@@ -180,12 +198,17 @@ namespace AoAndSugi.Game.Models
                     {
                         turns[0].TurnId = new TurnId(i);
                         processor.ProcessOrderCollection(masters.AsRefEnumerableUnsafe().Ptr, turns.Ptr, orders);
-//                        var buf = new StringBuilder().Append("TURN : ").Append(turns[0].TurnId.ToString()).Append(", TeamCount : ").Append(power.TeamCount);
-//                        for (var j = 1; j < power.TeamCount; j++)
-//                        {
-//                            buf.Append("\n\tPosition : ").Append(power.Positions[j].Value.ToString()).Append(", Unit Type : ").Append(power.UnitTypes[j].ToString()).Append(", Hp : ").Append(power.TotalHps[j].ToString()).Append(", Count : ").Append(power.CalcUnitCountInTeam(j, generateInitialHp));
-//                        }
-                        //Debug.Log(buf.ToString());
+                        var buf = new StringBuilder().Append("TURN : ").Append(turns[0].TurnId.ToString()).Append(", TeamCount : ").Append(power.TeamCount);
+                        for (var j = 0; j < power.TeamCount; j++)
+                        {
+                            buf.Append("\n\tPosition : ").Append(power.Positions[j].Value.ToString())
+                                .Append(", Unit Type : ").Append(power.UnitTypes[j].ToString())
+                                .Append(", Status : ").Append(power.Statuses[j].ToString())
+                                .Append(", Hp : ").Append(power.TotalHps[j].ToString())
+                                .Append(", Count : ").Append(power.CalcUnitCountInTeam(j, generateInitialHp))
+                                .Append(", Move : ").Append(power.MovePowers[j]);
+                        }
+                        Debug.Log(buf.ToString());
                         //Debug.Log("T : " + i + ", " + turns[0].Board[width, default][0] + ", Team : " + power.TeamCount + ", Count : " + power.InitialCounts[1]);
                         //Assert.AreEqual(UnitStatus.Generate, power.Statuses[0]);
                         //Assert.AreEqual(1 + ((i + 1) / 15), power.TeamCount);
@@ -206,7 +229,7 @@ namespace AoAndSugi.Game.Models
             {
                 ref var energy = ref energies[i];
                 energy.Value = 1000;
-                energy.Position = new int2(i, i * i);
+                energy.Position = new int2(3, i * i);
             }
             return energies;
         }
