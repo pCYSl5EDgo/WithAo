@@ -3,7 +3,7 @@ using Unity.Jobs;
 
 namespace AoAndSugi.Game.Models
 {
-    public unsafe struct LivingJob : IJobParallelFor
+    public unsafe struct LivingJob : IJob
     {
         [NativeDisableUnsafePtrRestriction] private readonly GameMasterData* master;
         [NativeDisableUnsafePtrRestriction] private readonly Turn* turn;
@@ -14,26 +14,17 @@ namespace AoAndSugi.Game.Models
             this.turn = turn;
         }
 
-        public void Execute(int index)
-        {
-            ref var power = ref turn->Powers[index];
-            for (var i = power.TeamCount; i-- != 0;)
-            {
-                ProcessTeams(ref power, i, turn->TurnId.Value);
-            }
-        }
-
         private void ProcessTeams(ref Power power, int teamIndex, uint turnValue)
         {
             var speciesType = power.SpeciesTypes[teamIndex];
             var unitType = power.UnitTypes[teamIndex];
             var sinceGeneration = turnValue - power.GenerationTurns[teamIndex].Value;
             var interval = master->GetLivingInterval(speciesType, unitType).Value;
-
             if (sinceGeneration / (interval + 1) * (interval + 1) != sinceGeneration) return;
 
             var cost = master->GetLivingCost(speciesType, unitType).Value;
-            var unitCount = power.CalcUnitCountInTeam(teamIndex, master->GetInitialHp(speciesType, unitType));
+            var unitInitialHp = master->GetInitialHp(speciesType, unitType);
+            var unitCount = power.CalcUnitCountInTeam(teamIndex, unitInitialHp);
             ref var totalHp = ref power.TotalHps[teamIndex].Value;
 #if DEBUG
             checked
@@ -46,6 +37,17 @@ namespace AoAndSugi.Game.Models
             if (totalHp > 0) return;
 
             power.RemoveAtSwapBack(teamIndex);
+        }
+
+        public void Execute()
+        {
+            foreach (ref var power in turn->Powers)
+            {
+                for (var i = 0; i < power.TeamCount; i++)
+                {
+                    ProcessTeams(ref power, i, turn->TurnId.Value);
+                }
+            }
         }
     }
 }

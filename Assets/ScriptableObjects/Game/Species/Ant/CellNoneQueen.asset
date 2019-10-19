@@ -16,4 +16,4 @@ MonoBehaviour:
   targetCellType: 0
   earnPowerInItsTerritory: 1
   earnPowerOther: 0
-  cost: 1
+  cost: 20

@@ -1,4 +1,5 @@
 ﻿using System;
+using UniNativeLinq;
 using AoAndSugi.Game.Models.Unit;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
@@ -6,7 +7,7 @@ using Unity.Mathematics;
 
 namespace AoAndSugi.Game.Models
 {
-    public unsafe struct AdvanceJob : IJobParallelFor
+    public unsafe struct AdvanceJob : IJob
     {
         [NativeDisableUnsafePtrRestriction] private readonly GameMasterData* master;
         [NativeDisableUnsafePtrRestriction] private readonly Turn* turn;
@@ -17,37 +18,39 @@ namespace AoAndSugi.Game.Models
             this.turn = turn;
         }
 
-        public void Execute(int index)
+        public void Execute()
         {
-            ref var power = ref turn->Powers[index];
-            for (var i = 0; i < power.TeamCount; i++)
+            foreach (ref var power in turn->Powers)
             {
-                ProcessTeams(ref power, i);
+                for (var i = 0; i < power.TeamCount; i++)
+                {
+                    ProcessTeams(ref power, i);
+                }
             }
         }
 
-        private void ProcessTeams(ref Power power, int i)
+        private void ProcessTeams(ref Power power, int teamIndex)
         {
-            ref var unitStatus = ref power.Statuses[i];
+            ref var unitStatus = ref power.Statuses[teamIndex];
             if (unitStatus != UnitStatus.AdvanceAndRole && unitStatus != UnitStatus.AdvanceAndStop) return;
-            var speciesType = power.SpeciesTypes[i];
-            var unitType = power.UnitTypes[i];
+            var speciesType = power.SpeciesTypes[teamIndex];
+            var unitType = power.UnitTypes[teamIndex];
 
-            ref var unitPosition = ref power.Positions[i];
+            ref var unitPosition = ref power.Positions[teamIndex];
             ref var cell = ref turn->Board[master->Width, unitPosition.Value];
 
-            ref var unitMovePower = ref power.MovePowers[i];
-            
+            ref var unitMovePower = ref power.MovePowers[teamIndex];
+
             {
-                var movePower = master->GetMovePower(speciesType, unitType, cell.CellTypeValue, cell.IsTerritoryOf((int) power.PowerId.Value));
+                var movePower = master->GetMovePower(speciesType, unitType, cell.CellTypeValue, cell.IsTerritoryOf((int)power.PowerId.Value));
                 unitMovePower.Value += movePower.Value;
             }
 
-            var unitDestination = power.Destinations[i];
+            var unitDestination = power.Destinations[teamIndex];
             while (true)
             {
                 var moveCost = master->GetCellMoveCost(cell.CellTypeValue).Value;
-                if(unitMovePower.Value < moveCost) break;
+                if (unitMovePower.Value < moveCost) break;
                 unitMovePower.Value -= moveCost;
                 var diff = unitDestination.Value - unitPosition.Value;
                 AdvanceUnitPositionToDestination(diff, ref unitPosition);
@@ -56,25 +59,77 @@ namespace AoAndSugi.Game.Models
             if (math.any(unitPosition.Value != unitDestination.Value))
                 return;
 
-            WhenReachingTheDestination(ref unitStatus, unitType);
-            power.GenerationTurns[i] = turn->TurnId;
+            WhenReachingTheDestination(ref power, teamIndex, unitType, unitDestination.Value);
         }
 
-        private static void WhenReachingTheDestination(ref UnitStatus unitStatus, UnitType unitType)
+        private readonly struct SamePosition : IRefFunc<EnergySupplier, bool>
         {
-            if (unitStatus != UnitStatus.AdvanceAndRole)
+            private readonly int2 position;
+
+            public SamePosition(int2 position)
             {
-                unitStatus = UnitStatus.Idle;
-                return;
+                this.position = position;
             }
-            unitStatus = unitType switch
+
+            public bool Calc(ref EnergySupplier arg0) => arg0.Position.Equals(position);
+        }
+
+        private void WhenReachingTheDestination(ref Power power, int teamIndex, UnitType unitType, int2 position)
+        {
+            power.GenerationTurns[teamIndex] = turn->TurnId;
+            ref var unitStatus = ref power.Statuses[teamIndex];
+
+            if (WhenReachEnergySupplier(ref power, teamIndex, position)) return;
+            if (IfStatusIsAdvanceAndStop(ref power, teamIndex, unitStatus)) return;
+            switch (unitType)
             {
-                UnitType.Porter => UnitStatus.Return,
-                UnitType.Queen => UnitStatus.Generate,
-                UnitType.Soldier => UnitStatus.Scouting,
-                UnitType.Worker => UnitStatus.Return,
-                _ => throw new ArgumentOutOfRangeException()
-            };
+                case UnitType.Queen:
+                    unitStatus = UnitStatus.Generate;
+                    break;
+                case UnitType.Soldier:
+                    unitStatus = UnitStatus.Scouting;
+                    break;
+                case UnitType.Porter:
+                case UnitType.Worker:
+                    if (power.UnitTypes.TryGetFirstIndexOf(out var queenIndex, new IsQueen()))
+                    {
+                        unitStatus = UnitStatus.AdvanceAndStop;
+                        power.Destinations[teamIndex].Value = power.Positions[queenIndex].Value;
+                    }
+                    else
+                    {
+                        power.SetStatusIdle(teamIndex, turn->TurnId);
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private bool IfStatusIsAdvanceAndStop(ref Power power, int teamIndex, UnitStatus unitStatus)
+        {
+            if (unitStatus == UnitStatus.AdvanceAndStop)
+            {
+                power.SetStatusIdle(teamIndex, turn->TurnId);
+                return true;
+            }
+            return false;
+        }
+
+        private bool WhenReachEnergySupplier(ref Power power, int teamIndex, int2 position)
+        {
+            if (turn->EnergySuppliers.TryGetFirstIndexOf(out var supplierIndex, new SamePosition(position)))
+            {
+                power.Statuses[teamIndex] = UnitStatus.Eating;
+                power.MiscellaneousData[teamIndex] = (ulong) supplierIndex;
+                return true;
+            }
+            return false;
+        }
+
+        private readonly struct IsQueen : IRefFunc<UnitType, bool>
+        {
+            public bool Calc(ref UnitType arg0) => arg0 == UnitType.Queen;
         }
 
         private static void AdvanceUnitPositionToDestination(int2 diff, ref UnitPosition unitPosition)

@@ -36,6 +36,7 @@ namespace AoAndSugi.Game.Models
             NextUnitId = default;
             TeamCount = default;
             SpeciesTypes = NativeEnumerable<SpeciesType>.Create((SpeciesType*)Malloc(capacity), capacity);
+            UnsafeUtility.MemClear(SpeciesTypes.Ptr, CalcCapacityByteLength(capacity));
             UnitIds = NativeEnumerable<UnitId>.Create((UnitId*)(SpeciesTypes.Ptr + capacity), capacity);
             UnitTypes = NativeEnumerable<UnitType>.Create((UnitType*)(UnitIds.Ptr + capacity), capacity);
             InitialCounts = NativeEnumerable<UnitInitialCount>.Create((UnitInitialCount*)(UnitTypes.Ptr + capacity), capacity);
@@ -49,7 +50,9 @@ namespace AoAndSugi.Game.Models
         }
 
         private static void* Malloc(int capacity)
-            => UnsafeUtility.Malloc(capacity * (sizeof(SpeciesType) + sizeof(UnitId) + sizeof(UnitType) + sizeof(UnitInitialCount) + sizeof(UnitTotalHp) + sizeof(UnitStatus) + sizeof(UnitPosition) + sizeof(UnitMovePower) + sizeof(UnitDestination) + sizeof(long) + sizeof(TurnId)), 4, Allocator.Persistent);
+            => UnsafeUtility.Malloc(CalcCapacityByteLength(capacity), 4, Allocator.Persistent);
+
+        private static long CalcCapacityByteLength(long capacity) => capacity * (sizeof(SpeciesType) + sizeof(UnitId) + sizeof(UnitType) + sizeof(UnitInitialCount) + sizeof(UnitTotalHp) + sizeof(UnitStatus) + sizeof(UnitPosition) + sizeof(UnitMovePower) + sizeof(UnitDestination) + sizeof(long) + sizeof(TurnId));
 
         public void RemoveAtSwapBack(int index)
         {
@@ -88,8 +91,12 @@ namespace AoAndSugi.Game.Models
                 return;
             }
 
-            var CommonInfos = NativeEnumerable<SpeciesType>.Create((SpeciesType*)Malloc(capacity), capacity);
-            var UnitIds = NativeEnumerable<UnitId>.Create((UnitId*)(CommonInfos.Ptr + capacity), capacity);
+            if (capacity < oldCapacity + (oldCapacity >> 1))
+                capacity = (int)(oldCapacity + (oldCapacity >> 1));
+
+            var SpeciesTypes = NativeEnumerable<SpeciesType>.Create((SpeciesType*)Malloc(capacity), capacity);
+            UnsafeUtility.MemClear(SpeciesTypes.Ptr, CalcCapacityByteLength(capacity));
+            var UnitIds = NativeEnumerable<UnitId>.Create((UnitId*)(SpeciesTypes.Ptr + capacity), capacity);
             var UnitTypes = NativeEnumerable<UnitType>.Create((UnitType*)(UnitIds.Ptr + capacity), capacity);
             var InitialCounts = NativeEnumerable<UnitInitialCount>.Create((UnitInitialCount*)(UnitTypes.Ptr + capacity), capacity);
             var TotalHps = NativeEnumerable<UnitTotalHp>.Create((UnitTotalHp*)(InitialCounts.Ptr + capacity), capacity);
@@ -100,7 +107,7 @@ namespace AoAndSugi.Game.Models
             var MiscellaneousData = NativeEnumerable<ulong>.Create((ulong*)(Destinations.Ptr + capacity), capacity);
             var GenerationTurns = NativeEnumerable<TurnId>.Create((TurnId*)(MiscellaneousData.Ptr + capacity), capacity);
 
-            this.SpeciesTypes.Take(TeamCount).CopyTo(CommonInfos.Ptr);
+            this.SpeciesTypes.Take(TeamCount).CopyTo(SpeciesTypes.Ptr);
             this.UnitIds.Take(TeamCount).CopyTo(UnitIds.Ptr);
             this.UnitTypes.Take(TeamCount).CopyTo(UnitTypes.Ptr);
             this.InitialCounts.Take(TeamCount).CopyTo(InitialCounts.Ptr);
@@ -118,7 +125,7 @@ namespace AoAndSugi.Game.Models
 
             this.PowerId = id;
             this.TeamCount = teamCount;
-            this.SpeciesTypes = CommonInfos;
+            this.SpeciesTypes = SpeciesTypes;
             this.UnitIds = UnitIds;
             this.UnitTypes = UnitTypes;
             this.InitialCounts = InitialCounts;
@@ -174,12 +181,13 @@ namespace AoAndSugi.Game.Models
             Destinations[TeamCount] = default;
             MiscellaneousData[TeamCount] = miscellaneousDatum;
             GenerationTurns[TeamCount] = turn;
+            TeamCount++;
         }
 
         public void AddInitialCount(int teamIndex, UnitInitialCount addCount, UnitInitialHp initialHp, TurnId turn)
         {
             InitialCounts[teamIndex].Value += addCount.Value;
-            TotalHps[teamIndex].Value += (int) (initialHp.Value * addCount.Value);
+            TotalHps[teamIndex].Value += (int)(initialHp.Value * addCount.Value);
             MovePowers[teamIndex] = default;
             GenerationTurns[teamIndex] = turn;
         }
@@ -206,7 +214,6 @@ namespace AoAndSugi.Game.Models
             sourceCount.Value -= count.Value;
 
             var index = TeamCount++;
-
             ReAlloc(TeamCount);
 
             SpeciesTypes[index] = SpeciesTypes[sourceIndex];
@@ -250,11 +257,27 @@ namespace AoAndSugi.Game.Models
 
         public uint CalcUnitCountInTeam(int teamIndex, UnitInitialHp initialHp)
         {
-            var answer = (TotalHps[teamIndex].Value + 1) / initialHp.Value;
+            var total = TotalHps[teamIndex].Value;
+            var answer = total / initialHp.Value;
+            if (answer * initialHp.Value != total)
+                answer++;
             var initial = InitialCounts[teamIndex].Value;
             if (answer > initial)
                 return initial;
             return (uint)answer;
+        }
+
+        public void SetStatusIdle(int teamIndex, TurnId turnId)
+        {
+            var pos = Positions[teamIndex].Value;
+            for (var i = 0; i < TeamCount; i++)
+            {
+                if(i == teamIndex || Statuses[i] != UnitStatus.Idle || !Positions[i].Value.Equals(pos)) continue;
+                MergeUnits(i, teamIndex, turnId);
+                return;
+            }
+            Statuses[teamIndex] = UnitStatus.Idle;
+            GenerationTurns[teamIndex] = turnId;
         }
     }
 }

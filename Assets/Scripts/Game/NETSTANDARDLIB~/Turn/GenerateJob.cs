@@ -1,12 +1,14 @@
 ﻿using System;
 using AoAndSugi.Game.Models.Unit;
+using UniNativeLinq;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace AoAndSugi.Game.Models
 {
-    public unsafe struct GenerateJob : IJobParallelFor
+    public unsafe struct GenerateJob : IJob
     {
         [NativeDisableUnsafePtrRestriction] private readonly GameMasterData* master;
         [NativeDisableUnsafePtrRestriction] private readonly Turn* turn;
@@ -17,12 +19,14 @@ namespace AoAndSugi.Game.Models
             this.turn = turn;
         }
 
-        public void Execute(int index)
+        public void Execute()
         {
-            ref var power = ref turn->Powers[index];
-            for (var i = power.TeamCount; i-- != 0;)
+            foreach (ref var power in turn->Powers)
             {
-                ProcessTeams(ref power, i, turn->TurnId.Value);
+                for (var i = 0; i < power.TeamCount; i++)
+                {
+                    ProcessTeams(ref power, i, turn->TurnId.Value);
+                }
             }
         }
 
@@ -32,6 +36,7 @@ namespace AoAndSugi.Game.Models
 
             var unitType = power.UnitTypes[teamIndex];
             if (unitType != UnitType.Queen) return;
+
 
             ref var miscellaneousDatum = ref power.MiscellaneousData[teamIndex];
             var generateUnitType = (UnitType)(uint)miscellaneousDatum;
@@ -54,7 +59,7 @@ namespace AoAndSugi.Game.Models
 
             var sinceGeneration = turnValue - (uint)(miscellaneousDatum >> 32);
 
-            var interval = master->GetGenerationInterval(speciesType, unitType).Value;
+            var interval = master->GetGenerationInterval(speciesType, generateUnitType).Value;
 
             if (sinceGeneration <= interval) return;
 
@@ -64,14 +69,24 @@ namespace AoAndSugi.Game.Models
             totalHp -= generationCount * generationCost;
 
             var generateInitialHp = master->GetInitialHp(speciesType, generateUnitType);
+            var unitInitialCount = new UnitInitialCount((uint)generationCount);
+            var turnId = new TurnId(turnValue);
             if (generateUnitType == UnitType.Queen)
             {
-                power.AddInitialCount(teamIndex, new UnitInitialCount((uint)generationCount), generateInitialHp, new TurnId(turnValue));
+                power.AddInitialCount(teamIndex, unitInitialCount, generateInitialHp, turnId);
                 return;
             }
             var spawnPosition = CalcGeneratePosition(width: master->Width, height: master->Height, power.Positions[teamIndex], generateUnitType);
 
-            power.CreateNewUnit(speciesType, generateUnitType, new UnitInitialCount((uint)generationCount), generateInitialHp, spawnPosition, new TurnId(turnValue));
+            for (var i = 0; i < power.TeamCount; i++)
+            {
+                if (!power.Positions[i].Value.Equals(spawnPosition.Value)) continue;
+                if (power.Statuses[i] != UnitStatus.Idle) continue;
+                power.AddInitialCount(i, unitInitialCount, generateInitialHp, turnId);
+                return;
+            }
+
+            power.CreateNewUnit(speciesType, generateUnitType, unitInitialCount, generateInitialHp, spawnPosition, turnId);
         }
 
         private static UnitPosition CalcGeneratePosition(int width, int height, UnitPosition position, UnitType generateUnitType)

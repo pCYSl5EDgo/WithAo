@@ -39,10 +39,6 @@
         /// </summary>
         Battle,
         /// <summary>
-        /// 帰還
-        /// </summary>
-        Return,
-        /// <summary>
         /// 食事中
         /// </summary>
         Eating,

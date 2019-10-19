@@ -26,8 +26,11 @@ namespace AoAndSugi.Installer
 
         private void OnDestroy()
         {
-            this.GameMasterData[0].Dispose();
-            this.GameMasterData.Dispose();
+            if(this.GameMasterData.IsCreated)
+            {
+                this.GameMasterData[0].Dispose();
+                this.GameMasterData.Dispose();
+            }
         }
     }
 }

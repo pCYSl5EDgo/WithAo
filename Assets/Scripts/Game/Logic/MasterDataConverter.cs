@@ -4,12 +4,13 @@ using AoAndSugi.Game.Models.Unit;
 using UniNativeLinq;
 using Unity.Collections;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace AoAndSugi.Game.Models
 {
     public readonly struct MasterDataConverter : IMasterDataConverter
     {
-        public GameMasterData Convert(int2 size, int maxTeamCount, ISpeciesFacade[] speciesUnitInfoProviders, IUnitMovePowerDataProvider[] unitMovePowerDataProviders)
+        public GameMasterData Convert(int2 size, int maxTeamCount, SpeciesCommonData[] speciesUnitInfoProviders, CellCommonData[] unitMovePowerDataProviders)
         {
             Array.Sort(speciesUnitInfoProviders);
             var speciesTypeCount = speciesUnitInfoProviders.Length;
@@ -22,6 +23,13 @@ namespace AoAndSugi.Game.Models
             }
 
             var providers = unitMovePowerDataProviders.OrderBy(MovePowerKeySelector).ToArray();
+            var initialHpTable = speciesUnitInfoProviders.SelectMany(
+                x => x.UnitInfoProviders.Select(
+                    y => new UnitInitialHp()
+                    {
+                        Value = y.InitialHP
+                    })).ToArray().AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent);
+            Debug.Log("INITIAL HP TABLE LENGTH : "+initialHpTable.Length);
             return new GameMasterData(
                 speciesTypeCount,
                 unitTypeCount,
@@ -29,12 +37,7 @@ namespace AoAndSugi.Game.Models
                 size.x,
                 size.y,
                 maxTeamCount,
-                speciesUnitInfoProviders.SelectMany(
-                    x => x.UnitInfoProviders.Select(
-                        y => new UnitInitialHp()
-                        {
-                            Value = y.InitialHP
-                        })).ToArray().AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                initialHpTable,
                 speciesUnitInfoProviders.SelectMany(
                     x => x.UnitInfoProviders.Select(
                         y => new UnitMaxHp()

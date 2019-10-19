@@ -20,5 +20,7 @@ namespace AoAndSugi.Game.Models.Unit
         {
             return (int) Value;
         }
+
+        public override string ToString() => Value.ToString();
     }
 }
