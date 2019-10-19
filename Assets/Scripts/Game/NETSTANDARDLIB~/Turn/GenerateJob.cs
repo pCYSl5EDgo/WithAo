@@ -6,7 +6,7 @@ using Unity.Mathematics;
 
 namespace AoAndSugi.Game.Models
 {
-    public unsafe struct GenerateJob : IJobParallelFor
+    public unsafe struct GenerateJob : IJob
     {
         [NativeDisableUnsafePtrRestriction] private readonly GameMasterData* master;
         [NativeDisableUnsafePtrRestriction] private readonly Turn* turn;
@@ -17,12 +17,14 @@ namespace AoAndSugi.Game.Models
             this.turn = turn;
         }
 
-        public void Execute(int index)
+        public void Execute()
         {
-            ref var power = ref turn->Powers[index];
-            for (var i = power.TeamCount; i-- != 0;)
+            foreach (ref var power in turn->Powers)
             {
-                ProcessTeams(ref power, i, turn->TurnId.Value);
+                for (var i = 0; i < power.TeamCount; i++)
+                {
+                    ProcessTeams(ref power, i, turn->TurnId.Value);
+                }
             }
         }
 

@@ -6,7 +6,7 @@ using Unity.Mathematics;
 
 namespace AoAndSugi.Game.Models
 {
-    public unsafe struct AdvanceJob : IJobParallelFor
+    public unsafe struct AdvanceJob : IJob
     {
         [NativeDisableUnsafePtrRestriction] private readonly GameMasterData* master;
         [NativeDisableUnsafePtrRestriction] private readonly Turn* turn;
@@ -17,16 +17,18 @@ namespace AoAndSugi.Game.Models
             this.turn = turn;
         }
 
-        public void Execute(int index)
+        public void Execute()
         {
-            ref var power = ref turn->Powers[index];
-            for (var i = 0; i < power.TeamCount; i++)
+            foreach (ref var power in turn->Powers)
             {
-                ProcessTeams(ref power, i);
+                for (var i = 0; i < power.TeamCount; i++)
+                {
+                    ProcessTeams(ref power, i, turn->TurnId.Value);
+                }
             }
         }
 
-        private void ProcessTeams(ref Power power, int i)
+        private void ProcessTeams(ref Power power, int i, uint turnValue)
         {
             ref var unitStatus = ref power.Statuses[i];
             if (unitStatus != UnitStatus.AdvanceAndRole && unitStatus != UnitStatus.AdvanceAndStop) return;
@@ -57,7 +59,7 @@ namespace AoAndSugi.Game.Models
                 return;
 
             WhenReachingTheDestination(ref unitStatus, unitType);
-            power.GenerationTurns[i] = turn->TurnId;
+            power.GenerationTurns[i] = new TurnId(turnValue);
         }
 
         private static void WhenReachingTheDestination(ref UnitStatus unitStatus, UnitType unitType)

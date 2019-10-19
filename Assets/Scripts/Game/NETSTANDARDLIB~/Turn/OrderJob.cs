@@ -7,7 +7,7 @@ using Unity.Jobs;
 
 namespace AoAndSugi.Game.Models
 {
-    public unsafe struct OrderJob : IJobParallelFor
+    public unsafe struct OrderJob : IJob
     {
         [NativeDisableUnsafePtrRestriction] private readonly GameMasterData* master;
         [NativeDisableUnsafePtrRestriction] private readonly Turn* turn;
@@ -41,9 +41,9 @@ namespace AoAndSugi.Game.Models
             public bool Calc(ref Order arg0) => arg0.Power.Value == value;
         }
 
-        public void Execute(int powerIndex)
+        public void Execute()
         {
-            foreach (ref var order in orders.Where(new PowerEquality(powerIndex)))
+            foreach (ref var order in orders)
             {
                 switch (order.Kind)
                 {

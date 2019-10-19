@@ -1,5 +1,4 @@
 ﻿using UniNativeLinq;
-using Unity.Jobs;
 
 namespace AoAndSugi.Game.Models
 {
@@ -7,10 +6,10 @@ namespace AoAndSugi.Game.Models
     {
         public void ProcessOrderCollection(GameMasterData* master, Turn* turn, NativeEnumerable<Order> orders)
         {
-            new LivingJob(master, turn).Run(master->MaxTeamCount);
-            new OrderJob(master, turn, orders).Run(master->MaxTeamCount);
-            new GenerateJob(master, turn).Run(master->MaxTeamCount);
-            new AdvanceJob(master, turn).Run(master->MaxTeamCount);
+            new LivingJob(master, turn).Execute();
+            new OrderJob(master, turn, orders).Execute();
+            new GenerateJob(master, turn).Execute();
+            new AdvanceJob(master, turn).Execute();
         }
     }
 }
