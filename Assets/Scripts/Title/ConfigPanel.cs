@@ -1,18 +1,21 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public sealed class ConfigPanel : MonoBehaviour
 {
+    [Inject] private SoundManager soundManager;
+
     [SerializeField] Slider slider;
 
     private void OnEnable()
     {
-        slider.value = SoundManager.Instance.BgmVolume;
+        slider.value = soundManager.BgmVolume;
     }
 
     public void OnValueChanged()
     {
-        SoundManager.Instance.BgmVolume = slider.value;
+        soundManager.BgmVolume = slider.value;
     }
 
     public void OnClickClose()
