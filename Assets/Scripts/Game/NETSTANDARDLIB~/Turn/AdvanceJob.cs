@@ -1,4 +1,5 @@
 ﻿using System;
+using UniNativeLinq;
 using AoAndSugi.Game.Models.Unit;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
@@ -28,28 +29,28 @@ namespace AoAndSugi.Game.Models
             }
         }
 
-        private void ProcessTeams(ref Power power, int i, uint turnValue)
+        private void ProcessTeams(ref Power power, int teamIndex, uint turnValue)
         {
-            ref var unitStatus = ref power.Statuses[i];
+            ref var unitStatus = ref power.Statuses[teamIndex];
             if (unitStatus != UnitStatus.AdvanceAndRole && unitStatus != UnitStatus.AdvanceAndStop) return;
-            var speciesType = power.SpeciesTypes[i];
-            var unitType = power.UnitTypes[i];
+            var speciesType = power.SpeciesTypes[teamIndex];
+            var unitType = power.UnitTypes[teamIndex];
 
-            ref var unitPosition = ref power.Positions[i];
+            ref var unitPosition = ref power.Positions[teamIndex];
             ref var cell = ref turn->Board[master->Width, unitPosition.Value];
 
-            ref var unitMovePower = ref power.MovePowers[i];
-            
+            ref var unitMovePower = ref power.MovePowers[teamIndex];
+
             {
-                var movePower = master->GetMovePower(speciesType, unitType, cell.CellTypeValue, cell.IsTerritoryOf((int) power.PowerId.Value));
+                var movePower = master->GetMovePower(speciesType, unitType, cell.CellTypeValue, cell.IsTerritoryOf((int)power.PowerId.Value));
                 unitMovePower.Value += movePower.Value;
             }
 
-            var unitDestination = power.Destinations[i];
+            var unitDestination = power.Destinations[teamIndex];
             while (true)
             {
                 var moveCost = master->GetCellMoveCost(cell.CellTypeValue).Value;
-                if(unitMovePower.Value < moveCost) break;
+                if (unitMovePower.Value < moveCost) break;
                 unitMovePower.Value -= moveCost;
                 var diff = unitDestination.Value - unitPosition.Value;
                 AdvanceUnitPositionToDestination(diff, ref unitPosition);
@@ -58,12 +59,31 @@ namespace AoAndSugi.Game.Models
             if (math.any(unitPosition.Value != unitDestination.Value))
                 return;
 
-            WhenReachingTheDestination(ref unitStatus, unitType);
-            power.GenerationTurns[i] = new TurnId(turnValue);
+            WhenReachingTheDestination(ref power, teamIndex, unitType, unitDestination.Value);
         }
 
-        private static void WhenReachingTheDestination(ref UnitStatus unitStatus, UnitType unitType)
+        private readonly struct SamePosition : IRefFunc<EnergySupplier, bool>
         {
+            private readonly int2 position;
+
+            public SamePosition(int2 position)
+            {
+                this.position = position;
+            }
+
+            public bool Calc(ref EnergySupplier arg0) => arg0.Position.Equals(position);
+        }
+
+        private void WhenReachingTheDestination(ref Power power, int teamIndex, UnitType unitType, int2 position)
+        {
+            power.GenerationTurns[teamIndex] = turn->TurnId;
+            ref UnitStatus unitStatus = ref power.Statuses[teamIndex];
+            if (turn->EnergySuppliers.TryGetFirstIndexOf(out var supplierIndex, new SamePosition(position)))
+            {
+                unitStatus = UnitStatus.Eating;
+                power.MiscellaneousData[teamIndex] = (ulong)supplierIndex;
+                return;
+            }
             if (unitStatus != UnitStatus.AdvanceAndRole)
             {
                 unitStatus = UnitStatus.Idle;

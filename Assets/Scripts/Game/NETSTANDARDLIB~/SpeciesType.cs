@@ -24,5 +24,7 @@ namespace AoAndSugi.Game.Models
         {
             return Value.CompareTo(other.Value);
         }
+
+        public override string ToString() => Value.ToString();
     }
 }

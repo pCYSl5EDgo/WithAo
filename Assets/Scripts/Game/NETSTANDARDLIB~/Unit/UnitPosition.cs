@@ -7,5 +7,7 @@ namespace AoAndSugi.Game.Models.Unit
         public int2 Value;
 
         public UnitPosition(int2 value) => Value = value;
+
+        public override string ToString() => Value.ToString();
     }
 }

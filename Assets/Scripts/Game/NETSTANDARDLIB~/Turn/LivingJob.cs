@@ -1,6 +1,5 @@
 ﻿using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
-using UnityEngine;
 
 namespace AoAndSugi.Game.Models
 {
@@ -21,12 +20,10 @@ namespace AoAndSugi.Game.Models
             var unitType = power.UnitTypes[teamIndex];
             var sinceGeneration = turnValue - power.GenerationTurns[teamIndex].Value;
             var interval = master->GetLivingInterval(speciesType, unitType).Value;
-            Debug.Log("INTERVAL: " + interval);
             if (sinceGeneration / (interval + 1) * (interval + 1) != sinceGeneration) return;
 
             var cost = master->GetLivingCost(speciesType, unitType).Value;
             var unitInitialHp = master->GetInitialHp(speciesType, unitType);
-            Debug.Log("INIT: " + unitInitialHp);
             var unitCount = power.CalcUnitCountInTeam(teamIndex, unitInitialHp);
             ref var totalHp = ref power.TotalHps[teamIndex].Value;
 #if DEBUG

@@ -18,7 +18,7 @@ MonoBehaviour:
   attackInterval: 1
   paintCost: 1
   paintPoint: 1
-  paintInterval: 14
+  paintInterval: 0
   initialHp: 500
   maxHp: 1250
   livingCost: 2

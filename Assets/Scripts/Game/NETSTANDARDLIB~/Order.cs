@@ -12,27 +12,6 @@ namespace AoAndSugi.Game.Models
         public UnitInitialCount InitialCount;
         public UnitDestination Destination;
 
-        public override string ToString()
-        {
-            var buffer = new StringBuilder();
-            buffer
-                .Append("{\"TurnId\": ")
-                .Append(TurnId)
-                .Append(", \"InitialCount\":")
-                .Append(InitialCount.ToString())
-                .Append(", \"Destination\": ")
-                .Append(Destination.ToString())
-                .Append(", \"Kind\": ")
-                .Append(Kind.ToString())
-                .Append(", \"Power\": ")
-                .Append(Power.ToString())
-                .Append(", \"Type\": ")
-                .Append(Type.ToString())
-                .Append("}");
-
-            return buffer.ToString();
-        }
-
         public UnitInitialCount Count => InitialCount;
         UnitDestination IOrder.Destination => Destination;
         UnitId IOrder.UnitId => UnitId;
@@ -101,34 +80,6 @@ namespace AoAndSugi.Game.Models
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(value), value, null);
-                }
-            }
-        }
-
-        // 2bit 6, 7
-        public UnitType ForQueenGenerateType
-        {
-            get => (UnitType)((Value >> 6) & 0x3);
-            set
-            {
-                switch (value)
-                {
-                case UnitType.Soldier:
-                    Value &= ~192U;
-                    break;
-                case UnitType.Worker:
-                    Value |= 64U;
-                    Value &= ~128U;
-                    break;
-                case UnitType.Porter:
-                    Value |= 128U;
-                    Value &= ~64U;
-                    break;
-                case UnitType.Queen:
-                    Value |= 192U;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
                 }
             }
         }

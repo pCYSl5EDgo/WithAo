@@ -258,7 +258,10 @@ namespace AoAndSugi.Game.Models
 
         public uint CalcUnitCountInTeam(int teamIndex, UnitInitialHp initialHp)
         {
-            var answer = (TotalHps[teamIndex].Value + 1) / initialHp.Value;
+            var total = TotalHps[teamIndex].Value;
+            var answer = total / initialHp.Value;
+            if (answer * initialHp.Value != total)
+                answer++;
             var initial = InitialCounts[teamIndex].Value;
             if (answer > initial)
                 return initial;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using AoAndSugi.Game.Models.Unit;
 using NUnit.Framework;
 using UniNativeLinq;
@@ -30,9 +31,7 @@ namespace AoAndSugi.Game.Models
         private NativeArray<GameMasterData> CreateMaster(int width, int height, int maxTeamCount)
         {
             var speciesUnitInfoProviders = GetAssets<SpeciesCommonData>();
-            Debug.Log("SPECIES LENGTH: " + speciesUnitInfoProviders.Length);
             var unitMovePowerDataProviders = GetAssets<CellCommonData>();
-            Debug.Log("UNIT MOVE POWER : " + unitMovePowerDataProviders.Length);
             return new NativeArray<GameMasterData>(1, Allocator.Persistent)
             {
                 [0] = new MasterDataConverter().Convert(new int2(width, height), maxTeamCount, speciesUnitInfoProviders, unitMovePowerDataProviders)
@@ -140,7 +139,7 @@ namespace AoAndSugi.Game.Models
             {
                 [0] = new Order()
                 {
-                    ForQueenGenerateType = UnitType.Soldier,
+                    Type = UnitType.Soldier,
                     Kind = OrderKind.Generate,
                     Power = default,
                     InitialCount = new UnitInitialCount(1),
@@ -151,15 +150,15 @@ namespace AoAndSugi.Game.Models
             using (var board = new Board(new int2(width, height)))
             using (var turnArray = new NativeArray<Turn>(1, Allocator.Persistent))
             {
+                var orders = orderArray.AsRefEnumerableUnsafe();
+                var turns = turnArray.AsRefEnumerableUnsafe();
                 var powers = powerArray.AsRefEnumerableUnsafe();
                 for (var i = 0L; i < powers.Length; i++)
                 {
                     ref var power = ref powers[i];
                     power = new Power(new PowerId((uint) i), 40);
                     var queenInitialHp = masters[0].GetInitialHp(new SpeciesType(0U), UnitType.Queen);
-                    Debug.Log("QUEEN: " + queenInitialHp);
                     power.CreateNewUnit(new SpeciesType(0U), UnitType.Queen, new UnitInitialCount(1U), queenInitialHp, new UnitPosition(new int2(1 << (int) i, 0)), new TurnId(0U));
-                    Debug.Log("OLD HP: " + power.TotalHps[0].Value);
                 }
                 var energies = InitializeEnergies(energyArray);
                 turnArray.AsRefEnumerableUnsafe()[0] = new Turn()
@@ -172,14 +171,26 @@ namespace AoAndSugi.Game.Models
                 try
                 {
                     ref var power = ref powers[0];
-                    Assert.AreNotEqual(0, masters[0].GetInitialHp(default, UnitType.Soldier));
-                    Debug.Log("OLD HP: " + power.TotalHps[0].Value);
-                    processor.ProcessOrderCollection(masters.AsRefEnumerableUnsafe().Ptr, turnArray.AsRefEnumerableUnsafe().Ptr, orderArray.AsRefEnumerable());
-
-                    Debug.Log("STATUS: " + power.Statuses[0]);
-                    Debug.Log("TEAM: " + power.TeamCount);
-                    Debug.Log("POS: " + power.Positions[0].Value);
-                    Debug.Log("NEW HP: " + power.TotalHps[0].Value);
+                    var generateInitialHp = masters[0].GetInitialHp(default, UnitType.Soldier);
+                    var queenInitialHp = masters[0].GetInitialHp(default, UnitType.Queen);
+                    Assert.AreNotEqual(0U, generateInitialHp.Value);
+                    Assert.AreNotEqual(0U, queenInitialHp.Value);
+                    Assert.AreEqual((int) queenInitialHp.Value, power.TotalHps[0].Value);
+                    for (uint i = 0; i < 501; i++)
+                    {
+                        turns[0].TurnId = new TurnId(i);
+                        processor.ProcessOrderCollection(masters.AsRefEnumerableUnsafe().Ptr, turns.Ptr, orders);
+//                        var buf = new StringBuilder().Append("TURN : ").Append(turns[0].TurnId.ToString()).Append(", TeamCount : ").Append(power.TeamCount);
+//                        for (var j = 1; j < power.TeamCount; j++)
+//                        {
+//                            buf.Append("\n\tPosition : ").Append(power.Positions[j].Value.ToString()).Append(", Unit Type : ").Append(power.UnitTypes[j].ToString()).Append(", Hp : ").Append(power.TotalHps[j].ToString()).Append(", Count : ").Append(power.CalcUnitCountInTeam(j, generateInitialHp));
+//                        }
+                        //Debug.Log(buf.ToString());
+                        //Debug.Log("T : " + i + ", " + turns[0].Board[width, default][0] + ", Team : " + power.TeamCount + ", Count : " + power.InitialCounts[1]);
+                        //Assert.AreEqual(UnitStatus.Generate, power.Statuses[0]);
+                        //Assert.AreEqual(1 + ((i + 1) / 15), power.TeamCount);
+                        //Assert.AreEqual(queenInitialHp.Value - 1U - i - ((i + 1) / 15), (uint) power.TotalHps[0].Value);
+                    }
                 }
                 finally
                 {

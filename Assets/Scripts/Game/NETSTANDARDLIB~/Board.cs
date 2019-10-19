@@ -13,20 +13,21 @@ namespace AoAndSugi.Game.Models
     {
         public NativeEnumerable<Cell> Cells;
 
-        public ref Cell this[int width, int2 position] => ref this[position.x + position.y * width]; 
+        public ref Cell this[int width, int2 position] => ref this[position.x + position.y * width];
 
         public Board(int2 size)
         {
             var count = size.x * size.y;
-            #if DEBUG
+#if DEBUG
             if (math.any(size < 0)) throw new ArgumentOutOfRangeException(size.x + ", " + size.y + " should not be less than 0!");
-            #endif
+#endif
             if (math.any(size == 0))
             {
                 Cells = default;
                 return;
             }
             Cells = NativeEnumerable<Cell>.Create(UnsafeUtilityEx.Malloc<Cell>(count, Allocator.Persistent), count);
+            UnsafeUtility.MemClear(Cells.Ptr, count * sizeof(Cell));
         }
 
         public void Clear() => UnsafeUtility.MemClear(Cells.Ptr, sizeof(Cell) * Cells.Length);
@@ -66,7 +67,7 @@ namespace AoAndSugi.Game.Models
 
         public ref Cell this[long index] => ref Cells[index];
 
-        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable) Cells).GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Cells).GetEnumerator();
 
         public NativeEnumerable<Cell>.Enumerator GetEnumerator() => Cells.GetEnumerator();
     }

@@ -73,7 +73,7 @@ namespace AoAndSugi.Game.Models
             }
 
             power.Statuses[index] = UnitStatus.Generate;
-            power.MiscellaneousData[index] = (ulong)order.ForQueenGenerateType;
+            power.MiscellaneousData[index] = (ulong)order.Type | ((ulong)order.TurnId.Value << 32);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
