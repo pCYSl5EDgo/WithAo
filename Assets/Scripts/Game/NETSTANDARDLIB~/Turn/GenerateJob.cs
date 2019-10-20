@@ -1,10 +1,8 @@
 ﻿using System;
 using AoAndSugi.Game.Models.Unit;
-using UniNativeLinq;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Mathematics;
-using UnityEngine;
 
 namespace AoAndSugi.Game.Models
 {
@@ -32,39 +30,25 @@ namespace AoAndSugi.Game.Models
 
         private void ProcessTeams(ref Power power, int teamIndex, uint turnValue)
         {
-            if (power.Statuses[teamIndex] != UnitStatus.Generate) return;
-
-            var unitType = power.UnitTypes[teamIndex];
-            if (unitType != UnitType.Queen) return;
-
+            if (GuardBlock(ref power, teamIndex)) return;
 
             ref var miscellaneousDatum = ref power.MiscellaneousData[teamIndex];
-            var generateUnitType = (UnitType)(uint)miscellaneousDatum;
-
-            var speciesType = power.SpeciesTypes[teamIndex];
-
-
             ref var totalHp = ref power.TotalHps[teamIndex].Value;
 
-            var generationCount = totalHp / master->GetGenerationRequiredHp(speciesType, generateUnitType).Value;
-
-            if (generationCount == 0) return;
+            if (GuardBlockCanGenerate(ref power, teamIndex, miscellaneousDatum, totalHp, out var generateUnitType, out var speciesType, out var generationCount)) return;
 
             var generationCost = master->GetGenerationCost(speciesType, generateUnitType).Value;
-            var countCostAffordable = (totalHp - 1) / generationCost;
+            
+            {
+                if (GuardBlockCanPayCost(totalHp, generationCost, out var countCostAffordable)) return;
 
-            if (countCostAffordable == 0) return;
-            if (generationCount > countCostAffordable)
-                generationCount = countCostAffordable;
+                if (generationCount > countCostAffordable)
+                    generationCount = countCostAffordable;
+            }
 
-            var sinceGeneration = turnValue - (uint)(miscellaneousDatum >> 32);
+            if (GuardBlockInterval(turnValue, miscellaneousDatum, speciesType, generateUnitType)) return;
 
-            var interval = master->GetGenerationInterval(speciesType, generateUnitType).Value;
-
-            if (sinceGeneration <= interval) return;
-
-            miscellaneousDatum &= 0xFFFF_FFFFUL;
-            miscellaneousDatum |= ((ulong)turnValue) << 32;
+            RenewLastGenerationTurn(turnValue, ref miscellaneousDatum);
 
             totalHp -= generationCount * generationCost;
 
@@ -87,6 +71,46 @@ namespace AoAndSugi.Game.Models
             }
 
             power.CreateNewUnit(speciesType, generateUnitType, unitInitialCount, generateInitialHp, spawnPosition, turnId);
+        }
+
+        private static void RenewLastGenerationTurn(uint turnValue, ref ulong miscellaneousDatum)
+        {
+            miscellaneousDatum &= 0xFFFF_FFFFUL;
+            miscellaneousDatum |= ((ulong) turnValue) << 32;
+        }
+
+        private bool GuardBlockInterval(uint turnValue, ulong miscellaneousDatum, SpeciesType speciesType, UnitType generateUnitType)
+        {
+            var sinceGeneration = turnValue - (uint) (miscellaneousDatum >> 32);
+
+            var interval = master->GetGenerationInterval(speciesType, generateUnitType).Value;
+
+            if (sinceGeneration <= interval) return true;
+            return false;
+        }
+
+        private static bool GuardBlockCanPayCost(int totalHp, int generationCost, out int countCostAffordable) => (countCostAffordable = (totalHp - 1) / generationCost) == 0;
+
+        private bool GuardBlockCanGenerate(ref Power power, int teamIndex, ulong miscellaneousDatum, int totalHp, out UnitType generateUnitType, out SpeciesType speciesType, out int generationCount)
+        {
+            generateUnitType = (UnitType)(uint)miscellaneousDatum;
+
+            speciesType = power.SpeciesTypes[teamIndex];
+
+
+            generationCount = totalHp / master->GetGenerationRequiredHp(speciesType, generateUnitType).Value;
+
+            if (generationCount == 0) return true;
+            return false;
+        }
+
+        private static bool GuardBlock(ref Power power, int teamIndex)
+        {
+            if (power.Statuses[teamIndex] != UnitStatus.Generate) return true;
+
+            var unitType = power.UnitTypes[teamIndex];
+            if (unitType != UnitType.Queen) return true;
+            return false;
         }
 
         private static UnitPosition CalcGeneratePosition(int width, int height, UnitPosition position, UnitType generateUnitType)

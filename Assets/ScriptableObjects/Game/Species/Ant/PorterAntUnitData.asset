@@ -16,8 +16,9 @@ MonoBehaviour:
   attackPoint: 5
   attackCalculationFormulaIndex: 0
   attackInterval: 29
+  attackRange: 10
   paintCost: 1
-  paintPoint: 1
+  paintPoint: 5
   paintInterval: 1
   initialHp: 2000
   maxHp: 16000
@@ -29,3 +30,4 @@ MonoBehaviour:
   generationCost: 10
   generationInterval: 14
   generationRequiredHp: 2000
+  viewRange: 100

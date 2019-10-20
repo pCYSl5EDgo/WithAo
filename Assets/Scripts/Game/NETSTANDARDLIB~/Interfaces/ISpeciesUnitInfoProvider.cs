@@ -13,5 +13,6 @@ namespace AoAndSugi.Game.Models
         SpeciesType SpeciesType { get; }
 
         UnitType UnitType { get; }
+        uint ViewRange { get; }
     }
 }

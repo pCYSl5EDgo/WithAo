@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using AoAndSugi.Game.Models.Unit;
 
 namespace AoAndSugi.Game.Models
@@ -36,7 +35,7 @@ namespace AoAndSugi.Game.Models
                         Value |= 2;
                         Value &= ~1U;
                         break;
-                    case OrderKind.Prepare:
+                    case OrderKind.LockOn:
                         Value |= 3;
                         break;
                     default:
@@ -46,17 +45,6 @@ namespace AoAndSugi.Game.Models
         }
 
         // 2bit 2, 3
-        public PowerId Power
-        {
-            get => new PowerId((Value >> 2) & 0x3);
-            set
-            {
-                Value &= ~12U;
-                Value |= value.Value << 2;
-            }
-        }
-
-        // 2bit 4, 5
         public UnitType Type
         {
             get => (UnitType)((Value >> 4) & 0x3);
@@ -65,22 +53,43 @@ namespace AoAndSugi.Game.Models
                 switch (value)
                 {
                     case UnitType.Soldier:
-                        Value &= ~48U;
+                        Value &= ~12U;
                         break;
                     case UnitType.Worker:
-                        Value |= 16U;
-                        Value &= ~32U;
+                        Value |= 4U;
+                        Value &= ~8U;
                         break;
                     case UnitType.Porter:
-                        Value |= 32U;
-                        Value &= ~16U;
+                        Value |= 8U;
+                        Value &= ~4U;
                         break;
                     case UnitType.Queen:
-                        Value |= 48U;
+                        Value |= 12U;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(value), value, null);
                 }
+            }
+        }
+        // 5bit 4,  5,  6,  7,  8
+        public PowerId Power
+        {
+            get => new PowerId((Value >> 4) & 0b1111_1U);
+            set
+            {
+                Value &= ~0b1111_1_0000U;
+                Value |= (value.Value & 0b1111_1U) << 4;
+            }
+        }
+
+        // 5bit 9, 10, 11, 12, 13
+        public PowerId LockOnPower
+        {
+            get => new PowerId((Value >> 9) & 0b1111_1U);
+            set
+            {
+                Value &= ~(0b1111_1U << 9);
+                Value |= (value.Value & 0b1111_1U) << 9;
             }
         }
     }
@@ -90,6 +99,6 @@ namespace AoAndSugi.Game.Models
         AdvanceAndStop,
         AdvanceAndExecuteJobOfEachType,
         Generate,
-        Prepare,
+        LockOn,
     }
 }

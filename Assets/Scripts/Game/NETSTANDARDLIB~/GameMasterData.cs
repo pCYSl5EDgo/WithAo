@@ -20,9 +20,12 @@ namespace AoAndSugi.Game.Models
         private NativeEnumerable<UnitAttackPoint> attackPointTable;
         private NativeEnumerable<UnitAttackCost> attackCostTable;
         private NativeEnumerable<UnitAttackInterval> attackIntervalTable;
+        private NativeEnumerable<UnitAttackRange> attackRangeTable;
         private NativeEnumerable<UnitLivingCost> livingCostTable;
         private NativeEnumerable<UnitLivingInterval> livingIntervalTable;
         private NativeEnumerable<CellMoveCost> cellMoveCostTable;
+        private NativeEnumerable<UnitViewRange> viewRangeTable;
+
 
         private readonly int speciesTypeCount;
         private readonly int unitTypeCount;
@@ -42,8 +45,9 @@ namespace AoAndSugi.Game.Models
             NativeEnumerable<UnitMovePower> movePowerTable,
             NativeEnumerable<UnitPaintCost> paintCostTable, NativeEnumerable<UnitPaintPoint> paintPointTable, NativeEnumerable<UnitPaintInterval> paintIntervalTable,
             NativeEnumerable<UnitGenerationCost> generationCostTable, NativeEnumerable<UnitGenerationInterval> generationIntervalTable, NativeEnumerable<UnitGenerationRequiredHp> generationRequiredHpTable,
-            NativeEnumerable<UnitAttackPoint> attackPointTable, NativeEnumerable<UnitAttackCost> attackCostTable, NativeEnumerable<UnitAttackInterval> attackIntervalTable, NativeEnumerable<UnitLivingCost> livingCostTable, NativeEnumerable<UnitLivingInterval> livingIntervalTable,
-            NativeEnumerable<CellMoveCost> cellMoveCostTable)
+            NativeEnumerable<UnitAttackPoint> attackPointTable, NativeEnumerable<UnitAttackCost> attackCostTable, NativeEnumerable<UnitAttackInterval> attackIntervalTable, NativeEnumerable<UnitAttackRange> attackRangeTable, 
+            NativeEnumerable<UnitLivingCost> livingCostTable, NativeEnumerable<UnitLivingInterval> livingIntervalTable,
+            NativeEnumerable<CellMoveCost> cellMoveCostTable, NativeEnumerable<UnitViewRange> viewRangeTable)
         {
             this.speciesTypeCount = speciesTypeCount;
             this.unitTypeCount = unitTypeCount;
@@ -60,9 +64,11 @@ namespace AoAndSugi.Game.Models
             this.attackPointTable = attackPointTable;
             this.attackCostTable = attackCostTable;
             this.attackIntervalTable = attackIntervalTable;
+            this.attackRangeTable = attackRangeTable;
             this.livingCostTable = livingCostTable;
             this.livingIntervalTable = livingIntervalTable;
             this.cellMoveCostTable = cellMoveCostTable;
+            this.viewRangeTable = viewRangeTable;
             Width = width;
             Height = height;
             MaxTeamCount = maxTeamCount;
@@ -110,6 +116,9 @@ namespace AoAndSugi.Game.Models
         public readonly ref readonly UnitAttackInterval GetAttackInterval(SpeciesType speciesType, UnitType unitType)
             => ref attackIntervalTable[IndexFrom2(speciesType, unitType)];
 
+        public readonly ref readonly UnitAttackRange GetAttackRange(SpeciesType speciesType, UnitType unitType)
+            => ref attackRangeTable[IndexFrom2(speciesType, unitType)];
+
         public readonly ref readonly UnitLivingCost GetLivingCost(SpeciesType speciesType, UnitType unitType)
             => ref livingCostTable[IndexFrom2(speciesType, unitType)];
 
@@ -118,6 +127,9 @@ namespace AoAndSugi.Game.Models
 
         public readonly ref readonly CellMoveCost GetCellMoveCost(CellType cellType)
             => ref cellMoveCostTable[(long)cellType];
+
+        public readonly ref readonly UnitViewRange GetViewRange(SpeciesType speciesType, UnitType unitType)
+            => ref viewRangeTable[IndexFrom2(speciesType, unitType)];
 
         public void Dispose()
         {
@@ -133,9 +145,11 @@ namespace AoAndSugi.Game.Models
             attackCostTable.Dispose(Allocator.Persistent);
             attackPointTable.Dispose(Allocator.Persistent);
             attackIntervalTable.Dispose(Allocator.Persistent);
+            attackRangeTable.Dispose(Allocator.Persistent);
             livingCostTable.Dispose(Allocator.Persistent);
             livingIntervalTable.Dispose(Allocator.Persistent);
             cellMoveCostTable.Dispose(Allocator.Persistent);
+            viewRangeTable.Dispose(Allocator.Persistent);
         }
     }
 }

@@ -20,24 +20,33 @@ namespace AoAndSugi.Game.Models
 
         public void Execute()
         {
+            var hasNoticedPower = stackalloc bool[master->MaxTeamCount];
             foreach (ref var power in turn->Powers)
             {
-                for (var i = 0; i < power.TeamCount; i++)
+                UnsafeUtility.MemClear(hasNoticedPower, master->MaxTeamCount);
+                for (var teamIndex = 0; teamIndex < power.TeamCount; teamIndex++)
                 {
-                    ProcessTeams(ref power, i);
+                    ProcessTeams(ref power, teamIndex, hasNoticedPower);
+                }
+                for (var i = 0; i < master->MaxTeamCount; i++)
+                {
+                    if (!hasNoticedPower[i]) continue;
+                    turn->Powers[i].SetKnowEnemy(power.PowerId, true);
                 }
             }
         }
 
-        private void ProcessTeams(ref Power power, int teamIndex)
+        private void ProcessTeams(ref Power power, int teamIndex, bool* hasNoticedPower)
         {
             ref var unitStatus = ref power.Statuses[teamIndex];
-            if (unitStatus != UnitStatus.AdvanceAndRole && unitStatus != UnitStatus.AdvanceAndStop) return;
+            if (IsNotAdvanceState(unitStatus)) return;
             var speciesType = power.SpeciesTypes[teamIndex];
             var unitType = power.UnitTypes[teamIndex];
+            var powerId = (int)power.PowerId.Value;
 
             ref var unitPosition = ref power.Positions[teamIndex];
-            ref var cell = ref turn->Board[master->Width, unitPosition.Value];
+            ref var board = ref turn->Board;
+            ref var cell = ref board[master->Width, unitPosition.Value];
 
             ref var unitMovePower = ref power.MovePowers[teamIndex];
 
@@ -47,19 +56,56 @@ namespace AoAndSugi.Game.Models
             }
 
             var unitDestination = power.Destinations[teamIndex];
+            var hasNoticed = stackalloc bool[master->MaxTeamCount];
+            UnsafeUtility.MemClear(hasNoticed, master->MaxTeamCount);
             while (true)
             {
                 var moveCost = master->GetCellMoveCost(cell.CellTypeValue).Value;
                 if (unitMovePower.Value < moveCost) break;
+
                 unitMovePower.Value -= moveCost;
                 var diff = unitDestination.Value - unitPosition.Value;
-                AdvanceUnitPositionToDestination(diff, ref unitPosition);
-                cell = ref turn->Board[master->Width, unitPosition.Value];
+                var isReached = AdvanceUnitPositionToDestination(diff, ref unitPosition);
+                Notice(ref power, teamIndex, ref (cell = ref board[master->Width, unitPosition.Value]), powerId, unitType, hasNoticed, hasNoticedPower);
+                if (isReached) break;
             }
-            if (math.any(unitPosition.Value != unitDestination.Value))
+
+            if (!unitPosition.Value.Equals(unitDestination.Value))
                 return;
 
             WhenReachingTheDestination(ref power, teamIndex, unitType, unitDestination.Value);
+        }
+
+        private static bool IsNotAdvanceState(UnitStatus unitStatus)
+        {
+            return unitStatus != UnitStatus.AdvanceAndRole
+                && unitStatus != UnitStatus.AdvanceAndStop
+                && unitStatus != UnitStatus.LockOn
+                && unitStatus != UnitStatus.Battle;
+        }
+
+        private void Notice(ref Power power, int teamIndex, ref Cell cell, int powerId, UnitType unitType, bool* hasNoticed, bool* hasNoticedOfPower)
+        {
+            if (!cell.IsOtherTerritory(powerId)) return;
+            var turnId = new TurnId(turn->TurnId.Value + 1);
+            for (var i = 0; i < master->MaxTeamCount; i++)
+            {
+                if (i == teamIndex) continue;
+                if (!cell.IsTerritoryOf(i)) continue;
+                if (hasNoticed[i]) continue;
+                hasNoticed[i] = true;
+                hasNoticedOfPower[i] = true;
+                turn->AddOrder(new Order
+                {
+                    Destination = new UnitDestination(new int2(teamIndex, 0)),
+                    Kind = OrderKind.LockOn,
+                    Power = new PowerId((uint)i),
+                    TurnId = turnId,
+                    LockOnPower = power.PowerId,
+                    UnitId = power.UnitIds[teamIndex],
+                    Type = unitType,
+                });
+            }
         }
 
         private readonly struct SamePosition : IRefFunc<EnergySupplier, bool>
@@ -78,9 +124,11 @@ namespace AoAndSugi.Game.Models
         {
             power.GenerationTurns[teamIndex] = turn->TurnId;
             ref var unitStatus = ref power.Statuses[teamIndex];
+            if (unitStatus == UnitStatus.LockOn) return;
 
             if (WhenReachEnergySupplier(ref power, teamIndex, position)) return;
             if (IfStatusIsAdvanceAndStop(ref power, teamIndex, unitStatus)) return;
+            if (unitStatus == UnitStatus.Battle) return;
             switch (unitType)
             {
                 case UnitType.Queen:
@@ -108,23 +156,32 @@ namespace AoAndSugi.Game.Models
 
         private bool IfStatusIsAdvanceAndStop(ref Power power, int teamIndex, UnitStatus unitStatus)
         {
-            if (unitStatus == UnitStatus.AdvanceAndStop)
+            if (unitStatus != UnitStatus.AdvanceAndStop) return false;
+            power.SetStatusIdle(teamIndex, turn->TurnId);
+            for (var i = 0; i < power.TeamCount; i++)
             {
-                power.SetStatusIdle(teamIndex, turn->TurnId);
-                return true;
+                if (i == teamIndex || power.UnitTypes[i] != UnitType.Queen) continue;
+                TransferHp(ref power, teamIndex, i);
+                break;
             }
-            return false;
+            return true;
+        }
+
+        private void TransferHp(ref Power power, int source, int destination)
+        {
+            var initialSourceHp = (int)(master->GetInitialHp(power.SpeciesTypes[source], power.UnitTypes[source]).Value * power.InitialCounts[source].Value);
+            ref var hp = ref power.TotalHps[source].Value;
+            if (initialSourceHp >= hp) return;
+            power.TotalHps[destination].Value += hp - initialSourceHp;
+            hp = initialSourceHp;
         }
 
         private bool WhenReachEnergySupplier(ref Power power, int teamIndex, int2 position)
         {
-            if (turn->EnergySuppliers.TryGetFirstIndexOf(out var supplierIndex, new SamePosition(position)))
-            {
-                power.Statuses[teamIndex] = UnitStatus.Eating;
-                power.MiscellaneousData[teamIndex] = (ulong) supplierIndex;
-                return true;
-            }
-            return false;
+            if (!turn->EnergySuppliers.TryGetFirstIndexOf(out var supplierIndex, new SamePosition(position))) return false;
+            power.Statuses[teamIndex] = UnitStatus.Eating;
+            power.MiscellaneousData[teamIndex] = (ulong)supplierIndex;
+            return true;
         }
 
         private readonly struct IsQueen : IRefFunc<UnitType, bool>
@@ -132,20 +189,22 @@ namespace AoAndSugi.Game.Models
             public bool Calc(ref UnitType arg0) => arg0 == UnitType.Queen;
         }
 
-        private static void AdvanceUnitPositionToDestination(int2 diff, ref UnitPosition unitPosition)
+        private static bool AdvanceUnitPositionToDestination(int2 diff, ref UnitPosition unitPosition)
         {
             if (diff.x == 0)
             {
-                if (diff.y == 0) return;
+                if (diff.y == 0) return true;
                 if (diff.y < 0)
                 {
                     // Go Down
                     unitPosition.Value.y--;
+                    return diff.y == -1;
                 }
                 else
                 {
                     // Go Up
                     unitPosition.Value.y++;
+                    return diff.y == 1;
                 }
             }
             else if (diff.y == 0)
@@ -154,10 +213,12 @@ namespace AoAndSugi.Game.Models
                 {
                     // Go Left
                     unitPosition.Value.x--;
+                    return diff.x == -1;
                 }
                 else
                 {
                     unitPosition.Value.x++;
+                    return diff.x == 1;
                 }
             }
             else if ((math.csum(diff) & 1) == 0)
@@ -186,6 +247,7 @@ namespace AoAndSugi.Game.Models
                     unitPosition.Value.y++;
                 }
             }
+            return false;
         }
     }
 }

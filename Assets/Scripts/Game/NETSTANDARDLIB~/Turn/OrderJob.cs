@@ -32,17 +32,10 @@ namespace AoAndSugi.Game.Models
             this.orders = orders.Where(new TurnIdEquality(turn->TurnId));
         }
 
-        private readonly struct PowerEquality : IRefFunc<Order, bool>
-        {
-            private readonly uint value;
-
-            public PowerEquality(int value) => this.value = (uint)value;
-
-            public bool Calc(ref Order arg0) => arg0.Power.Value == value;
-        }
-
         public void Execute()
         {
+            var doesNotHaveScout = stackalloc bool[master->MaxTeamCount];
+            UnsafeUtility.MemClear(doesNotHaveScout, master->MaxTeamCount);
             foreach (ref var order in orders)
             {
                 switch (order.Kind)
@@ -56,11 +49,49 @@ namespace AoAndSugi.Game.Models
                     case OrderKind.Generate:
                         Generate(ref order);
                         break;
-                    case OrderKind.Prepare:
+                    case OrderKind.LockOn:
+                        LockOn(ref order, doesNotHaveScout);
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
             }
+        }
+
+        private void LockOn(ref Order order, bool* doesNotHaveScout)
+        {
+            var powerValue = order.Power.Value;
+            if(doesNotHaveScout[powerValue]) return;
+            ref var enemyPower = ref turn->Powers[order.LockOnPower.Value];
+            if (enemyPower.TeamCount == 0)
+            {
+                return;
+            }
+            var enemyTeamIndex = order.Destination.Value.x;
+            if (enemyTeamIndex >= enemyPower.TeamCount)
+                enemyTeamIndex = enemyPower.TeamCount - 1;
+            var targetId = order.UnitId.Value;
+            for (; enemyTeamIndex >= 0; enemyTeamIndex--)
+            {
+                if (enemyPower.UnitIds[enemyTeamIndex].Value == targetId)
+                    break;
+            }
+            if (enemyTeamIndex == -1)
+                return;
+            ref var power = ref turn->Powers[powerValue];
+            if (!power.Statuses.TryGetFirstIndexOf(out var scoutingIndex, new IsScouting()))
+            {
+                doesNotHaveScout[powerValue] = true;
+                return;
+            }
+            power.Statuses[scoutingIndex] = UnitStatus.LockOn;
+            power.GenerationTurns[scoutingIndex] = turn->TurnId;
+            power.SetLockOnTarget(scoutingIndex, ref enemyPower, targetId, enemyTeamIndex);
+        }
+
+        private readonly struct IsScouting : IRefFunc<UnitStatus, bool>
+        {
+            public bool Calc(ref UnitStatus arg0) => arg0 == UnitStatus.Scouting;
         }
 
         private void Generate(ref Order order)

@@ -7,11 +7,13 @@ namespace AoAndSugi.Game.Models
         public void ProcessOrderCollection(GameMasterData* master, Turn* turn, NativeEnumerable<Order> orders)
         {
             new LivingJob(master, turn).Execute();
+            new RenewLockOnJob(master, turn).Execute();
             new OrderJob(master, turn, orders).Execute();
             new GenerateJob(master, turn).Execute();
             new AdvanceJob(master, turn).Execute();
             new PaintJob(master, turn).Execute();
             new EatingJob(master, turn).Execute();
+            turn->ReFillEnergySuppliers(ref *master);
         }
     }
 }

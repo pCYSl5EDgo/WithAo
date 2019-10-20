@@ -7,7 +7,7 @@ namespace AoAndSugi.Game.Models
     {
         GameMasterData Convert(int2 size,
             int maxTeamCount,
-            SpeciesCommonData[] speciesUnitInfoProviders,
-            CellCommonData[] unitMovePowerDataProviders);
+            ISpeciesFacade[] speciesUnitInfoProviders,
+            IUnitMovePowerDataProvider[] unitMovePowerDataProviders);
     }
 }

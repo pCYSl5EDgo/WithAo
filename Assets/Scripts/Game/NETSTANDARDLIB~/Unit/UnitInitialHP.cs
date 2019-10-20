@@ -22,5 +22,7 @@ namespace AoAndSugi.Game.Models.Unit
         }
 
         public override string ToString() => Value.ToString();
+
+        public UnitInitialHp(uint value) => Value = value;
     }
 }
