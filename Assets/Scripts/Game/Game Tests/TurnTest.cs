@@ -244,26 +244,35 @@ namespace AoAndSugi.Game.Models
             using (var energyArray = new NativeArray<EnergySupplier>(512, Allocator.Persistent))
             using (var board = new Board(new int2(width, height)))
             using (var turnArray = new NativeArray<Turn>(1, Allocator.Persistent))
-            using (var orderArray = new NativeArray<Order>(2, Allocator.Persistent))
+            using (var orderArray = new NativeArray<Order>(4, Allocator.Persistent))
             {
                 InitializeBoard(board, width, height);
-                var masterPtr = masterArray.AsRefEnumerableUnsafe().Ptr;
-                var orders = orderArray.AsRefEnumerableUnsafe();
+                InitializePowers(powerArray, masterArray, width, height);
+                var orders = orderArray.AsRefEnumerable();
                 var turns = turnArray.AsRefEnumerableUnsafe();
                 var turnPtr = turns.Ptr;
                 var powers = powerArray.AsRefEnumerableUnsafe();
-                {
-                    var soldierHp = masterPtr->GetInitialHp(default, UnitType.Soldier);
-                    {
-                        ref var power = ref powers[0];
-                        var basePos = new int2(width >> 1, height >> 1);
-                        for (var i = 0; i < 10; i++)
-                        {
-                            basePos -= 1;
-                            power.CreateNewUnit(default, UnitType.Soldier, new UnitInitialCount(100), soldierHp, new UnitPosition(basePos), new TurnId());
-                        }
-                    }
-                }
+            }
+        }
+
+        private static void InitializePowers(NativeArray<Power> powerArray, NativeArray<GameMasterData> masterArray, int width, int height)
+        {
+            var masterPtr = masterArray.AsRefEnumerableUnsafe().Ptr;
+            var soldierHp = masterPtr->GetInitialHp(default, UnitType.Soldier);
+            InitializePower(width, height, powerArray, 0, new int2(-1, -1), soldierHp);
+            InitializePower(width, height, powerArray, 1, new int2(-1, 1), soldierHp);
+            InitializePower(width, height, powerArray, 2, new int2(1, -1), soldierHp);
+            InitializePower(width, height, powerArray, 3, new int2(1, 1), soldierHp);
+        }
+
+        private static void InitializePower(int width, int height, NativeArray<Power> powers, int index, int2 diff, UnitInitialHp soldierHp)
+        {
+            ref var power = ref powers.AsRefEnumerableUnsafe()[index];
+            var basePos = new int2(width >> 1, height >> 1);
+            for (var i = 0; i < 10; i++)
+            {
+                basePos += diff;
+                power.CreateNewUnit(default, UnitType.Soldier, new UnitInitialCount(100), soldierHp, new UnitPosition(basePos), new TurnId());
             }
         }
 
@@ -282,7 +291,7 @@ namespace AoAndSugi.Game.Models
             }
             for (var x = (height >> 1); x < width; x++)
             {
-                for (var y = (height >> 1); y < height; y++)
+                for (var y = height >> 1; --y >= 0;)
                 {
                     board[width, new int2(x, y)].AddPaint(2, 50);
                 }
