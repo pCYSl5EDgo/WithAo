@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using UniNativeLinq;
 using AoAndSugi.Game.Models.Unit;
 using Unity.Collections.LowLevel.Unsafe;
@@ -22,9 +23,9 @@ namespace AoAndSugi.Game.Models
         {
             foreach (ref var power in turn->Powers)
             {
-                for (var i = 0; i < power.TeamCount; i++)
+                for (var teamIndex = 0; teamIndex < power.TeamCount; teamIndex++)
                 {
-                    ProcessTeams(ref power, i);
+                    ProcessTeams(ref power, teamIndex);
                 }
             }
         }
@@ -35,9 +36,11 @@ namespace AoAndSugi.Game.Models
             if (unitStatus != UnitStatus.AdvanceAndRole && unitStatus != UnitStatus.AdvanceAndStop) return;
             var speciesType = power.SpeciesTypes[teamIndex];
             var unitType = power.UnitTypes[teamIndex];
+            var powerId = (int)power.PowerId.Value;
 
             ref var unitPosition = ref power.Positions[teamIndex];
-            ref var cell = ref turn->Board[master->Width, unitPosition.Value];
+            ref var board = ref turn->Board;
+            ref var cell = ref board[master->Width, unitPosition.Value];
 
             ref var unitMovePower = ref power.MovePowers[teamIndex];
 
@@ -51,10 +54,14 @@ namespace AoAndSugi.Game.Models
             {
                 var moveCost = master->GetCellMoveCost(cell.CellTypeValue).Value;
                 if (unitMovePower.Value < moveCost) break;
+                
                 unitMovePower.Value -= moveCost;
                 var diff = unitDestination.Value - unitPosition.Value;
                 AdvanceUnitPositionToDestination(diff, ref unitPosition);
-                cell = ref turn->Board[master->Width, unitPosition.Value];
+                cell = ref board[master->Width, unitPosition.Value];
+                
+                if (!cell.IsOtherTerritory(powerId)) continue;
+                
             }
             if (math.any(unitPosition.Value != unitDestination.Value))
                 return;
@@ -108,23 +115,32 @@ namespace AoAndSugi.Game.Models
 
         private bool IfStatusIsAdvanceAndStop(ref Power power, int teamIndex, UnitStatus unitStatus)
         {
-            if (unitStatus == UnitStatus.AdvanceAndStop)
+            if (unitStatus != UnitStatus.AdvanceAndStop) return false;
+            power.SetStatusIdle(teamIndex, turn->TurnId);
+            for (var i = 0; i < power.TeamCount; i++)
             {
-                power.SetStatusIdle(teamIndex, turn->TurnId);
-                return true;
+                if (i == teamIndex || power.UnitTypes[i] != UnitType.Queen) continue;
+                TransferHp(ref power, teamIndex, i);
+                break;
             }
-            return false;
+            return true;
+        }
+
+        private void TransferHp(ref Power power, int source, int destination)
+        {
+            var initialSourceHp = (int) (master->GetInitialHp(power.SpeciesTypes[source], power.UnitTypes[source]).Value * power.InitialCounts[source].Value);
+            ref var hp = ref power.TotalHps[source].Value;
+            if (initialSourceHp >= hp) return;
+            power.TotalHps[destination].Value += hp - initialSourceHp;
+            hp = initialSourceHp;
         }
 
         private bool WhenReachEnergySupplier(ref Power power, int teamIndex, int2 position)
         {
-            if (turn->EnergySuppliers.TryGetFirstIndexOf(out var supplierIndex, new SamePosition(position)))
-            {
-                power.Statuses[teamIndex] = UnitStatus.Eating;
-                power.MiscellaneousData[teamIndex] = (ulong) supplierIndex;
-                return true;
-            }
-            return false;
+            if (!turn->EnergySuppliers.TryGetFirstIndexOf(out var supplierIndex, new SamePosition(position))) return false;
+            power.Statuses[teamIndex] = UnitStatus.Eating;
+            power.MiscellaneousData[teamIndex] = (ulong)supplierIndex;
+            return true;
         }
 
         private readonly struct IsQueen : IRefFunc<UnitType, bool>

@@ -179,13 +179,7 @@ namespace AoAndSugi.Game.Models
                     power.CreateNewUnit(new SpeciesType(0U), UnitType.Queen, new UnitInitialCount(1U), queenInitialHp, new UnitPosition(new int2(1 << (int) i, 0)), new TurnId(0U));
                 }
                 var energies = InitializeEnergies(energyArray);
-                turnArray.AsRefEnumerableUnsafe()[0] = new Turn()
-                {
-                    Board = board,
-                    Powers = powers,
-                    TurnId = default,
-                    EnergySuppliers = energies
-                };
+                turnArray.AsRefEnumerableUnsafe()[0] = new Turn(default, board, powers, energies);
                 try
                 {
                     ref var power = ref powers[0];
@@ -208,6 +202,12 @@ namespace AoAndSugi.Game.Models
                                 .Append(", Count : ").Append(power.CalcUnitCountInTeam(j, generateInitialHp))
                                 .Append(", Move : ").Append(power.MovePowers[j]);
                         }
+                        for (var j = 0; j < 4; j++)
+                        {
+                            var value = turns[0].Board[width, new int2(j, 0)][0];
+                            if(value == 0) continue;
+                            buf.Append("\n\t\t (").Append(j).Append(", 0) : ").Append(value);
+                        }
                         Debug.Log(buf.ToString());
                         //Debug.Log("T : " + i + ", " + turns[0].Board[width, default][0] + ", Team : " + power.TeamCount + ", Count : " + power.InitialCounts[1]);
                         //Assert.AreEqual(UnitStatus.Generate, power.Statuses[0]);
@@ -217,6 +217,7 @@ namespace AoAndSugi.Game.Models
                 }
                 finally
                 {
+                    turns[0].Dispose();
                     Dispose(masters);
                 }
             }
