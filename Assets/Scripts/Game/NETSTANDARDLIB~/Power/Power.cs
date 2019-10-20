@@ -214,7 +214,7 @@ namespace AoAndSugi.Game.Models
         public int DivideNewUnitFromOriginal(int sourceIndex, UnitInitialCount count, UnitInitialHp initialHp, UnitStatus status, UnitDestination destination, TurnId turn)
         {
             ref var sourceCount = ref InitialCounts[sourceIndex];
-            
+
             if (count.Value >= sourceCount.Value)
             {
                 return RewriteStatus(sourceIndex, status, destination);
@@ -309,11 +309,58 @@ namespace AoAndSugi.Game.Models
                 knownPowerFlags &= ~(1U << (int)enemyPowerId.Value);
             }
         }
-
-
-        public void SetStatusBattle(int teamIndex, TurnId turnId, PowerId enemyPower, UnitId enemyUnitId, int enemyTeamIndex)
+        /// <summary>
+        /// Taken damage
+        /// </summary>
+        /// <param name="teamIndex">team index damaged</param>
+        /// <param name="turnId">turn</param>
+        /// <param name="enemyPowerId">enemy power</param>
+        /// <param name="enemyUnitId">enemy unit id</param>
+        /// <param name="enemyTeamIndex">enemy unit index</param>
+        /// <param name="damageValue">damage</param>
+        /// <returns>is dead</returns>
+        public bool SetDamage(int teamIndex, TurnId turnId, ref Power enemyPower, UnitId enemyUnitId, int enemyTeamIndex, int damageValue)
         {
-
+            SetKnowEnemy(enemyPower.PowerId, true);
+            ref var hp = ref TotalHps[teamIndex].Value;
+            hp -= damageValue;
+            var isDead = hp <= 0;
+            if (isDead)
+            {
+                RemoveAtSwapBack(teamIndex);
+                return true;
+            }
+            ref var unitStatus = ref Statuses[teamIndex];
+            switch (unitStatus)
+            {
+                case UnitStatus.AskingForDestination:
+                case UnitStatus.Ordered:
+                case UnitStatus.Dying:
+                case UnitStatus.Dead:
+                case UnitStatus.AdvanceAndStop:
+                case UnitStatus.Generate:
+                case UnitStatus.Battle:
+                    break;
+                case UnitStatus.Idle:
+                case UnitStatus.AdvanceAndRole:
+                case UnitStatus.Scouting:
+                case UnitStatus.Eating:
+                case UnitStatus.LockOn:
+                    Statuses[teamIndex] = UnitStatus.LockOn;
+                    SetLockOnTarget(teamIndex, ref enemyPower, enemyUnitId, enemyTeamIndex);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            return false;
         }
+
+        public void SetLockOnTarget(long teamIndex, ref Power enemyPower, UnitId enemyUnitId, int enemyTeamIndex)
+        {
+            MiscellaneousData[teamIndex] = LockOnUtility.Construct(enemyUnitId, enemyTeamIndex);
+            MiscellaneousData2[teamIndex] = enemyPower.PowerId.Value;
+            Destinations[teamIndex].Value = enemyPower.Positions[enemyTeamIndex].Value;
+        }
+
     }
 }

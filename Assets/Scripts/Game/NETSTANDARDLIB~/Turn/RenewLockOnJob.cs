@@ -37,22 +37,19 @@ namespace AoAndSugi.Game.Models
             ref var targetPower = ref turn->Powers[(uint)datum2];
             if (targetPower.TeamCount == 0)
             {
-                Debug.Log("ZZZ");
                 power.SetStatusRole(teamIndex);
                 return;
             }
-            var targetId = (uint)(datum >> 32);
-            var targetIndex = (uint)datum;
+            var (targetId, targetIndex) = datum;
             if (targetIndex >= targetPower.TeamCount)
-                targetIndex = (uint)targetPower.TeamCount - 1;
+                targetIndex = targetPower.TeamCount - 1;
             while (true)
             {
-                if (targetPower.UnitIds[targetIndex].Value == targetId)
+                if (targetPower.UnitIds[targetIndex].Value == targetId.Value)
                     break;
                 if (targetIndex == 0)
                 {
                     power.SetStatusRole(teamIndex);
-                    Debug.Log("YYY");
                     return;
                 }
                 targetIndex--;
@@ -62,13 +59,14 @@ namespace AoAndSugi.Game.Models
             var speciesType = power.SpeciesTypes[teamIndex];
             var unitType = power.UnitTypes[teamIndex];
 
-            var isInAttackRange = math.csum(math.abs(targetPosition - power.Positions[teamIndex].Value)) <= master->GetAttackRange(speciesType, unitType).Value;
+            var manhattanDistance = math.csum(math.abs(targetPosition - power.Positions[teamIndex].Value));
+            var attackRange = master->GetAttackRange(speciesType, unitType).Value;
+            var isInAttackRange = manhattanDistance <= attackRange;
             if (isInAttackRange)
             {
                 unitStatus = UnitStatus.Battle;
             }
-            Debug.Log("XXX");
-            power.SetLockOnTarget(teamIndex, ref targetPower, targetId, (int)targetIndex);
+            power.SetLockOnTarget(teamIndex, ref targetPower, targetId, targetIndex);
         }
     }
 }

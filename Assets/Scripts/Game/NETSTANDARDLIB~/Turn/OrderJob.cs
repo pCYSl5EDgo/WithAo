@@ -86,7 +86,7 @@ namespace AoAndSugi.Game.Models
             }
             power.Statuses[scoutingIndex] = UnitStatus.LockOn;
             power.GenerationTurns[scoutingIndex] = turn->TurnId;
-            power.SetLockOnTarget(scoutingIndex, ref enemyPower, targetId, enemyTeamIndex);
+            power.SetLockOnTarget(scoutingIndex, ref enemyPower, new UnitId(targetId), enemyTeamIndex);
         }
 
         private readonly struct IsScouting : IRefFunc<UnitStatus, bool>

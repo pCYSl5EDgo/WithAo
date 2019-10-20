@@ -260,10 +260,6 @@ namespace AoAndSugi.Game.Models
                     ref var turn = ref turns[0];
                     Append(buf, ref turn, width, bottomLeft, topRight);
                     processor.ProcessOrderCollection(master, turns.Ptr, orderArray);
-                    for (var i = 0; i < orderArray.Length; i++)
-                    {
-                        var order = orderArray[i];
-                    }
                     buf.AppendLine();
                     Append(buf, ref turn, width, bottomLeft, topRight);
                     for (var i = 1; i < 100; i++)
@@ -310,12 +306,16 @@ namespace AoAndSugi.Game.Models
                 }
                 for (var j = 0; j < power.TeamCount; j++)
                 {
+                    var dst = power.Destinations[j].Value;
                     buf.Append("\n    ").Append(power.UnitTypes[j].ToString())
                         .Append(", ").Append(power.Positions[j].ToString())
                         .Append(", Hp : ").Append(power.TotalHps[j].Value)
                         .Append(", Status : ").Append(power.Statuses[j].ToString())
-                        .Append(", Dst : ").Append(power.Destinations[j].ToString())
-                        .Append(", MP : ").Append(power.MovePowers[j].Value);
+                        .Append($", Dst : ({dst.x:D3}, {dst.y:D3}), MP : ")
+                        .Append(power.MovePowers[j].Value)
+                        .Append($", T : {power.GenerationTurns[j].Value :D2}")
+                        .Append(", Data0 : ").Append($"{power.MiscellaneousData[j] :x8}")
+                        .Append(", Data1 : ").Append($"{power.MiscellaneousData2[j] :x8}");
                 }
             }
             foreach (ref var energySupplier in turn.EnergySuppliers)
