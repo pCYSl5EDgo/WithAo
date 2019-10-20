@@ -214,9 +214,8 @@ namespace AoAndSugi.Game.Models
         public int DivideNewUnitFromOriginal(int sourceIndex, UnitInitialCount count, UnitInitialHp initialHp, UnitStatus status, UnitDestination destination, TurnId turn)
         {
             ref var sourceCount = ref InitialCounts[sourceIndex];
-            if (count.Value > sourceCount.Value) return -1;
-
-            if (sourceCount.Value == count.Value)
+            
+            if (count.Value >= sourceCount.Value)
             {
                 return RewriteStatus(sourceIndex, status, destination);
             }

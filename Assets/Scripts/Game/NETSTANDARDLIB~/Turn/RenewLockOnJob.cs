@@ -1,10 +1,8 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using AoAndSugi.Game.Models.Unit;
-using UniNativeLinq;
+﻿using AoAndSugi.Game.Models.Unit;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace AoAndSugi.Game.Models
 {
@@ -33,12 +31,13 @@ namespace AoAndSugi.Game.Models
         private void ProcessTeams(ref Power power, int teamIndex)
         {
             ref var unitStatus = ref power.Statuses[teamIndex];
-            if (unitStatus != UnitStatus.LockOn || unitStatus != UnitStatus.Battle) return;
+            if (unitStatus != UnitStatus.LockOn && unitStatus != UnitStatus.Battle) return;
             ref var datum = ref power.MiscellaneousData[teamIndex];
             ref var datum2 = ref power.MiscellaneousData2[teamIndex];
             ref var targetPower = ref turn->Powers[(uint)datum2];
             if (targetPower.TeamCount == 0)
             {
+                Debug.Log("ZZZ");
                 power.SetStatusRole(teamIndex);
                 return;
             }
@@ -53,6 +52,7 @@ namespace AoAndSugi.Game.Models
                 if (targetIndex == 0)
                 {
                     power.SetStatusRole(teamIndex);
+                    Debug.Log("YYY");
                     return;
                 }
                 targetIndex--;
@@ -67,6 +67,7 @@ namespace AoAndSugi.Game.Models
             {
                 unitStatus = UnitStatus.Battle;
             }
+            Debug.Log("XXX");
             power.SetLockOnTarget(teamIndex, ref targetPower, targetId, (int)targetIndex);
         }
     }

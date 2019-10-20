@@ -29,7 +29,6 @@ namespace AoAndSugi.Game.Models
                     {
                         Value = y.InitialHP
                     })).ToArray().AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent);
-            Debug.Log("INITIAL HP TABLE LENGTH : " + initialHpTable.Length);
             return new GameMasterData(
                 speciesTypeCount,
                 unitTypeCount,

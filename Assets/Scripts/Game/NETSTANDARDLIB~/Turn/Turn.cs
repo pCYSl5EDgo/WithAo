@@ -86,7 +86,7 @@ namespace AoAndSugi.Game.Models
                 random.state = _.y;
                 energySupplier.Position.y = random.NextInt(0, master.Height - 1);
                 random.state = _.z;
-                energySupplier.Value = random.NextInt(1000, 40000);
+                energySupplier.Value = random.NextInt(500, 20000);
                 random.state = _.w;
             }
             RandomSeed = random.state;
