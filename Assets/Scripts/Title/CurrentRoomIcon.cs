@@ -20,7 +20,8 @@ namespace AoAndSugi
         [SerializeField] TextMeshProUGUI mapSize;
         [SerializeField] TextMeshProUGUI playerCount;
         [SerializeField] TextMeshProUGUI npcCount;
-        
+        [SerializeField] TextMeshProUGUI matchTime;
+
         public void OnClickButton() {
             PhotonNetwork.JoinRoom(roomName.text);
             waitPanel.gameObject.SetActive(true);
@@ -42,6 +43,12 @@ namespace AoAndSugi
             {
                 int count = ((MaxTeamCount)value).Value;
                 npcCount.text = $"{ count }";
+            }
+            value = null;
+            if (info.CustomProperties.TryGetValue("MatchTime", out value))
+            {
+                int time = ((MatchTime)value).Value;
+                matchTime.text = $"{ time }";
             }
         }
 
