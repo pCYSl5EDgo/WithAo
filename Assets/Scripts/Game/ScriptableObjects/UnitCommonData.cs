@@ -16,6 +16,7 @@ namespace AoAndSugi.Game
         [SerializeField] private int attackPoint;
         [SerializeField] private int attackCalculationFormulaIndex;
         [SerializeField] private uint attackInterval;
+        [SerializeField] private uint attackRange;
         [SerializeField] private int paintCost;
         [SerializeField] private int paintPoint;
         [SerializeField] private uint paintInterval;
@@ -29,7 +30,7 @@ namespace AoAndSugi.Game
         [SerializeField] private int generationCost;
         [SerializeField] private uint generationInterval;
         [SerializeField] private int generationRequiredHp;
-        private SpeciesType speciesType1;
+        [SerializeField] private uint viewRange;
 
         public int AttackCost => attackCost;
 
@@ -38,6 +39,8 @@ namespace AoAndSugi.Game
         public int AttackCalculationFormulaIndex => attackCalculationFormulaIndex;
 
         public uint AttackInterval => attackInterval;
+
+        public uint AttackRange => attackRange;
 
         public int PaintCost => paintCost;
 
@@ -55,11 +58,11 @@ namespace AoAndSugi.Game
 
         public string SpeciesName => speciesName;
 
-        SpeciesType ISpeciesUnitInfoProvider.SpeciesType => speciesType1;
-
-        public uint SpeciesType => speciesType;
+        public SpeciesType SpeciesType => new SpeciesType(speciesType);
 
         public UnitType UnitType => unitType;
+
+        public uint ViewRange => viewRange;
 
         public int GenerationCost => generationCost;
 

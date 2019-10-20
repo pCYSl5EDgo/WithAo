@@ -14,7 +14,7 @@ namespace AoAndSugi.Game
         public UnitCommonData[] UnitCommonData;
         private ISpeciesUnitInfoProvider[] unitInfoProviders;
 
-        public SpeciesType SpeciesType => new SpeciesType(UnitCommonData[0].SpeciesType);
+        public SpeciesType SpeciesType => UnitCommonData[0].SpeciesType;
 
         public ISpeciesUnitInfoProvider[] UnitInfoProviders
         {

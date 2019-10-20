@@ -21,7 +21,9 @@ namespace AoAndSugi.Game.Models
         public NativeEnumerable<UnitMovePower> MovePowers;
         public NativeEnumerable<UnitDestination> Destinations;
         public NativeEnumerable<ulong> MiscellaneousData;
+        public NativeEnumerable<ulong> MiscellaneousData2;
         public NativeEnumerable<TurnId> GenerationTurns;
+        private uint knownPowerFlags;
 
         public Power(PowerId powerId, int capacity)
         {
@@ -33,6 +35,7 @@ namespace AoAndSugi.Game.Models
                 return;
             }
             PowerId = powerId;
+            knownPowerFlags = 1U << (int)powerId.Value;
             NextUnitId = default;
             TeamCount = default;
             SpeciesTypes = NativeEnumerable<SpeciesType>.Create((SpeciesType*)Malloc(capacity), capacity);
@@ -46,13 +49,14 @@ namespace AoAndSugi.Game.Models
             MovePowers = NativeEnumerable<UnitMovePower>.Create((UnitMovePower*)(Positions.Ptr + capacity), capacity);
             Destinations = NativeEnumerable<UnitDestination>.Create((UnitDestination*)(MovePowers.Ptr + capacity), capacity);
             MiscellaneousData = NativeEnumerable<ulong>.Create((ulong*)(Destinations.Ptr + capacity), capacity);
-            GenerationTurns = NativeEnumerable<TurnId>.Create((TurnId*)(MiscellaneousData.Ptr + capacity), capacity);
+            MiscellaneousData2 = NativeEnumerable<ulong>.Create((ulong*)(MiscellaneousData.Ptr + capacity), capacity);
+            GenerationTurns = NativeEnumerable<TurnId>.Create((TurnId*)(MiscellaneousData2.Ptr + capacity), capacity);
         }
 
         private static void* Malloc(int capacity)
             => UnsafeUtility.Malloc(CalcCapacityByteLength(capacity), 4, Allocator.Persistent);
 
-        private static long CalcCapacityByteLength(long capacity) => capacity * (sizeof(SpeciesType) + sizeof(UnitId) + sizeof(UnitType) + sizeof(UnitInitialCount) + sizeof(UnitTotalHp) + sizeof(UnitStatus) + sizeof(UnitPosition) + sizeof(UnitMovePower) + sizeof(UnitDestination) + sizeof(long) + sizeof(TurnId));
+        private static long CalcCapacityByteLength(long capacity) => capacity * (sizeof(SpeciesType) + sizeof(UnitId) + sizeof(UnitType) + sizeof(UnitInitialCount) + sizeof(UnitTotalHp) + sizeof(UnitStatus) + sizeof(UnitPosition) + sizeof(UnitMovePower) + sizeof(UnitDestination) + sizeof(ulong) * 2 + sizeof(TurnId));
 
         public void RemoveAtSwapBack(int index)
         {
@@ -73,6 +77,7 @@ namespace AoAndSugi.Game.Models
             SwapBack(MovePowers, index, TeamCount);
             SwapBack(Destinations, index, TeamCount);
             SwapBack(MiscellaneousData, index, TeamCount);
+            SwapBack(MiscellaneousData2, index, TeamCount);
             SwapBack(GenerationTurns, index, TeamCount);
         }
 
@@ -105,7 +110,8 @@ namespace AoAndSugi.Game.Models
             var MovePowers = NativeEnumerable<UnitMovePower>.Create((UnitMovePower*)(Positions.Ptr + capacity), capacity);
             var Destinations = NativeEnumerable<UnitDestination>.Create((UnitDestination*)(MovePowers.Ptr + capacity), capacity);
             var MiscellaneousData = NativeEnumerable<ulong>.Create((ulong*)(Destinations.Ptr + capacity), capacity);
-            var GenerationTurns = NativeEnumerable<TurnId>.Create((TurnId*)(MiscellaneousData.Ptr + capacity), capacity);
+            var MiscellaneousData2 = NativeEnumerable<ulong>.Create((ulong*)(MiscellaneousData.Ptr + capacity), capacity);
+            var GenerationTurns = NativeEnumerable<TurnId>.Create((TurnId*)(MiscellaneousData2.Ptr + capacity), capacity);
 
             this.SpeciesTypes.Take(TeamCount).CopyTo(SpeciesTypes.Ptr);
             this.UnitIds.Take(TeamCount).CopyTo(UnitIds.Ptr);
@@ -116,6 +122,7 @@ namespace AoAndSugi.Game.Models
             this.MovePowers.Take(TeamCount).CopyTo(MovePowers.Ptr);
             this.Destinations.Take(TeamCount).CopyTo(Destinations.Ptr);
             this.MiscellaneousData.Take(TeamCount).CopyTo(MiscellaneousData.Ptr);
+            this.MiscellaneousData2.Take(TeamCount).CopyTo(MiscellaneousData2.Ptr);
             this.GenerationTurns.Take(TeamCount).CopyTo(GenerationTurns.Ptr);
 
             var teamCount = TeamCount;
@@ -135,6 +142,7 @@ namespace AoAndSugi.Game.Models
             this.MovePowers = MovePowers;
             this.Destinations = Destinations;
             this.MiscellaneousData = MiscellaneousData;
+            this.MiscellaneousData2 = MiscellaneousData2;
             this.GenerationTurns = GenerationTurns;
         }
 
@@ -163,10 +171,11 @@ namespace AoAndSugi.Game.Models
             MovePowers.Take(TeamCount).CopyTo(power.MovePowers.Ptr);
             Destinations.Take(TeamCount).CopyTo(power.Destinations.Ptr);
             MiscellaneousData.Take(TeamCount).CopyTo(power.MiscellaneousData.Ptr);
+            MiscellaneousData2.Take(TeamCount).CopyTo(power.MiscellaneousData2.Ptr);
             GenerationTurns.Take(TeamCount).CopyTo(GenerationTurns.Ptr);
         }
 
-        public void CreateNewUnit(SpeciesType speciesType, UnitType unitType, UnitInitialCount initialCount, UnitInitialHp initialHp, UnitPosition position, TurnId turn, ulong miscellaneousDatum = default)
+        public void CreateNewUnit(SpeciesType speciesType, UnitType unitType, UnitInitialCount initialCount, UnitInitialHp initialHp, UnitPosition position, TurnId turn, ulong miscellaneousDatum = default, ulong miscellaneousDatum2 = default)
         {
             ReAlloc(TeamCount + 1);
             SpeciesTypes[TeamCount] = speciesType;
@@ -180,6 +189,7 @@ namespace AoAndSugi.Game.Models
             MovePowers[TeamCount] = default;
             Destinations[TeamCount] = default;
             MiscellaneousData[TeamCount] = miscellaneousDatum;
+            MiscellaneousData2[TeamCount] = miscellaneousDatum2;
             GenerationTurns[TeamCount] = turn;
             TeamCount++;
         }
@@ -233,6 +243,7 @@ namespace AoAndSugi.Game.Models
             MovePowers[index] = default;
             Destinations[index] = destination;
             MiscellaneousData[index] = MiscellaneousData[sourceIndex];
+            MiscellaneousData2[index] = MiscellaneousData2[sourceIndex];
             GenerationTurns[index] = turn;
 
             NextUnitId.Value++;
@@ -272,12 +283,38 @@ namespace AoAndSugi.Game.Models
             var pos = Positions[teamIndex].Value;
             for (var i = 0; i < TeamCount; i++)
             {
-                if(i == teamIndex || Statuses[i] != UnitStatus.Idle || !Positions[i].Value.Equals(pos)) continue;
+                if (i == teamIndex || Statuses[i] != UnitStatus.Idle || !Positions[i].Value.Equals(pos)) continue;
                 MergeUnits(i, teamIndex, turnId);
                 return;
             }
             Statuses[teamIndex] = UnitStatus.Idle;
             GenerationTurns[teamIndex] = turnId;
+        }
+
+        public void SetStatusRole(int teamIndex)
+        {
+            Statuses[teamIndex] = UnitStatus.AdvanceAndRole;
+            Destinations[teamIndex].Value = Positions[teamIndex].Value;
+        }
+
+        public bool DoesKnowEnemy(PowerId enemyPowerId) => (knownPowerFlags & (1U << (int)enemyPowerId.Value)) != 0U;
+
+        public void SetKnowEnemy(PowerId enemyPowerId, bool value)
+        {
+            if (value)
+            {
+                knownPowerFlags |= 1U << (int)enemyPowerId.Value;
+            }
+            else
+            {
+                knownPowerFlags &= ~(1U << (int)enemyPowerId.Value);
+            }
+        }
+
+
+        public void SetStatusBattle(int teamIndex, TurnId turnId, PowerId enemyPower, UnitId enemyUnitId, int enemyTeamIndex)
+        {
+
         }
     }
 }

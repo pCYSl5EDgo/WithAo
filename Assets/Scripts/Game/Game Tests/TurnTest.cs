@@ -127,6 +127,18 @@ namespace AoAndSugi.Game.Models
             }
         }
 
+        private static NativeEnumerable<EnergySupplier> InitializeEnergies(NativeArray<EnergySupplier> energyArray)
+        {
+            var energies = energyArray.AsRefEnumerableUnsafe();
+            for (var i = 0; i < energies.Length; i++)
+            {
+                ref var energy = ref energies[i];
+                energy.Value = 10000;
+                energy.Position = new int2(3, i * i);
+            }
+            return energies;
+        }
+
         [TestCase(4, 4, 1, 1)]
         [TestCase(32, 32, 5, 4)]
         public void CreateOrder(int width, int height, int maxTeamCount, int energyCount)
@@ -179,7 +191,7 @@ namespace AoAndSugi.Game.Models
                     power.CreateNewUnit(new SpeciesType(0U), UnitType.Queen, new UnitInitialCount(1U), queenInitialHp, new UnitPosition(new int2(1 << (int) i, 0)), new TurnId(0U));
                 }
                 var energies = InitializeEnergies(energyArray);
-                turnArray.AsRefEnumerableUnsafe()[0] = new Turn(default, board, powers, energies);
+                turns[0] = new Turn(default, board, powers, energies, 114u);
                 try
                 {
                     ref var power = ref powers[0];
@@ -205,7 +217,7 @@ namespace AoAndSugi.Game.Models
                         for (var j = 0; j < 4; j++)
                         {
                             var value = turns[0].Board[width, new int2(j, 0)][0];
-                            if(value == 0) continue;
+                            if (value == 0) continue;
                             buf.Append("\n\t\t (").Append(j).Append(", 0) : ").Append(value);
                         }
                         Debug.Log(buf.ToString());
@@ -223,16 +235,62 @@ namespace AoAndSugi.Game.Models
             }
         }
 
-        private static NativeEnumerable<EnergySupplier> InitializeEnergies(NativeArray<EnergySupplier> energyArray)
+        [TestCase(1024, 1024, 4)]
+        public void BattleTest(int width, int height, int maxTeamCount)
         {
-            var energies = energyArray.AsRefEnumerableUnsafe();
-            for (var i = 0; i < energies.Length; i++)
+            var processor = new TurnProcessor();
+            using (var masterArray = CreateMaster(width, height, maxTeamCount))
+            using (var powerArray = new NativeArray<Power>(maxTeamCount, Allocator.Persistent))
+            using (var energyArray = new NativeArray<EnergySupplier>(512, Allocator.Persistent))
+            using (var board = new Board(new int2(width, height)))
+            using (var turnArray = new NativeArray<Turn>(1, Allocator.Persistent))
+            using (var orderArray = new NativeArray<Order>(2, Allocator.Persistent))
             {
-                ref var energy = ref energies[i];
-                energy.Value = 1000;
-                energy.Position = new int2(3, i * i);
+                InitializeBoard(board, width, height);
+                var masterPtr = masterArray.AsRefEnumerableUnsafe().Ptr;
+                var orders = orderArray.AsRefEnumerableUnsafe();
+                var turns = turnArray.AsRefEnumerableUnsafe();
+                var turnPtr = turns.Ptr;
+                var powers = powerArray.AsRefEnumerableUnsafe();
+                {
+                    var soldierHp = masterPtr->GetInitialHp(default, UnitType.Soldier);
+                    {
+                        ref var power = ref powers[0];
+                        var basePos = new int2(width >> 1, height >> 1);
+                        for (var i = 0; i < 10; i++)
+                        {
+                            basePos -= 1;
+                            power.CreateNewUnit(default, UnitType.Soldier, new UnitInitialCount(100), soldierHp, new UnitPosition(basePos), new TurnId());
+                        }
+                    }
+                }
             }
-            return energies;
+        }
+
+        private static void InitializeBoard(Board board, int width, int height)
+        {
+            for (var x = width >> 1; --x >= 0;)
+            {
+                for (var y = height >> 1; --y >= 0;)
+                {
+                    board[width, new int2(x, y)].AddPaint(0, 50);
+                }
+                for (var y = height >> 1; y < height; y++)
+                {
+                    board[width, new int2(x, y)].AddPaint(1, 50);
+                }
+            }
+            for (var x = (height >> 1); x < width; x++)
+            {
+                for (var y = (height >> 1); y < height; y++)
+                {
+                    board[width, new int2(x, y)].AddPaint(2, 50);
+                }
+                for (var y = height >> 1; y < height; y++)
+                {
+                    board[width, new int2(x, y)].AddPaint(3, 50);
+                }
+            }
         }
     }
 }

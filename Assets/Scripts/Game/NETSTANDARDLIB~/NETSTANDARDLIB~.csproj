@@ -14,15 +14,11 @@
     </Reference>
 
     <Reference Include="Unity.Mathematics">
-      <HintPath>$(ProjectDir)../../../../Library/ScriptAssemblies/Unity.Mathematics.dll</HintPath>
+      <HintPath>$(ProjectDir)Unity.Mathematics.dll</HintPath>
     </Reference>
 
     <Reference Include="Unity.Collections">
-      <HintPath>$(ProjectDir)../../../../Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
-    </Reference>
-
-    <Reference Include="Unity.Burst">
-      <HintPath>$(ProjectDir)../../../../Library/ScriptAssemblies/Unity.Burst.dll</HintPath>
+      <HintPath>$(ProjectDir)Unity.Collections.dll</HintPath>
     </Reference>
 
     <Reference Include="UniNativeLinqDll">

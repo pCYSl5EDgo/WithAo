@@ -2,12 +2,14 @@ using System;
 using UniNativeLinq;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using Random = Unity.Mathematics.Random;
 using UnsafeUtilityEx = UniNativeLinq.UnsafeUtilityEx;
 
 namespace AoAndSugi.Game.Models
 {
     public unsafe struct Turn : IDisposable
     {
+        public uint RandomSeed;
         public TurnId TurnId;
         public Board Board;
         public NativeEnumerable<Power> Powers;
@@ -32,12 +34,13 @@ namespace AoAndSugi.Game.Models
             ordersForLaterTurn[ordersForLaterTurnCount++] = order;
         }
 
-        public Turn(TurnId turnId, Board board, NativeEnumerable<Power> powers, NativeEnumerable<EnergySupplier> energySuppliers)
+        public Turn(TurnId turnId, Board board, NativeEnumerable<Power> powers, NativeEnumerable<EnergySupplier> energySuppliers, uint randomSeed)
         {
             this.TurnId = turnId;
             this.Board = board;
             this.Powers = powers;
             this.EnergySuppliers = energySuppliers;
+            RandomSeed = randomSeed;
             this.ordersForLaterTurn = default;
             this.ordersForLaterTurnCount = default;
         }
@@ -69,6 +72,24 @@ namespace AoAndSugi.Game.Models
         {
             if (ordersForLaterTurnCount == 0) return;
             ordersForLaterTurn.Dispose(Allocator.Persistent);
+        }
+
+        public void ReFillEnergySuppliers(ref GameMasterData master)
+        {
+            var random = new Random(RandomSeed);
+            foreach (ref var energySupplier in EnergySuppliers)
+            {
+                if (energySupplier.Value > 0) continue;
+                var _ = random.NextUInt4();
+                random.state = _.x;
+                energySupplier.Position.x = random.NextInt(0, master.Width - 1);
+                random.state = _.y;
+                energySupplier.Position.y = random.NextInt(0, master.Height - 1);
+                random.state = _.z;
+                energySupplier.Value = random.NextInt(1000, 40000);
+                random.state = _.w;
+            }
+            RandomSeed = random.state;
         }
     }
 }

@@ -10,7 +10,7 @@ namespace AoAndSugi.Game.Models
 {
     public readonly struct MasterDataConverter : IMasterDataConverter
     {
-        public GameMasterData Convert(int2 size, int maxTeamCount, SpeciesCommonData[] speciesUnitInfoProviders, CellCommonData[] unitMovePowerDataProviders)
+        public GameMasterData Convert(int2 size, int maxTeamCount, ISpeciesFacade[] speciesUnitInfoProviders, IUnitMovePowerDataProvider[] unitMovePowerDataProviders)
         {
             Array.Sort(speciesUnitInfoProviders);
             var speciesTypeCount = speciesUnitInfoProviders.Length;
@@ -29,7 +29,7 @@ namespace AoAndSugi.Game.Models
                     {
                         Value = y.InitialHP
                     })).ToArray().AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent);
-            Debug.Log("INITIAL HP TABLE LENGTH : "+initialHpTable.Length);
+            Debug.Log("INITIAL HP TABLE LENGTH : " + initialHpTable.Length);
             return new GameMasterData(
                 speciesTypeCount,
                 unitTypeCount,
@@ -115,6 +115,13 @@ namespace AoAndSugi.Game.Models
                     .AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
                 speciesUnitInfoProviders.SelectMany(
                         x => x.UnitInfoProviders.Select(
+                            y => new UnitAttackRange()
+                            {
+                                Value = y.AttackRange
+                            })).ToArray()
+                    .AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                speciesUnitInfoProviders.SelectMany(
+                        x => x.UnitInfoProviders.Select(
                             y => new UnitLivingCost()
                             {
                                 Value = y.LivingCost
@@ -129,6 +136,13 @@ namespace AoAndSugi.Game.Models
                     .AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
                 providers.Select(x => new CellMoveCost(x.Cost))
                     .ToArray()
+                    .AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent),
+                speciesUnitInfoProviders.SelectMany(
+                        x => x.UnitInfoProviders.Select(
+                            y => new UnitViewRange()
+                            {
+                                Value = y.ViewRange
+                            })).ToArray()
                     .AsRefEnumerable().ToNativeEnumerable(Allocator.Persistent)
             );
         }
