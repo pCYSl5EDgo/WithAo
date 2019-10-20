@@ -33,5 +33,13 @@ namespace AoAndSugi
                 sceneLoader.LoadScene("Game");
             }
         }
+
+        public void OnClickLeave()
+        {
+
+            Debug.Log("部屋を出ます");
+            PhotonNetwork.LeaveRoom();
+            this.gameObject.SetActive(false);
+        }
     }
 }

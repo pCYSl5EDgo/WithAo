@@ -6,12 +6,14 @@ using Unity.Mathematics;
 public static class MyCustomType
 {
     public static readonly byte[] bufferMaxTeamCount = new byte[4];
+    public static readonly byte[] bufferMatchTIme = new byte[4];
     public static readonly byte[] bufferBoardSize = new byte[8];
 
     // カスタムタイプを登録するメソッド（起動時に一度だけ呼び出す）
     public static void Register()
     {
         PhotonPeer.RegisterType(typeof(MaxTeamCount), 1, SerializeMaxTeamCount, DeserializeMaxTeamCount);
+        PhotonPeer.RegisterType(typeof(MatchTime), 1, SerializeMatchTime, DeserializeMaxTeamCount);
         PhotonPeer.RegisterType(typeof(BoardSize), 2, SerializeBoardSize, DeserializeBoardSize);
     }
 
@@ -24,6 +26,19 @@ public static class MyCustomType
         {
             Protocol.Serialize(maxTeamCount.Value, bufferMaxTeamCount, ref index);
             outStream.Write(bufferMaxTeamCount, 0, index);
+        }
+        return (short)index; // 書き込んだバイト数を返す
+    }
+
+    // バイト列に変換して送信データに書き込むメソッド
+    private static short SerializeMatchTime(StreamBuffer outStream, object customObject)
+    {
+        MatchTime matchTime = (MatchTime)customObject;
+        int index = 0;
+        lock (bufferMaxTeamCount)
+        {
+            Protocol.Serialize(matchTime.Value, bufferMatchTIme, ref index);
+            outStream.Write(bufferMatchTIme, 0, index);
         }
         return (short)index; // 書き込んだバイト数を返す
     }
@@ -53,6 +68,19 @@ public static class MyCustomType
             Protocol.Deserialize(out value, bufferMaxTeamCount, ref index);
         }
         return new MaxTeamCount { Value = value };
+    }
+
+    // 受信データからバイト列を読み込んで変換するメソッド
+    private static object DeserializeMatchTime(StreamBuffer inStream, short length)
+    {
+        int value;
+        int index = 0;
+        lock (bufferMatchTIme)
+        {
+            inStream.Read(bufferMatchTIme, 0, length);
+            Protocol.Deserialize(out value, bufferMatchTIme, ref index);
+        }
+        return new MatchTime { Value = value };
     }
 
     // 受信データからバイト列を読み込んで変換するメソッド
