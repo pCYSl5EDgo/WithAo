@@ -269,8 +269,9 @@ namespace AoAndSugi.Game.Models
                     for (var i = 1; i < 100; i++)
                     {
                         turn.TurnId.Value = (uint) i;
+                        turn.ClearUnnecessaryOrder();
                         var nativeArray = turn.OrdersForLaterTurn.ToNativeArray(Allocator.Temp);
-                        processor.ProcessOrderCollection(master, turns.Ptr, default);
+                        processor.ProcessOrderCollection(master, turns.Ptr, nativeArray);
                         if (nativeArray.IsCreated)
                             nativeArray.Dispose();
                         buf.AppendLine();
