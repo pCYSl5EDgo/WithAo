@@ -50,6 +50,8 @@ namespace AoAndSugi
         ReactiveProperty<int> matchTime = new ReactiveProperty<int>(10);
         ReactiveProperty<bool> isPrivate = new ReactiveProperty<bool>(false);
 
+        readonly byte MaxPlayerCount = 16;
+
         public void OnClickClose() => gameObject.SetActive(false);
 
         private void Start()
@@ -101,9 +103,9 @@ namespace AoAndSugi
 
         private bool IsEnabelCreate()
         {
-            return (1 <= playerCount.Value && playerCount.Value <= 20 
-                && 0 <= npcCount.Value && npcCount.Value <= 19 
-                && (playerCount.Value + npcCount.Value) <= 20 
+            return (1 <= playerCount.Value && playerCount.Value <= MaxPlayerCount
+                && 0 <= npcCount.Value && npcCount.Value <= MaxPlayerCount-1
+                && (playerCount.Value + npcCount.Value) <= MaxPlayerCount
                 && 1 <= width.Value && width.Value <= 2000000000
                 && 1 <= height.Value && height.Value <= 2000000000
                 && 1 <= matchTime.Value && matchTime.Value <= 2000000000);
@@ -121,12 +123,14 @@ namespace AoAndSugi
                     { "PlayerCount", new MaxTeamCount(){ Value = (int)(playerCount.Value) } },
                     { "NpcCount", new MaxTeamCount(){ Value = (int)(npcCount.Value) } },
                     { "BordSize", new BoardSize(){ Value = new int2(){ x = width.Value, y = height.Value }} },
+                    { "MatchTime", new BoardSize(){ Value = (int)(matchTime.Value) } },
                    },
                 CustomRoomPropertiesForLobby = new[] {
                     "DisplayName",
                     "PlayerCount",
                     "NpcCount",
                     "BordSize",
+                    "MatchTime",
                 }
             };
 
@@ -148,14 +152,14 @@ namespace AoAndSugi
         public void OnPlayerCountValueChanged()
         { 
             var count = inputValidation.CheckInputNumber(playerCountField.text, this.gameObject);
-            if (20 < count + npcCount.Value)
+            if (MaxPlayerCount < count + npcCount.Value)
             {
                 playerCountField.enabled = false;
-                count = 20 - npcCount.Value;
+                count = MaxPlayerCount - npcCount.Value;
                 if (_messagePanel == null)
                 {
                     _messagePanel = Instantiate(messagePanel, this.gameObject.transform);
-                    _messagePanel.Initialized("Number : Up to 20 in total", 
+                    _messagePanel.Initialized("Number : Up to 16 in total", 
                         () => {
                             playerCountField.enabled = true;
                             playerCount.Value = (byte)(count);
@@ -171,14 +175,14 @@ namespace AoAndSugi
         public void OnNpcCountValueChanged()
         { 
             var count = inputValidation.CheckInputNumber(npcCountField.text, this.gameObject, true);
-            if (20 < count + playerCount.Value)
+            if (MaxPlayerCount < count + playerCount.Value)
             {
                 npcCountField.enabled = false;
-                count = 20 - npcCount.Value;
+                count = MaxPlayerCount - playerCount.Value;
                 if (_messagePanel == null)
                 {
                     _messagePanel = Instantiate(messagePanel, this.gameObject.transform);
-                    _messagePanel.Initialized("Number : Up to 20 in total",
+                    _messagePanel.Initialized("Number : Up to 16 in total",
                         () => {
                             npcCountField.enabled = true;
                             npcCount.Value = (byte)(count);
