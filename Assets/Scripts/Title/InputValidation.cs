@@ -56,7 +56,7 @@ namespace AoAndSugi
             {
                 var str = match.ToString().ToCharArray();
                 var isOk = true; 
-                for (int i = 0; i <= 10; ++i)
+                for (int i = 0; i < 10; ++i)
                 {
                     if(i == 0)
                     {
