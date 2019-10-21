@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using AoAndSugi.Game.Models.Unit;
 using NUnit.Framework;
@@ -61,7 +62,7 @@ namespace AoAndSugi.Game.Models
                 ref var master = ref enumerable[0];
                 Assert.AreEqual(width, master.Width);
                 Assert.AreEqual(height, master.Height);
-                Assert.AreEqual(maxTeamCount, master.MaxTeamCount);
+                Assert.AreEqual(maxTeamCount, master.MaxPowerCount);
                 Assert.AreEqual(100U, master.GetInitialHp(new SpeciesType(0), UnitType.Soldier).Value);
                 Assert.AreEqual(500U, master.GetInitialHp(new SpeciesType(0), UnitType.Worker).Value);
                 Assert.AreEqual(2000U, master.GetInitialHp(new SpeciesType(0), UnitType.Porter).Value);
@@ -239,36 +240,140 @@ namespace AoAndSugi.Game.Models
         public void BattleTest(int width, int height, int maxTeamCount)
         {
             var processor = new TurnProcessor();
+            var buf = new StringBuilder(100000);
             using (var masterArray = CreateMaster(width, height, maxTeamCount))
             using (var powerArray = new NativeArray<Power>(maxTeamCount, Allocator.Persistent))
-            using (var energyArray = new NativeArray<EnergySupplier>(512, Allocator.Persistent))
+            using (var energyArray = new NativeArray<EnergySupplier>(4, Allocator.Persistent))
             using (var board = new Board(new int2(width, height)))
             using (var turnArray = new NativeArray<Turn>(1, Allocator.Persistent))
-            using (var orderArray = new NativeArray<Order>(2, Allocator.Persistent))
+            using (var orderArray = new NativeArray<Order>(4, Allocator.Persistent))
             {
                 InitializeBoard(board, width, height);
-                var masterPtr = masterArray.AsRefEnumerableUnsafe().Ptr;
-                var orders = orderArray.AsRefEnumerableUnsafe();
+                InitializePowers(powerArray, masterArray, width, height);
+                InitializeOrders(orderArray, width, height);
                 var turns = turnArray.AsRefEnumerableUnsafe();
-                var turnPtr = turns.Ptr;
-                var powers = powerArray.AsRefEnumerableUnsafe();
+                var master = masterArray.AsRefEnumerableUnsafe().Ptr;
+                using (turns[0] = new Turn(default, board, powerArray, energyArray, 114514U))
                 {
-                    var soldierHp = masterPtr->GetInitialHp(default, UnitType.Soldier);
+                    var bottomLeft = new int2((width >> 1) - 2, (height >> 1) - 2);
+                    var topRight = new int2((width >> 1) + 2, (height >> 1) + 2);
+                    ref var turn = ref turns[0];
+                    Append(buf, ref turn, width, bottomLeft, topRight);
+                    processor.ProcessOrderCollection(master, turns.Ptr, orderArray);
+                    buf.AppendLine();
+                    Append(buf, ref turn, width, bottomLeft, topRight);
+                    for (var i = 1; i < 100; i++)
                     {
-                        ref var power = ref powers[0];
-                        var basePos = new int2(width >> 1, height >> 1);
-                        for (var i = 0; i < 10; i++)
-                        {
-                            basePos -= 1;
-                            power.CreateNewUnit(default, UnitType.Soldier, new UnitInitialCount(100), soldierHp, new UnitPosition(basePos), new TurnId());
-                        }
+                        turn.TurnId.Value = (uint) i;
+                        turn.ClearUnnecessaryOrder();
+                        var nativeArray = turn.OrdersForLaterTurn.ToNativeArray(Allocator.Temp);
+                        processor.ProcessOrderCollection(master, turns.Ptr, nativeArray);
+                        if (nativeArray.IsCreated)
+                            nativeArray.Dispose();
+                        buf.AppendLine();
+                        Append(buf, ref turn, width, bottomLeft, topRight);
                     }
                 }
+                File.WriteAllText(Application.dataPath + "/../record.txt", buf.ToString());
+            }
+        }
+
+        private static void Append(StringBuilder buf, ref Turn turn, int width, int2 bottomLeft, int2 topRight)
+        {
+            buf.Append("Turn : ").Append(turn.TurnId.Value).Append(", orders : ").Append(turn.OrdersForLaterTurn.Length);
+            for (var xIndex = bottomLeft.x; xIndex < topRight.x; xIndex++)
+            {
+                for (var yIndex = bottomLeft.y; yIndex < topRight.y; yIndex++)
+                {
+                    var position = new int2(xIndex, yIndex);
+                    buf.Append("\n  (").Append($"{position.x:D4}").Append(", ").AppendFormat($"{position.y:D4}").Append(") : ");
+                    ref var cell = ref turn.Board[width, position];
+                    for (var i = 0; i < 4; i++)
+                    {
+                        if (!cell.IsTerritoryOf(i)) continue;
+                        buf.Append(i).Append("->").Append(cell[i]).Append(", ");
+                    }
+                }
+            }
+            for (var i = 0; i < 4; i++)
+            {
+                buf.Append("\n  Power ").Append(i);
+                ref var power = ref turn.Powers[i];
+                for (var j = 0U; j < 4U; j++)
+                {
+                    if (i == j) continue;
+                    buf.Append("\n    Knows ").Append(j).Append(" : ").Append(power.DoesKnowEnemy(new PowerId(j)));
+                }
+                for (var j = 0; j < power.TeamCount; j++)
+                {
+                    var dst = power.Destinations[j].Value;
+                    buf.Append("\n    ").Append(power.UnitTypes[j].ToString())
+                        .Append(", ").Append(power.Positions[j].ToString())
+                        .Append(", Hp : ").Append(power.TotalHps[j].Value)
+                        .Append(", Status : ").Append(power.Statuses[j].ToString())
+                        .Append($", Dst : ({dst.x:D3}, {dst.y:D3}), MP : ")
+                        .Append(power.MovePowers[j].Value)
+                        .Append($", T : {power.GenerationTurns[j].Value :D2}")
+                        .Append(", Data0 : ").Append($"{power.MiscellaneousData[j] :x8}")
+                        .Append(", Data1 : ").Append($"{power.MiscellaneousData2[j] :x8}");
+                }
+            }
+            foreach (ref var energySupplier in turn.EnergySuppliers)
+            {
+                buf.Append("\n  Energy Supplier ").Append(energySupplier.Position.ToString()).Append(" -> ").Append(energySupplier.Value);
+            }
+            buf.AppendLine();
+        }
+
+        private static void InitializeOrders(NativeEnumerable<Order> orders, int width, int height)
+        {
+            SetOrder(orders, width, height, 0, new int2(1, 1));
+            SetOrder(orders, width, height, 1, new int2(1, -1));
+            SetOrder(orders, width, height, 2, new int2(-1, 1));
+            SetOrder(orders, width, height, 3, new int2(-1, -1));
+        }
+
+        private static Order SetOrder(NativeEnumerable<Order> orders, int width, int height, uint index, int2 diff)
+        {
+            return orders[index] = new Order()
+            {
+                UnitId = default,
+                Power = new PowerId(index),
+                Kind = OrderKind.AdvanceAndExecuteJobOfEachType,
+                InitialCount = new UnitInitialCount(UInt32.MaxValue),
+                Destination = new UnitDestination(new int2(width >> 1, height >> 1) + diff),
+                TurnId = default,
+            };
+        }
+
+        private static void InitializePowers(NativeArray<Power> powerArray, NativeArray<GameMasterData> masterArray, int width, int height)
+        {
+            var masterPtr = masterArray.AsRefEnumerableUnsafe().Ptr;
+            var soldierHp = masterPtr->GetInitialHp(default, UnitType.Soldier);
+            InitializePower(width, height, powerArray, 0, new int2(-1, -1), soldierHp);
+            InitializePower(width, height, powerArray, 1, new int2(-1, 1), soldierHp);
+            InitializePower(width, height, powerArray, 2, new int2(1, -1), soldierHp);
+            InitializePower(width, height, powerArray, 3, new int2(1, 1), soldierHp);
+        }
+
+        private static void InitializePower(int width, int height, NativeArray<Power> powers, int index, int2 diff, UnitInitialHp soldierHp)
+        {
+            ref var power = ref powers.AsRefEnumerableUnsafe()[index];
+            power = new Power(new PowerId((uint) index), 10);
+            var basePos = new int2(width >> 1, height >> 1);
+            for (var i = 0; i < 2; i++)
+            {
+                basePos += diff;
+                power.CreateNewUnit(default, UnitType.Soldier, new UnitInitialCount(1), soldierHp, new UnitPosition(basePos), new TurnId());
             }
         }
 
         private static void InitializeBoard(Board board, int width, int height)
         {
+            // 0 左下
+            // 1 左上
+            // 2 右下
+            // 3 右上
             for (var x = width >> 1; --x >= 0;)
             {
                 for (var y = height >> 1; --y >= 0;)
@@ -282,7 +387,7 @@ namespace AoAndSugi.Game.Models
             }
             for (var x = (height >> 1); x < width; x++)
             {
-                for (var y = (height >> 1); y < height; y++)
+                for (var y = height >> 1; --y >= 0;)
                 {
                     board[width, new int2(x, y)].AddPaint(2, 50);
                 }

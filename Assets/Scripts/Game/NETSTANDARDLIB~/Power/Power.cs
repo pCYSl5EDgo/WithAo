@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using UniNativeLinq;
 using AoAndSugi.Game.Models.Unit;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Mathematics;
+using UnityEngine;
 
 namespace AoAndSugi.Game.Models
 {
@@ -214,9 +217,8 @@ namespace AoAndSugi.Game.Models
         public int DivideNewUnitFromOriginal(int sourceIndex, UnitInitialCount count, UnitInitialHp initialHp, UnitStatus status, UnitDestination destination, TurnId turn)
         {
             ref var sourceCount = ref InitialCounts[sourceIndex];
-            if (count.Value > sourceCount.Value) return -1;
 
-            if (sourceCount.Value == count.Value)
+            if (count.Value >= sourceCount.Value)
             {
                 return RewriteStatus(sourceIndex, status, destination);
             }
@@ -291,8 +293,10 @@ namespace AoAndSugi.Game.Models
             GenerationTurns[teamIndex] = turnId;
         }
 
-        public void SetStatusRole(int teamIndex)
+        public void SetStatusRole(int teamIndex, [CallerFilePath] string file = "", [CallerMemberName] string name = "", [CallerLineNumber] int number = 0)
         {
+            if (Positions[teamIndex].Value.Equals(new int2(510, 514)))
+                Debug.Log("SET ROLE : " + PowerId.Value + " -> " + teamIndex + " : " + Statuses[teamIndex] + "\n" + file + " : " + name + " @ " + number);
             Statuses[teamIndex] = UnitStatus.AdvanceAndRole;
             Destinations[teamIndex].Value = Positions[teamIndex].Value;
         }
@@ -311,10 +315,59 @@ namespace AoAndSugi.Game.Models
             }
         }
 
-
-        public void SetStatusBattle(int teamIndex, TurnId turnId, PowerId enemyPower, UnitId enemyUnitId, int enemyTeamIndex)
+        /// <summary>
+        /// Taken damage
+        /// </summary>
+        /// <param name="teamIndex">team index damaged</param>
+        /// <param name="enemyPower"></param>
+        /// <param name="enemyUnitId">enemy unit id</param>
+        /// <param name="enemyTeamIndex">enemy unit index</param>
+        /// <param name="damageValue">damage</param>
+        /// <param name="enemyPowerId">enemy power</param>
+        /// <returns>is dead</returns>
+        public bool SetDamage(int teamIndex, ref Power enemyPower, UnitId enemyUnitId, int enemyTeamIndex, int damageValue)
         {
-
+            SetKnowEnemy(enemyPower.PowerId, true);
+            ref var hp = ref TotalHps[teamIndex].Value;
+            hp -= damageValue;
+            var isDead = hp <= 0;
+            if (isDead)
+            {
+                RemoveAtSwapBack(teamIndex);
+                return true;
+            }
+            ref var unitStatus = ref Statuses[teamIndex];
+            switch (unitStatus)
+            {
+                case UnitStatus.AskingForDestination:
+                case UnitStatus.Ordered:
+                case UnitStatus.Dying:
+                case UnitStatus.Dead:
+                case UnitStatus.AdvanceAndStop:
+                case UnitStatus.Generate:
+                case UnitStatus.Battle:
+                    break;
+                case UnitStatus.Idle:
+                case UnitStatus.AdvanceAndRole:
+                case UnitStatus.Scouting:
+                case UnitStatus.Eating:
+                case UnitStatus.LockOn:
+                    unitStatus = UnitStatus.LockOn;
+                    SetLockOnTarget(teamIndex, ref enemyPower, enemyUnitId, enemyTeamIndex);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            return false;
         }
+
+        public void SetLockOnTarget(long teamIndex, ref Power enemyPower, UnitId enemyUnitId, int enemyTeamIndex)
+        {
+            if(enemyPower.PowerId.Equals(PowerId)) throw new ArgumentException();
+            MiscellaneousData[teamIndex] = LockOnUtility.Construct(enemyUnitId, enemyTeamIndex);
+            MiscellaneousData2[teamIndex] = enemyPower.PowerId.Value;
+            Destinations[teamIndex].Value = enemyPower.Positions[enemyTeamIndex].Value;
+        }
+
     }
 }

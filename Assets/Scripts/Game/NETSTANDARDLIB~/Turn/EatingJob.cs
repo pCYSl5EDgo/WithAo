@@ -20,25 +20,11 @@ namespace AoAndSugi.Game.Models
         {
             foreach (ref var power in turn->Powers)
             {
-                for (var teamIndex = 0; teamIndex < power.TeamCount; teamIndex++)
+                for (var teamIndex = power.TeamCount - 1; teamIndex >= 0; teamIndex--)
                 {
                     ProcessTeams(ref power, teamIndex);
                 }
             }
-            CleanUpEnergySuppliers();
-        }
-
-        private void CleanUpEnergySuppliers()
-        {
-            ref var suppliers = ref turn->EnergySuppliers;
-            var length = suppliers.Length;
-            for (var i = length - 1; i >= 0; i--)
-            {
-                if (suppliers[i].Value > 0) continue;
-                length--;
-                suppliers[i] = suppliers[length];
-            }
-            suppliers = suppliers.Take(length);
         }
 
         private void ProcessTeams(ref Power power, int teamIndex)

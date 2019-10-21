@@ -14,11 +14,11 @@ namespace AoAndSugi.Game.Models
             this.turn = turn;
         }
 
-        private void ProcessTeams(ref Power power, int teamIndex, uint turnValue)
+        private void ProcessTeams(ref Power power, int teamIndex)
         {
             var speciesType = power.SpeciesTypes[teamIndex];
             var unitType = power.UnitTypes[teamIndex];
-            var sinceGeneration = turnValue - power.GenerationTurns[teamIndex].Value;
+            var sinceGeneration = turn->TurnId.Value - power.GenerationTurns[teamIndex].Value;
             var interval = master->GetLivingInterval(speciesType, unitType).Value;
             if (sinceGeneration / (interval + 1) * (interval + 1) != sinceGeneration) return;
 
@@ -26,14 +26,7 @@ namespace AoAndSugi.Game.Models
             var unitInitialHp = master->GetInitialHp(speciesType, unitType);
             var unitCount = power.CalcUnitCountInTeam(teamIndex, unitInitialHp);
             ref var totalHp = ref power.TotalHps[teamIndex].Value;
-#if DEBUG
-            checked
-            {
-#endif
-            power.TotalHps[teamIndex].Value -= (int)(cost * unitCount);
-#if DEBUG
-            }
-#endif
+            totalHp -= (int)(cost * unitCount);
             if (totalHp > 0) return;
 
             power.RemoveAtSwapBack(teamIndex);
@@ -43,9 +36,9 @@ namespace AoAndSugi.Game.Models
         {
             foreach (ref var power in turn->Powers)
             {
-                for (var i = 0; i < power.TeamCount; i++)
+                for (var i = power.TeamCount - 1; i >= 0; i--)
                 {
-                    ProcessTeams(ref power, i, turn->TurnId.Value);
+                    ProcessTeams(ref power, i);
                 }
             }
         }

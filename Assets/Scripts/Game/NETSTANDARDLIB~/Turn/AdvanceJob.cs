@@ -20,15 +20,15 @@ namespace AoAndSugi.Game.Models
 
         public void Execute()
         {
-            var hasNoticedPower = stackalloc bool[master->MaxTeamCount];
+            var hasNoticedPower = stackalloc bool[master->MaxPowerCount];
             foreach (ref var power in turn->Powers)
             {
-                UnsafeUtility.MemClear(hasNoticedPower, master->MaxTeamCount);
-                for (var teamIndex = 0; teamIndex < power.TeamCount; teamIndex++)
+                UnsafeUtility.MemClear(hasNoticedPower, master->MaxPowerCount);
+                for (var teamIndex = power.TeamCount - 1; teamIndex >= 0; teamIndex--)
                 {
                     ProcessTeams(ref power, teamIndex, hasNoticedPower);
                 }
-                for (var i = 0; i < master->MaxTeamCount; i++)
+                for (var i = 0; i < master->MaxPowerCount; i++)
                 {
                     if (!hasNoticedPower[i]) continue;
                     turn->Powers[i].SetKnowEnemy(power.PowerId, true);
@@ -51,13 +51,13 @@ namespace AoAndSugi.Game.Models
             ref var unitMovePower = ref power.MovePowers[teamIndex];
 
             {
-                var movePower = master->GetMovePower(speciesType, unitType, cell.CellTypeValue, cell.IsTerritoryOf((int)power.PowerId.Value));
+                var movePower = master->GetMovePower(speciesType, unitType, cell.CellTypeValue, cell.IsMainTerritoryOwner((int)power.PowerId.Value));
                 unitMovePower.Value += movePower.Value;
             }
 
             var unitDestination = power.Destinations[teamIndex];
-            var hasNoticed = stackalloc bool[master->MaxTeamCount];
-            UnsafeUtility.MemClear(hasNoticed, master->MaxTeamCount);
+            var hasNoticed = stackalloc bool[master->MaxPowerCount];
+            UnsafeUtility.MemClear(hasNoticed, master->MaxPowerCount);
             while (true)
             {
                 var moveCost = master->GetCellMoveCost(cell.CellTypeValue).Value;
@@ -88,18 +88,19 @@ namespace AoAndSugi.Game.Models
         {
             if (!cell.IsOtherTerritory(powerId)) return;
             var turnId = new TurnId(turn->TurnId.Value + 1);
-            for (var i = 0; i < master->MaxTeamCount; i++)
+            for (var powerIndex = 0; powerIndex < master->MaxPowerCount; powerIndex++)
             {
-                if (i == teamIndex) continue;
-                if (!cell.IsTerritoryOf(i)) continue;
-                if (hasNoticed[i]) continue;
-                hasNoticed[i] = true;
-                hasNoticedOfPower[i] = true;
+                if (powerIndex == powerId) continue;
+                if (!cell.IsTerritoryOf(powerIndex)) continue;
+                if (hasNoticed[powerIndex]) continue;
+                hasNoticed[powerIndex] = true;
+                hasNoticedOfPower[powerIndex] = true;
+                if (power.PowerId.Value == powerIndex) throw new InvalidOperationException();
                 turn->AddOrder(new Order
                 {
                     Destination = new UnitDestination(new int2(teamIndex, 0)),
                     Kind = OrderKind.LockOn,
-                    Power = new PowerId((uint)i),
+                    Power = new PowerId((uint)powerIndex),
                     TurnId = turnId,
                     LockOnPower = power.PowerId,
                     UnitId = power.UnitIds[teamIndex],

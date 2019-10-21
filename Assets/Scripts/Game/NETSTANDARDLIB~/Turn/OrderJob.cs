@@ -34,8 +34,8 @@ namespace AoAndSugi.Game.Models
 
         public void Execute()
         {
-            var doesNotHaveScout = stackalloc bool[master->MaxTeamCount];
-            UnsafeUtility.MemClear(doesNotHaveScout, master->MaxTeamCount);
+            var doesNotHaveScout = stackalloc bool[master->MaxPowerCount];
+            UnsafeUtility.MemClear(doesNotHaveScout, master->MaxPowerCount);
             foreach (ref var order in orders)
             {
                 switch (order.Kind)
@@ -86,7 +86,7 @@ namespace AoAndSugi.Game.Models
             }
             power.Statuses[scoutingIndex] = UnitStatus.LockOn;
             power.GenerationTurns[scoutingIndex] = turn->TurnId;
-            power.SetLockOnTarget(scoutingIndex, ref enemyPower, targetId, enemyTeamIndex);
+            power.SetLockOnTarget(scoutingIndex, ref enemyPower, new UnitId(targetId), enemyTeamIndex);
         }
 
         private readonly struct IsScouting : IRefFunc<UnitStatus, bool>

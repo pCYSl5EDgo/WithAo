@@ -1,10 +1,8 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using AoAndSugi.Game.Models.Unit;
-using UniNativeLinq;
+﻿using AoAndSugi.Game.Models.Unit;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace AoAndSugi.Game.Models
 {
@@ -23,7 +21,7 @@ namespace AoAndSugi.Game.Models
         {
             foreach (ref var power in turn->Powers)
             {
-                for (var teamIndex = 0; teamIndex < power.TeamCount; teamIndex++)
+                for (var teamIndex = power.TeamCount - 1; teamIndex >= 0; teamIndex--)
                 {
                     ProcessTeams(ref power, teamIndex);
                 }
@@ -33,7 +31,7 @@ namespace AoAndSugi.Game.Models
         private void ProcessTeams(ref Power power, int teamIndex)
         {
             ref var unitStatus = ref power.Statuses[teamIndex];
-            if (unitStatus != UnitStatus.LockOn || unitStatus != UnitStatus.Battle) return;
+            if (unitStatus != UnitStatus.LockOn && unitStatus != UnitStatus.Battle) return;
             ref var datum = ref power.MiscellaneousData[teamIndex];
             ref var datum2 = ref power.MiscellaneousData2[teamIndex];
             ref var targetPower = ref turn->Powers[(uint)datum2];
@@ -42,13 +40,12 @@ namespace AoAndSugi.Game.Models
                 power.SetStatusRole(teamIndex);
                 return;
             }
-            var targetId = (uint)(datum >> 32);
-            var targetIndex = (uint)datum;
+            var (targetId, targetIndex) = datum;
             if (targetIndex >= targetPower.TeamCount)
-                targetIndex = (uint)targetPower.TeamCount - 1;
+                targetIndex = targetPower.TeamCount - 1;
             while (true)
             {
-                if (targetPower.UnitIds[targetIndex].Value == targetId)
+                if (targetPower.UnitIds[targetIndex].Value == targetId.Value)
                     break;
                 if (targetIndex == 0)
                 {
@@ -62,12 +59,14 @@ namespace AoAndSugi.Game.Models
             var speciesType = power.SpeciesTypes[teamIndex];
             var unitType = power.UnitTypes[teamIndex];
 
-            var isInAttackRange = math.csum(math.abs(targetPosition - power.Positions[teamIndex].Value)) <= master->GetAttackRange(speciesType, unitType).Value;
+            var manhattanDistance = math.csum(math.abs(targetPosition - power.Positions[teamIndex].Value));
+            var attackRange = master->GetAttackRange(speciesType, unitType).Value;
+            var isInAttackRange = manhattanDistance <= attackRange;
             if (isInAttackRange)
             {
                 unitStatus = UnitStatus.Battle;
             }
-            power.SetLockOnTarget(teamIndex, ref targetPower, targetId, (int)targetIndex);
+            power.SetLockOnTarget(teamIndex, ref targetPower, targetId, targetIndex);
         }
     }
 }

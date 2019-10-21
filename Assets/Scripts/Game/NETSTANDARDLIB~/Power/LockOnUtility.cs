@@ -1,12 +1,15 @@
-﻿namespace AoAndSugi.Game.Models
+﻿using AoAndSugi.Game.Models.Unit;
+
+namespace AoAndSugi.Game.Models
 {
     public static class LockOnUtility
     {
-        public static void SetLockOnTarget(ref this Power power, long teamIndex, ref Power enemyPower, uint enemyUnitId, int enemyTeamIndex)
+        public static void Deconstruct(this ulong miscellaneous, out UnitId enemyUnitId, out int enemyTeamIndex)
         {
-            power.MiscellaneousData[teamIndex] = ((ulong)enemyUnitId << 32) | (uint)enemyTeamIndex;
-            power.MiscellaneousData2[teamIndex] = enemyPower.PowerId.Value;
-            power.Destinations[teamIndex].Value = enemyPower.Positions[enemyTeamIndex].Value;
+            enemyTeamIndex = (int)(uint)miscellaneous;
+            enemyUnitId = new UnitId((uint)(miscellaneous >> 32));
         }
+
+        public static ulong Construct(UnitId enemyUnitId, int enemyTeamIndex) => (uint)enemyTeamIndex | ((ulong)enemyUnitId.Value << 32);
     }
 }

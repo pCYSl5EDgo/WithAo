@@ -18,9 +18,27 @@ namespace AoAndSugi.Game.Models
         private long ordersForLaterTurnCount;
         public NativeEnumerable<Order> OrdersForLaterTurn => ordersForLaterTurn.Take(ordersForLaterTurnCount);
 
+        public void ClearOrder()
+        {
+            if (ordersForLaterTurn.Ptr == null) return;
+            UnsafeUtility.Free(ordersForLaterTurn.Ptr, Allocator.Persistent);
+            ordersForLaterTurn = default;
+            ordersForLaterTurnCount = default;
+        }
+
+        public void ClearUnnecessaryOrder()
+        {
+            if (ordersForLaterTurn.Ptr == null) return;
+            for (var i = ordersForLaterTurnCount - 1L; i >= 0; i--)
+            {
+                if (ordersForLaterTurn[i].TurnId.Value >= TurnId.Value) continue;
+                ordersForLaterTurn[i] = ordersForLaterTurn[--ordersForLaterTurnCount];
+            }
+        }
+
         public void AddOrder(Order order)
         {
-            if (ordersForLaterTurn.Length == 0)
+            if (ordersForLaterTurn.Ptr == null)
             {
                 ordersForLaterTurn = NativeEnumerable<Order>.Create(UnsafeUtilityEx.Malloc<Order>(16, Allocator.Persistent), 16);
                 UnsafeUtility.MemClear(ordersForLaterTurn.Ptr + 1, 15 * sizeof(Order));
@@ -30,6 +48,8 @@ namespace AoAndSugi.Game.Models
                 var newEnumerable = NativeEnumerable<Order>.Create(UnsafeUtilityEx.Malloc<Order>(ordersForLaterTurnCount << 1, Allocator.Persistent), ordersForLaterTurnCount << 1);
                 UnsafeUtilityEx.MemCpy(newEnumerable.Ptr, ordersForLaterTurn.Ptr, ordersForLaterTurnCount);
                 UnsafeUtility.MemClear(newEnumerable.Ptr + ordersForLaterTurnCount + 1, (ordersForLaterTurnCount - 1) * sizeof(Order));
+                ordersForLaterTurn.Dispose(Allocator.Persistent);
+                ordersForLaterTurn = newEnumerable;
             }
             ordersForLaterTurn[ordersForLaterTurnCount++] = order;
         }
@@ -86,7 +106,7 @@ namespace AoAndSugi.Game.Models
                 random.state = _.y;
                 energySupplier.Position.y = random.NextInt(0, master.Height - 1);
                 random.state = _.z;
-                energySupplier.Value = random.NextInt(1000, 40000);
+                energySupplier.Value = random.NextInt(500, 20000);
                 random.state = _.w;
             }
             RandomSeed = random.state;
