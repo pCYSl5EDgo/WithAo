@@ -18,6 +18,7 @@ namespace AoAndSugi
         {
             if (string.IsNullOrEmpty(inputText))
             {
+                SetCautionName(deployer);
                 return null;
             }
 
@@ -27,14 +28,19 @@ namespace AoAndSugi
             var match = pattern.Match(inputText);
             if (!(1 <= match.Length && match.Length <= 7))
             {
-                if(_messagePanel == null)
-                {
-                    _messagePanel = Instantiate(messagePanel, deployer.transform);
-                    _messagePanel.Initialized("Please enter between 1 and 7 characters", null);
-                }
+                SetCautionName(deployer);
                 return null;
             }
             return match.ToString();
+        }
+
+        private void SetCautionName(GameObject deployer)
+        {
+            if (_messagePanel == null)
+            {
+                _messagePanel = Instantiate(messagePanel, deployer.transform);
+                _messagePanel.Initialized("Please enter between 1 and 7 characters", null);
+            }
         }
 
         public int CheckInputNumber(string inputText, GameObject deployer, bool isNpcCount = false)
