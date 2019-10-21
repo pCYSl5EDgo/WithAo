@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using UniNativeLinq;
 using AoAndSugi.Game.Models.Unit;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Mathematics;
+using UnityEngine;
 
 namespace AoAndSugi.Game.Models
 {
@@ -290,8 +293,10 @@ namespace AoAndSugi.Game.Models
             GenerationTurns[teamIndex] = turnId;
         }
 
-        public void SetStatusRole(int teamIndex)
+        public void SetStatusRole(int teamIndex, [CallerFilePath] string file = "", [CallerMemberName] string name = "", [CallerLineNumber] int number = 0)
         {
+            if (Positions[teamIndex].Value.Equals(new int2(510, 514)))
+                Debug.Log("SET ROLE : " + PowerId.Value + " -> " + teamIndex + " : " + Statuses[teamIndex] + "\n" + file + " : " + name + " @ " + number);
             Statuses[teamIndex] = UnitStatus.AdvanceAndRole;
             Destinations[teamIndex].Value = Positions[teamIndex].Value;
         }
@@ -309,17 +314,18 @@ namespace AoAndSugi.Game.Models
                 knownPowerFlags &= ~(1U << (int)enemyPowerId.Value);
             }
         }
+
         /// <summary>
         /// Taken damage
         /// </summary>
         /// <param name="teamIndex">team index damaged</param>
-        /// <param name="turnId">turn</param>
-        /// <param name="enemyPowerId">enemy power</param>
+        /// <param name="enemyPower"></param>
         /// <param name="enemyUnitId">enemy unit id</param>
         /// <param name="enemyTeamIndex">enemy unit index</param>
         /// <param name="damageValue">damage</param>
+        /// <param name="enemyPowerId">enemy power</param>
         /// <returns>is dead</returns>
-        public bool SetDamage(int teamIndex, TurnId turnId, ref Power enemyPower, UnitId enemyUnitId, int enemyTeamIndex, int damageValue)
+        public bool SetDamage(int teamIndex, ref Power enemyPower, UnitId enemyUnitId, int enemyTeamIndex, int damageValue)
         {
             SetKnowEnemy(enemyPower.PowerId, true);
             ref var hp = ref TotalHps[teamIndex].Value;
@@ -346,7 +352,7 @@ namespace AoAndSugi.Game.Models
                 case UnitStatus.Scouting:
                 case UnitStatus.Eating:
                 case UnitStatus.LockOn:
-                    Statuses[teamIndex] = UnitStatus.LockOn;
+                    unitStatus = UnitStatus.LockOn;
                     SetLockOnTarget(teamIndex, ref enemyPower, enemyUnitId, enemyTeamIndex);
                     break;
                 default:
@@ -357,6 +363,7 @@ namespace AoAndSugi.Game.Models
 
         public void SetLockOnTarget(long teamIndex, ref Power enemyPower, UnitId enemyUnitId, int enemyTeamIndex)
         {
+            if(enemyPower.PowerId.Equals(PowerId)) throw new ArgumentException();
             MiscellaneousData[teamIndex] = LockOnUtility.Construct(enemyUnitId, enemyTeamIndex);
             MiscellaneousData2[teamIndex] = enemyPower.PowerId.Value;
             Destinations[teamIndex].Value = enemyPower.Positions[enemyTeamIndex].Value;

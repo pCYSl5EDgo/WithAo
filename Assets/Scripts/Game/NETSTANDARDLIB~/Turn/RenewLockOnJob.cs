@@ -21,7 +21,7 @@ namespace AoAndSugi.Game.Models
         {
             foreach (ref var power in turn->Powers)
             {
-                for (var teamIndex = 0; teamIndex < power.TeamCount; teamIndex++)
+                for (var teamIndex = power.TeamCount - 1; teamIndex >= 0; teamIndex--)
                 {
                     ProcessTeams(ref power, teamIndex);
                 }

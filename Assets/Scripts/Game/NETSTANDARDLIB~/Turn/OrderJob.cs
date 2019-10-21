@@ -34,8 +34,8 @@ namespace AoAndSugi.Game.Models
 
         public void Execute()
         {
-            var doesNotHaveScout = stackalloc bool[master->MaxTeamCount];
-            UnsafeUtility.MemClear(doesNotHaveScout, master->MaxTeamCount);
+            var doesNotHaveScout = stackalloc bool[master->MaxPowerCount];
+            UnsafeUtility.MemClear(doesNotHaveScout, master->MaxPowerCount);
             foreach (ref var order in orders)
             {
                 switch (order.Kind)

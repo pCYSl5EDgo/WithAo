@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetUnitType: 1
   targetCellType: 0
-  earnPowerInItsTerritory: 4
-  earnPowerOther: 4
+  earnPowerInItsTerritory: 15
+  earnPowerOther: 15
   cost: 20

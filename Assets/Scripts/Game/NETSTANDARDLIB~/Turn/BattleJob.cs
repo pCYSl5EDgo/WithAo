@@ -1,7 +1,9 @@
-﻿using AoAndSugi.Game.Models.Unit;
+﻿using System;
+using AoAndSugi.Game.Models.Unit;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace AoAndSugi.Game.Models
 {
@@ -31,8 +33,10 @@ namespace AoAndSugi.Game.Models
         {
             ref var unitStatus = ref power.Statuses[teamIndex];
             if (unitStatus != UnitStatus.Battle) return;
-
-            ref var enemyPower = ref turn->Powers[(uint)power.MiscellaneousData2[teamIndex]];
+            var powerIndex = (uint)power.MiscellaneousData2[teamIndex];
+            if (powerIndex == power.PowerId.Value)
+                throw new ArgumentException("Don't attack ally!");
+            ref var enemyPower = ref turn->Powers[powerIndex];
             ref var datum = ref power.MiscellaneousData[teamIndex];
             if (GuardBlockIsEnemyAlive(ref power, teamIndex, ref datum, ref enemyPower, out var enemyTeamIndex) ||
                 GuardBlockIsAttackTiming(ref power, teamIndex, out var attackerSpeciesType, out var attackerUnitType))
@@ -42,7 +46,7 @@ namespace AoAndSugi.Game.Models
             var attackPoint = master->GetAttackPoint(attackerSpeciesType, attackerUnitType);
             var totalDamage = teamCount * attackPoint.Value;
 
-            var isEnemyDead = enemyPower.SetDamage(enemyTeamIndex, turn->TurnId, ref power, power.UnitIds[teamIndex], teamIndex, (int)totalDamage);
+            var isEnemyDead = enemyPower.SetDamage(enemyTeamIndex, ref power, power.UnitIds[teamIndex], teamIndex, (int)totalDamage);
             if (isEnemyDead)
             {
                 power.SetStatusRole(teamIndex);

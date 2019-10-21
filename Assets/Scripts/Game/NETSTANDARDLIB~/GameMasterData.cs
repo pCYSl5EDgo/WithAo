@@ -32,14 +32,14 @@ namespace AoAndSugi.Game.Models
         private readonly int cellTypeCount;
         public readonly int Width;
         public readonly int Height;
-        public readonly int MaxTeamCount;
+        public readonly int MaxPowerCount;
 
         public GameMasterData(int speciesTypeCount, 
             int unitTypeCount,
             int cellTypeCount,
             int width,
             int height,
-            int maxTeamCount,
+            int maxPowerCount,
             NativeEnumerable<UnitInitialHp> initialHpTable,
             NativeEnumerable<UnitMaxHp> maxHpTable,
             NativeEnumerable<UnitMovePower> movePowerTable,
@@ -71,7 +71,7 @@ namespace AoAndSugi.Game.Models
             this.viewRangeTable = viewRangeTable;
             Width = width;
             Height = height;
-            MaxTeamCount = maxTeamCount;
+            MaxPowerCount = maxPowerCount;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

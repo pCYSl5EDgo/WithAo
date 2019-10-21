@@ -20,8 +20,8 @@ MonoBehaviour:
   paintCost: 1
   paintPoint: 5
   paintInterval: 0
-  initialHp: 500
-  maxHp: 1250
+  initialHp: 5000
+  maxHp: 12500
   livingCost: 2
   livingInterval: 0
   speciesName: Camponotus japonicus

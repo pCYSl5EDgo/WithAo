@@ -9,6 +9,7 @@ namespace AoAndSugi.Game.Models
 {
     public unsafe struct Cell
     {
+        private const int MAX_POWER_COUNT = 16;
         public CellType CellTypeValue;
 
         public Cell(CellType cellType)
@@ -26,15 +27,16 @@ namespace AoAndSugi.Game.Models
         /// 各チームの色塗り率
         /// 0~255だが、bitフラッグがonなら1~256 offなら0と計算する
         /// </summary>
-        public fixed byte PowerValues[20];
+        public fixed byte PowerValues[MAX_POWER_COUNT];
 
         public bool IsTerritoryOf(int powerId) => ((PowerFlags >> powerId) & 0x1U) != 0;
         public bool IsOtherTerritory(int powerId) => (PowerFlags & ~(1U << powerId)) != 0U;
+        public bool IsMainTerritoryOwner(int powerId) => this[powerId] >= 128;
 
         public int Sum()
         {
             var answer = math.countbits(PowerFlags);
-            for (var i = 0; i < 20; i++)
+            for (var i = 0; i < MAX_POWER_COUNT; i++)
             {
                 answer += PowerValues[i];
             }
@@ -138,7 +140,7 @@ namespace AoAndSugi.Game.Models
         private void Decrease(int exceptId, int exceptIdValue, int overflow)
         {
 #if DEBUG
-            if (exceptId < 0 || exceptId > 20) throw new ArgumentOutOfRangeException(exceptId.ToString());
+            if (exceptId < 0 || exceptId > MAX_POWER_COUNT) throw new ArgumentOutOfRangeException(exceptId.ToString());
             if (exceptIdValue < 0 || exceptIdValue > 256) throw new ArgumentOutOfRangeException(exceptIdValue.ToString());
             if (overflow <= 0) throw new ArgumentOutOfRangeException(overflow.ToString());
 #endif
@@ -149,7 +151,7 @@ namespace AoAndSugi.Game.Models
                 var count = math.countbits(PowerFlags);
                 var dec = overflow / count;
                 var rest = overflow - dec * count;
-                for (var i = 0; i < 20; i++)
+                for (var i = 0; i < MAX_POWER_COUNT; i++)
                 {
                     var val = this[i];
                     if (val == 0) continue;
@@ -176,7 +178,7 @@ namespace AoAndSugi.Game.Models
         {
             fixed (void* ptr = PowerValues)
             {
-                UnsafeUtility.MemClear(ptr, 20L);
+                UnsafeUtility.MemClear(ptr, MAX_POWER_COUNT);
             }
             PowerFlags = 0;
         }
@@ -185,7 +187,7 @@ namespace AoAndSugi.Game.Models
         {
             var builder = new StringBuilder();
             builder.Append("{\"ChipType\": \"").Append(CellTypeValue.ToString()).Append("\", \"Territories\": [");
-            for (var i = 0; i < 20; i++)
+            for (var i = 0; i < MAX_POWER_COUNT; i++)
             {
                 if (IsTerritoryOf(i))
                 {

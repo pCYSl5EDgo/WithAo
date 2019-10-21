@@ -62,7 +62,7 @@ namespace AoAndSugi.Game.Models
                 ref var master = ref enumerable[0];
                 Assert.AreEqual(width, master.Width);
                 Assert.AreEqual(height, master.Height);
-                Assert.AreEqual(maxTeamCount, master.MaxTeamCount);
+                Assert.AreEqual(maxTeamCount, master.MaxPowerCount);
                 Assert.AreEqual(100U, master.GetInitialHp(new SpeciesType(0), UnitType.Soldier).Value);
                 Assert.AreEqual(500U, master.GetInitialHp(new SpeciesType(0), UnitType.Worker).Value);
                 Assert.AreEqual(2000U, master.GetInitialHp(new SpeciesType(0), UnitType.Porter).Value);
