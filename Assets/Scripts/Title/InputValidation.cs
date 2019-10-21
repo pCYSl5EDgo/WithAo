@@ -54,8 +54,11 @@ namespace AoAndSugi
             var firstLength = inputText.Length;
             var pattern = new Regex(@"^[0-9]+$");
             var match = pattern.Match(inputText);
+            Debug.Log("inputText");
+            Debug.Log(inputText);
             if (10 < match.Length)
             {
+                Debug.Log("大きい");
                 correctCount = isNpcCount ? 0 : 1;
                 SetCautionNumber(deployer);
             } else if (10 == match.Length)
@@ -78,9 +81,15 @@ namespace AoAndSugi
                     correctCount = isNpcCount ? 0 : 1;
                     SetCautionNumber(deployer);
                 }
+                else
+                {
+                    correctCount = Int32.Parse(match.ToString());
+                }
             }
             else
             {
+                Debug.Log("Match");
+                Debug.Log($"{match.ToString()}");
                 correctCount = Int32.Parse(match.ToString());
             }
             Debug.Log("返すよ");
