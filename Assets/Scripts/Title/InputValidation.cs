@@ -18,6 +18,7 @@ namespace AoAndSugi
         {
             if (string.IsNullOrEmpty(inputText))
             {
+                SetCautionName(deployer);
                 return null;
             }
 
@@ -27,14 +28,19 @@ namespace AoAndSugi
             var match = pattern.Match(inputText);
             if (!(1 <= match.Length && match.Length <= 7))
             {
-                if(_messagePanel == null)
-                {
-                    _messagePanel = Instantiate(messagePanel, deployer.transform);
-                    _messagePanel.Initialized("Please enter between 1 and 7 characters", null);
-                }
+                SetCautionName(deployer);
                 return null;
             }
             return match.ToString();
+        }
+
+        private void SetCautionName(GameObject deployer)
+        {
+            if (_messagePanel == null)
+            {
+                _messagePanel = Instantiate(messagePanel, deployer.transform);
+                _messagePanel.Initialized("Please enter between 1 and 7 characters", null);
+            }
         }
 
         public int CheckInputNumber(string inputText, GameObject deployer, bool isNpcCount = false)
@@ -48,15 +54,18 @@ namespace AoAndSugi
             var firstLength = inputText.Length;
             var pattern = new Regex(@"^[0-9]+$");
             var match = pattern.Match(inputText);
+            Debug.Log("inputText");
+            Debug.Log(inputText);
             if (10 < match.Length)
             {
+                Debug.Log("大きい");
                 correctCount = isNpcCount ? 0 : 1;
                 SetCautionNumber(deployer);
             } else if (10 == match.Length)
             {
                 var str = match.ToString().ToCharArray();
                 var isOk = true; 
-                for (int i = 0; i <= 10; ++i)
+                for (int i = 0; i < 10; ++i)
                 {
                     if(i == 0)
                     {
@@ -72,9 +81,15 @@ namespace AoAndSugi
                     correctCount = isNpcCount ? 0 : 1;
                     SetCautionNumber(deployer);
                 }
+                else
+                {
+                    correctCount = Int32.Parse(match.ToString());
+                }
             }
             else
             {
+                Debug.Log("Match");
+                Debug.Log($"{match.ToString()}");
                 correctCount = Int32.Parse(match.ToString());
             }
             Debug.Log("返すよ");
