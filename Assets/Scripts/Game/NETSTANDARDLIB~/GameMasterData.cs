@@ -33,6 +33,8 @@ namespace AoAndSugi.Game.Models
         public readonly int Width;
         public readonly int Height;
         public readonly int MaxPowerCount;
+        public readonly uint EnergySupplierCount;
+        public readonly uint MaxTurnCount;
 
         public GameMasterData(int speciesTypeCount, 
             int unitTypeCount,
@@ -40,6 +42,8 @@ namespace AoAndSugi.Game.Models
             int width,
             int height,
             int maxPowerCount,
+            uint energySupplierCount,
+            uint maxTurnCount,
             NativeEnumerable<UnitInitialHp> initialHpTable,
             NativeEnumerable<UnitMaxHp> maxHpTable,
             NativeEnumerable<UnitMovePower> movePowerTable,
@@ -69,9 +73,11 @@ namespace AoAndSugi.Game.Models
             this.livingIntervalTable = livingIntervalTable;
             this.cellMoveCostTable = cellMoveCostTable;
             this.viewRangeTable = viewRangeTable;
+            MaxTurnCount = maxTurnCount;
             Width = width;
             Height = height;
             MaxPowerCount = maxPowerCount;
+            EnergySupplierCount = energySupplierCount;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

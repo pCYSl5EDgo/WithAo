@@ -7,6 +7,8 @@ namespace AoAndSugi.Game.Models
     {
         GameMasterData Convert(int2 size,
             int maxTeamCount,
+            uint energySupplierCount,
+            uint maxTurnCount,
             ISpeciesFacade[] speciesUnitInfoProviders,
             IUnitMovePowerDataProvider[] unitMovePowerDataProviders);
     }

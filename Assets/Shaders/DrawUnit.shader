@@ -3,6 +3,7 @@ Shader "Unlit/DrawUnit"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _UnitInfoTex ("Texture Unit Info", 2D) = "white" {}
     }
     SubShader
     {

@@ -10,7 +10,7 @@ namespace AoAndSugi.Game.Models
 {
     public readonly struct MasterDataConverter : IMasterDataConverter
     {
-        public GameMasterData Convert(int2 size, int maxTeamCount, ISpeciesFacade[] speciesUnitInfoProviders, IUnitMovePowerDataProvider[] unitMovePowerDataProviders)
+        public GameMasterData Convert(int2 size, int maxTeamCount, uint energySupplierCount, uint maxTurnCount, ISpeciesFacade[] speciesUnitInfoProviders, IUnitMovePowerDataProvider[] unitMovePowerDataProviders)
         {
             Array.Sort(speciesUnitInfoProviders);
             var speciesTypeCount = speciesUnitInfoProviders.Length;
@@ -36,6 +36,8 @@ namespace AoAndSugi.Game.Models
                 size.x,
                 size.y,
                 maxTeamCount,
+                energySupplierCount,
+                maxTurnCount,
                 initialHpTable,
                 speciesUnitInfoProviders.SelectMany(
                     x => x.UnitInfoProviders.Select(
