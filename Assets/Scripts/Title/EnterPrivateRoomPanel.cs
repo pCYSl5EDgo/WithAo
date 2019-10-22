@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Zenject;
-using System.Collections.Generic;
+using System.Collections;
 using UniRx;
 using Unity.Mathematics;
 using AoAndSugi.Game.Models;
@@ -17,6 +17,8 @@ namespace AoAndSugi
         [Inject] private WaitPanel waitPanel;
 
         [Inject] private InputValidation inputValidation;
+
+        [Inject] private ConnectingPanel connectingPanel;
 
         [SerializeField] TMP_InputField field;
 
@@ -33,17 +35,23 @@ namespace AoAndSugi
             var correctText = inputValidation.CheckInputString(field.text, this.gameObject);
             if (!string.IsNullOrEmpty(correctText))
             {
-                EnterPrivateRoom(correctText);
+                StartCoroutine(EnterPrivateRoom(correctText));
             }
         }
 
-        private void EnterPrivateRoom(string roomName)
+        private IEnumerator EnterPrivateRoom(string roomName)
         {
-            if (PhotonNetwork.InLobby)
+            if (!PhotonNetwork.InLobby)
             {
-                PhotonNetwork.JoinRoom(roomName);
-                waitPanel.gameObject.SetActive(true);
+                connectingPanel.gameObject.SetActive(true);
+                while (!PhotonNetwork.InLobby)
+                {
+                    yield return null;
+                }
+                connectingPanel.gameObject.SetActive(false);
             }
+            PhotonNetwork.JoinRoom(roomName);
+            waitPanel.gameObject.SetActive(true);
         }
     }
 }

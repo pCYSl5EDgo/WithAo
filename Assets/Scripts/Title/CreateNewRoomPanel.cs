@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Zenject;
-using System.Collections.Generic;
+using System.Collections;
 using UniRx;
 using Unity.Mathematics;
 using AoAndSugi.Game.Models;
@@ -17,6 +17,7 @@ namespace AoAndSugi
     {
         [Inject] private WaitPanel waitPanel;
         [Inject] private InputValidation inputValidation;
+        [Inject] private ConnectingPanel connectingPanel;
 
         [SerializeField] MessagePanel messagePanel;
         MessagePanel _messagePanel;
@@ -156,18 +157,29 @@ namespace AoAndSugi
                 }
             };
 
-            if (PhotonNetwork.InLobby)
+            StartCoroutine(EnterRoom(roomName, option));
+        }
+
+        private IEnumerator EnterRoom(string roomName, RoomOptions option)
+        {
+            if (!PhotonNetwork.InLobby)
             {
-                var isSuccess = PhotonNetwork.CreateRoom(roomName, option);
-                if (!isSuccess)
+                connectingPanel.gameObject.SetActive(true);
+                while (!PhotonNetwork.InLobby)
                 {
-                    _messagePanel = Instantiate(messagePanel, this.gameObject.transform);
-                    _messagePanel.Initialized("Failed to create room. \n Try a different room name", null);
+                    yield return null;
                 }
-                else
-                {
-                    waitPanel.gameObject.SetActive(true);
-                }
+                connectingPanel.gameObject.SetActive(false);
+            }
+            var isSuccess = PhotonNetwork.CreateRoom(roomName, option);
+            if (!isSuccess)
+            {
+                _messagePanel = Instantiate(messagePanel, this.gameObject.transform);
+                _messagePanel.Initialized("Failed to create room. \n Try a different room name", null);
+            }
+            else
+            {
+                waitPanel.gameObject.SetActive(true);
             }
         }
 

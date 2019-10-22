@@ -8,12 +8,15 @@ using System;
 using Zenject;
 using AoAndSugi.Game.Models;
 using Unity.Mathematics;
+using System.Collections;
 
 namespace AoAndSugi
 {
     public sealed class CurrentRoomIcon : MonoBehaviour
     {
         [Inject] private WaitPanel waitPanel;
+
+        [Inject] private ConnectingPanel connectingPanel;
 
         [SerializeField] RectTransform rectTransform;
         [SerializeField] TextMeshProUGUI roomName;
@@ -25,11 +28,22 @@ namespace AoAndSugi
         [SerializeField] TextMeshProUGUI energySupplyLocationCount;
 
         public void OnClickButton() {
-            if (PhotonNetwork.InLobby)
+            StartCoroutine(EnterRoom());
+        }
+
+        private IEnumerator EnterRoom()
+        {
+            if (!PhotonNetwork.InLobby)
             {
-                PhotonNetwork.JoinRoom(roomName.text);
-                waitPanel.gameObject.SetActive(true);
+                connectingPanel.gameObject.SetActive(true);
+                while (!PhotonNetwork.InLobby)
+                {
+                    yield return null;
+                }
+                connectingPanel.gameObject.SetActive(false);
             }
+            PhotonNetwork.JoinRoom(roomName.text);
+            waitPanel.gameObject.SetActive(true);
         }
 
         public void Activate(RoomInfo info)
