@@ -9,26 +9,26 @@ using System.Collections.Generic;
 
 namespace AoAndSugi
 {
-    public sealed class CurrentRoomListPanel : MonoBehaviourPunCallbacks
+    public sealed class CurrentRoomListPanel : MonoBehaviour
     {
-        [SerializeField] RectTransform content;
+        [SerializeField] private RectTransform content;
 
-        [SerializeField] CurrentRoomIcon currentRoomIcon;
+        [SerializeField] private CurrentRoomIcon currentRoomIcon;
 
         [Inject] private PunNetwork punNetwork;
 
         public void OnClickClose() => gameObject.SetActive(false);
 
-        private Dictionary<string, CurrentRoomIcon> activeEntries = new Dictionary<string, CurrentRoomIcon>();
-        private Stack<CurrentRoomIcon> inactiveEntries = new Stack<CurrentRoomIcon>();
+        private readonly Dictionary<string, CurrentRoomIcon> activeEntries = new Dictionary<string, CurrentRoomIcon>();
+        private readonly Stack<CurrentRoomIcon> inactiveEntries = new Stack<CurrentRoomIcon>();
 
         private void OnEnable()
         {
             var roomList = punNetwork.RoomList;
+            if(roomList is null) return;
             foreach (var info in roomList)
             {
-                CurrentRoomIcon entry;
-                if (activeEntries.TryGetValue(info.Name, out entry))
+                if (activeEntries.TryGetValue(info.Name, out var entry))
                 {
                     if (!info.RemovedFromList)
                     {
