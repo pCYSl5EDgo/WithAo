@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace AoAndSugi
 {
-    public sealed class CurrentRoomListPanel : MonoBehaviourPunCallbacks
+    public sealed class CurrentRoomListPanel : MonoBehaviour
     {
         [SerializeField] RectTransform content;
 
@@ -25,6 +25,7 @@ namespace AoAndSugi
         private void OnEnable()
         {
             var roomList = punNetwork.RoomList;
+            if(roomList is null) return;
             foreach (var info in roomList)
             {
                 CurrentRoomIcon entry;
