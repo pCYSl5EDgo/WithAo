@@ -25,7 +25,6 @@ namespace AoAndSugi
         [SerializeField] private TMP_InputField npcCountField;
         [SerializeField] private TMP_InputField widthField;
         [SerializeField] private TMP_InputField heightField;
-        [SerializeField] private TMP_InputField foodStorageField;
         [SerializeField] private TMP_InputField energySupplyLocationField;
         [SerializeField] private TMP_InputField matchTimeField;
 
@@ -42,8 +41,6 @@ namespace AoAndSugi
         [SerializeField] private Button heightPrev;
         [SerializeField] private Button matchTimeNext;
         [SerializeField] private Button matchTimePrev;
-        [SerializeField] private Button foodStorageCountNext;
-        [SerializeField] private Button foodStorageCountPrev;
         [SerializeField] private Button energySupplyLocationCountNext;
         [SerializeField] private Button energySupplyLocationCountPrev;
         [SerializeField] private Button isPrivateButton;
@@ -68,7 +65,6 @@ namespace AoAndSugi
             widthField.ActivateInputField();
             heightField.ActivateInputField();
             matchTimeField.ActivateInputField();
-            foodStorageField.ActivateInputField();
             energySupplyLocationField.ActivateInputField();
 
             playerCount.Subscribe(_count => { playerCountField.text = _count.ToString(); });
@@ -130,17 +126,17 @@ namespace AoAndSugi
         private void CreateNewRoom(string roomName)
         {
             //オプション設定
-            var option = new RoomOptions()
+            var option = new RoomOptions
             {
                 MaxPlayers = playerCount.Value,
                 IsVisible = !isPrivate.Value,
-                CustomRoomProperties = new ExitGames.Client.Photon.Hashtable()
+                CustomRoomProperties = new ExitGames.Client.Photon.Hashtable
                 {
-                    {"DisplayName", $"{roomName}"},
-                    {"PlayerCount", new MaxTeamCount() {Value = (int) (playerCount.Value)}},
-                    {"NpcCount", new MaxTeamCount() {Value = (int) (npcCount.Value)}},
-                    {nameof(BoardSize), new BoardSize() {Value = new int2() {x = width.Value, y = height.Value}}},
-                    {nameof(MatchTime), new MatchTime() {Value = matchTime.Value}},
+                    {"DisplayName", roomName},
+                    {"PlayerCount", new MaxTeamCount {Value = playerCount.Value}},
+                    {"NpcCount", new MaxTeamCount {Value = npcCount.Value}},
+                    {nameof(BoardSize), new BoardSize {Value = new int2 {x = width.Value, y = height.Value}}},
+                    {nameof(MatchTime), new MatchTime {Value = matchTime.Value}},
                     {"EnergySupplyLocationCount", energySupplyLocationCount.Value},
                 },
                 CustomRoomPropertiesForLobby = new[]
@@ -150,7 +146,6 @@ namespace AoAndSugi
                     "NpcCount",
                     "BordSize",
                     "MatchTime",
-                    "FoodStorageCount",
                     "EnergySupplyLocationCount",
                 }
             };
