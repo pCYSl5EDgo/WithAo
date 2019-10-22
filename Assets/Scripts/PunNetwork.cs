@@ -15,11 +15,9 @@ namespace AoAndSugi
         private void Start()
         {
             DontDestroyOnLoad(this);
-            if (PhotonNetwork.IsConnected == false)
-            {
-                MyCustomType.Register();
-                PhotonNetwork.ConnectUsingSettings();
-            }
+            if (PhotonNetwork.IsConnected) return;
+            MyCustomType.Register();
+            PhotonNetwork.ConnectUsingSettings();
         }
 
         public override void OnConnectedToMaster()
