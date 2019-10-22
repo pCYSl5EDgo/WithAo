@@ -21,13 +21,12 @@ namespace AoAndSugi
 
         public void OnClickNext() {
             OnEndEdit();
-            matchingPanel.gameObject.SetActive(true);
         }
         
         public void OnEndEdit()
         {
             var correctText = inputValidation.CheckInputString(field.text, this.gameObject);
-            if (!string.IsNullOrEmpty(correctText))
+            if (!(string.IsNullOrEmpty(correctText)))
             {
                 PhotonNetwork.LocalPlayer.NickName = correctText;
                 matchingPanel.gameObject.SetActive(true);

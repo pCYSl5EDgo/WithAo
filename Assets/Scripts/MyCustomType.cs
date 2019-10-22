@@ -6,14 +6,14 @@ using Unity.Mathematics;
 public static class MyCustomType
 {
     public static readonly byte[] bufferMaxTeamCount = new byte[4];
-    public static readonly byte[] bufferMatchTIme = new byte[4];
+    public static readonly byte[] bufferMatchTime = new byte[4];
     public static readonly byte[] bufferBoardSize = new byte[8];
 
     // カスタムタイプを登録するメソッド（起動時に一度だけ呼び出す）
     public static void Register()
     {
         PhotonPeer.RegisterType(typeof(MaxTeamCount), 1, SerializeMaxTeamCount, DeserializeMaxTeamCount);
-        PhotonPeer.RegisterType(typeof(MatchTime), 1, SerializeMatchTime, DeserializeMaxTeamCount);
+        PhotonPeer.RegisterType(typeof(MatchTime), 1, SerializeMatchTime, DeserializeMatchTime);
         PhotonPeer.RegisterType(typeof(BoardSize), 2, SerializeBoardSize, DeserializeBoardSize);
     }
 
@@ -35,10 +35,10 @@ public static class MyCustomType
     {
         MatchTime matchTime = (MatchTime)customObject;
         int index = 0;
-        lock (bufferMaxTeamCount)
+        lock (bufferMatchTime)
         {
-            Protocol.Serialize(matchTime.Value, bufferMatchTIme, ref index);
-            outStream.Write(bufferMatchTIme, 0, index);
+            Protocol.Serialize(matchTime.Value, bufferMatchTime, ref index);
+            outStream.Write(bufferMatchTime, 0, index);
         }
         return (short)index; // 書き込んだバイト数を返す
     }
@@ -75,10 +75,10 @@ public static class MyCustomType
     {
         int value;
         int index = 0;
-        lock (bufferMatchTIme)
+        lock (bufferMatchTime)
         {
-            inStream.Read(bufferMatchTIme, 0, length);
-            Protocol.Deserialize(out value, bufferMatchTIme, ref index);
+            inStream.Read(bufferMatchTime, 0, length);
+            Protocol.Deserialize(out value, bufferMatchTime, ref index);
         }
         return new MatchTime { Value = value };
     }

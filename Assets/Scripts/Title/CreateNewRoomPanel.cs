@@ -123,7 +123,7 @@ namespace AoAndSugi
                     { "PlayerCount", new MaxTeamCount(){ Value = (int)(playerCount.Value) } },
                     { "NpcCount", new MaxTeamCount(){ Value = (int)(npcCount.Value) } },
                     { "BordSize", new BoardSize(){ Value = new int2(){ x = width.Value, y = height.Value }} },
-                    { "MatchTime", new BoardSize(){ Value = matchTime.Value } },
+                    { "MatchTime", new MatchTime(){ Value = matchTime.Value } },
                    },
                 CustomRoomPropertiesForLobby = new[] {
                     "DisplayName",
@@ -156,18 +156,20 @@ namespace AoAndSugi
             {
                 playerCountField.enabled = false;
                 count = MaxPlayerCount - npcCount.Value;
+                //playerCount.Value = 20;//一度別の値を入れないと値が正常に反映されないことがある
+                playerCount.Value = (byte)(count);
                 if (_messagePanel == null)
                 {
                     _messagePanel = Instantiate(messagePanel, this.gameObject.transform);
                     _messagePanel.Initialized("Number : Up to 16 in total", 
                         () => {
                             playerCountField.enabled = true;
-                            playerCount.Value = (byte)(count);
                         });
                 }
             }
             else
             {
+                //playerCount.Value = 20;//一度別の値を入れないと値が正常に反映されないことがある
                 playerCount.Value = (byte)(count);
             }
         }
