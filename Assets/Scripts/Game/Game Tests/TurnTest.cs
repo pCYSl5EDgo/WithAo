@@ -35,7 +35,7 @@ namespace AoAndSugi.Game.Models
             var unitMovePowerDataProviders = GetAssets<CellCommonData>();
             return new NativeArray<GameMasterData>(1, Allocator.Persistent)
             {
-                [0] = new MasterDataConverter().Convert(new int2(width, height), maxTeamCount, speciesUnitInfoProviders, unitMovePowerDataProviders)
+                [0] = new MasterDataConverter().Convert(new int2(width, height), maxTeamCount, 16, 1000U, speciesUnitInfoProviders, unitMovePowerDataProviders)
             };
         }
 
@@ -63,10 +63,10 @@ namespace AoAndSugi.Game.Models
                 Assert.AreEqual(width, master.Width);
                 Assert.AreEqual(height, master.Height);
                 Assert.AreEqual(maxTeamCount, master.MaxPowerCount);
-                Assert.AreEqual(100U, master.GetInitialHp(new SpeciesType(0), UnitType.Soldier).Value);
-                Assert.AreEqual(500U, master.GetInitialHp(new SpeciesType(0), UnitType.Worker).Value);
-                Assert.AreEqual(2000U, master.GetInitialHp(new SpeciesType(0), UnitType.Porter).Value);
-                Assert.AreEqual(500U, master.GetInitialHp(new SpeciesType(0), UnitType.Queen).Value);
+                Assert.AreEqual(1000U, master.GetInitialHp(new SpeciesType(0), UnitType.Soldier).Value);
+                Assert.AreEqual(5000U, master.GetInitialHp(new SpeciesType(0), UnitType.Worker).Value);
+                Assert.AreEqual(20000U, master.GetInitialHp(new SpeciesType(0), UnitType.Porter).Value);
+                Assert.AreEqual(5000U, master.GetInitialHp(new SpeciesType(0), UnitType.Queen).Value);
             }
             finally
             {
@@ -313,9 +313,9 @@ namespace AoAndSugi.Game.Models
                         .Append(", Status : ").Append(power.Statuses[j].ToString())
                         .Append($", Dst : ({dst.x:D3}, {dst.y:D3}), MP : ")
                         .Append(power.MovePowers[j].Value)
-                        .Append($", T : {power.GenerationTurns[j].Value :D2}")
-                        .Append(", Data0 : ").Append($"{power.MiscellaneousData[j] :x8}")
-                        .Append(", Data1 : ").Append($"{power.MiscellaneousData2[j] :x8}");
+                        .Append($", T : {power.GenerationTurns[j].Value:D2}")
+                        .Append(", Data0 : ").Append($"{power.MiscellaneousData[j]:x8}")
+                        .Append(", Data1 : ").Append($"{power.MiscellaneousData2[j]:x8}");
                 }
             }
             foreach (ref var energySupplier in turn.EnergySuppliers)

@@ -89,7 +89,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ShowResolutionOverlay: 1
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 0
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -439,6 +439,7 @@ GameObject:
   - component: {fileID: 1625943742}
   - component: {fileID: 1625943741}
   - component: {fileID: 1625943743}
+  - component: {fileID: 1625943744}
   m_Layer: 0
   m_Name: SceneContext
   m_TagString: Untagged
@@ -511,6 +512,22 @@ MonoBehaviour:
   - {fileID: 11400000, guid: bf40675300f078643889fb2cee83d986, type: 2}
   - {fileID: 11400000, guid: bcf6003e27ad9d7499897dd4bb8d67c6, type: 2}
   - {fileID: 11400000, guid: 25616cf1a3d43d14ebd54f6b65151279, type: 2}
+  UnitDrawer: {fileID: 2100000, guid: 24597914bceb8344ab3390bb0308944c, type: 2}
+  FieldDrawer: {fileID: 4800000, guid: 989e82e62c1f4a7291c8044f9264ad6c, type: 3}
+  QuadMesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1625943744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1625943740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95b55f2b707102b4cacb9a5e2e01fef5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DistanceFromEnergySupplier: 10
 --- !u!224 &2078029351 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5036383822470159798, guid: c8307cc0243a1e9468b112127060c4e7,

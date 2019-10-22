@@ -1,13 +1,17 @@
 {
     "name": "AoAndSugi.Game.IO",
-    "references": [],
+    "references": [
+        "Unity.Mathematics"
+    ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
     "overrideReferences": true,
     "precompiledReferences": [
-        "AoAndSugi.Game.Model.dll"
+        "AoAndSugi.Game.Model.dll",
+        "Zenject-usage.dll",
+        "UniNativeLinqDll.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": []
