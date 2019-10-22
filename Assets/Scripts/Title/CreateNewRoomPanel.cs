@@ -156,19 +156,19 @@ namespace AoAndSugi
                 }
             };
 
-            var a = PhotonNetwork.CreateRoom(roomName, option);
-            if (a)
+            if (PhotonNetwork.InLobby)
             {
-                Debug.Log("成功");
+                var isSuccess = PhotonNetwork.CreateRoom(roomName, option);
+                if (!isSuccess)
+                {
+                    _messagePanel = Instantiate(messagePanel, this.gameObject.transform);
+                    _messagePanel.Initialized("Failed to create room. \n Try a different room name", null);
+                }
+                else
+                {
+                    waitPanel.gameObject.SetActive(true);
+                }
             }
-            else
-            {
-                Debug.Log("失敗");
-                _messagePanel = Instantiate(messagePanel, this.gameObject.transform);
-                _messagePanel.Initialized("Failed to create room. \n Try a different room name", null);
-            }
-
-            waitPanel.gameObject.SetActive(true);
         }
 
         public void OnPlayerCountValueChanged()

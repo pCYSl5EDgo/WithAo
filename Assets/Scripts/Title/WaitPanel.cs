@@ -15,17 +15,8 @@ namespace AoAndSugi
             
         public void OnClickClose() => gameObject.SetActive(false);
 
-        //自分が入ってきたとき
-        private void Start()
-        {
-            //UpdatePlayerCount();
-        }
-
         public void UpdatePlayerCount()
         {
-            var a = count.text;
-            var b = PhotonNetwork.CurrentRoom.PlayerCount;
-            var c = PhotonNetwork.CurrentRoom.MaxPlayers;
             count.text = $"{PhotonNetwork.CurrentRoom.PlayerCount}/{PhotonNetwork.CurrentRoom.MaxPlayers}";
             if(PhotonNetwork.CurrentRoom.MaxPlayers <= PhotonNetwork.CurrentRoom.PlayerCount)
             {
@@ -36,9 +27,10 @@ namespace AoAndSugi
 
         public void OnClickLeave()
         {
-
-            Debug.Log("部屋を出ます");
-            PhotonNetwork.LeaveRoom();
+            if (PhotonNetwork.InRoom)
+            {
+                PhotonNetwork.LeaveRoom();
+            }
             this.gameObject.SetActive(false);
         }
     }

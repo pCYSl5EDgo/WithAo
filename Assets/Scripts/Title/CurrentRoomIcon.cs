@@ -25,8 +25,11 @@ namespace AoAndSugi
         [SerializeField] TextMeshProUGUI energySupplyLocationCount;
 
         public void OnClickButton() {
-            PhotonNetwork.JoinRoom(roomName.text);
-            waitPanel.gameObject.SetActive(true);
+            if (PhotonNetwork.InLobby)
+            {
+                PhotonNetwork.JoinRoom(roomName.text);
+                waitPanel.gameObject.SetActive(true);
+            }
         }
 
         public void Activate(RoomInfo info)

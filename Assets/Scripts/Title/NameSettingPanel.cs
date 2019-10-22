@@ -28,7 +28,10 @@ namespace AoAndSugi
             var correctText = inputValidation.CheckInputString(field.text, this.gameObject);
             if (!(string.IsNullOrEmpty(correctText)))
             {
-                PhotonNetwork.LocalPlayer.NickName = correctText;
+                if (PhotonNetwork.IsConnected)
+                {
+                    PhotonNetwork.LocalPlayer.NickName = correctText;
+                }
                 matchingPanel.gameObject.SetActive(true);
             }
         }

@@ -39,15 +39,11 @@ namespace AoAndSugi
 
         private void EnterPrivateRoom(string roomName)
         {
-            PhotonNetwork.JoinRoom(roomName);
-
-            waitPanel.gameObject.SetActive(true);
-        }
-
-        public void OnClickLeave()
-        {
-            Debug.Log("部屋を出ます");
-            PhotonNetwork.LeaveRoom();
+            if (PhotonNetwork.InLobby)
+            {
+                PhotonNetwork.JoinRoom(roomName);
+                waitPanel.gameObject.SetActive(true);
+            }
         }
     }
 }
