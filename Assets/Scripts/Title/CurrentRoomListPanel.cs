@@ -17,6 +17,8 @@ namespace AoAndSugi
 
         [Inject] private PunNetwork punNetwork;
 
+        [Inject] DiContainer container = null;
+
         public void OnClickClose() => gameObject.SetActive(false);
 
         private readonly Dictionary<string, CurrentRoomIcon> activeEntries = new Dictionary<string, CurrentRoomIcon>();
@@ -48,7 +50,7 @@ namespace AoAndSugi
                     // リスト要素を追加する
                     entry = (inactiveEntries.Count > 0)
                         ? inactiveEntries.Pop().SetAsLastSibling()
-                        : Instantiate(currentRoomIcon, content);
+                        : container.InstantiatePrefabForComponent<CurrentRoomIcon>(currentRoomIcon, content);
                     entry.Activate(info);
                     activeEntries.Add(info.Name, entry);
                 }
