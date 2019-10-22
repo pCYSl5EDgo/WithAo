@@ -2,8 +2,11 @@
 using System;
 #endif
 using System.Text;
+using UniNativeLinq;
+using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace AoAndSugi.Game.Models
 {
