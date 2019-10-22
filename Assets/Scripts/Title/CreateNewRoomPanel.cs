@@ -26,6 +26,8 @@ namespace AoAndSugi
         [SerializeField] TMP_InputField npcCountField;
         [SerializeField] TMP_InputField widthField;
         [SerializeField] TMP_InputField heightField;
+        [SerializeField] TMP_InputField foodStorageField;
+        [SerializeField] TMP_InputField energySupplyLocationField;
         [SerializeField] TMP_InputField matchTimeField;
         
         [SerializeField] TextMeshProUGUI trueText;
@@ -41,6 +43,10 @@ namespace AoAndSugi
         [SerializeField] Button heightPrev;
         [SerializeField] Button matchTimeNext;
         [SerializeField] Button matchTimePrev;
+        [SerializeField] Button foodStorageCountNext;
+        [SerializeField] Button foodStorageCountPrev;
+        [SerializeField] Button energySupplyLocationCountNext;
+        [SerializeField] Button energySupplyLocationCountPrev;
         [SerializeField] Button isPrivateButton;
 
         ReactiveProperty<byte> playerCount = new ReactiveProperty<byte>(1);
@@ -48,6 +54,8 @@ namespace AoAndSugi
         ReactiveProperty<int> width = new ReactiveProperty<int>(500);
         ReactiveProperty<int> height = new ReactiveProperty<int>(500);
         ReactiveProperty<int> matchTime = new ReactiveProperty<int>(10);
+        ReactiveProperty<uint> foodStorageCount = new ReactiveProperty<uint>(1);
+        ReactiveProperty<uint> energySupplyLocationCount = new ReactiveProperty<uint>(1);
         ReactiveProperty<bool> isPrivate = new ReactiveProperty<bool>(false);
 
         readonly byte MaxPlayerCount = 16;
@@ -62,12 +70,16 @@ namespace AoAndSugi
             widthField.ActivateInputField();
             heightField.ActivateInputField();
             matchTimeField.ActivateInputField();
+            foodStorageField.ActivateInputField();
+            energySupplyLocationField.ActivateInputField();
 
             playerCount.Subscribe(_count => { playerCountField.text = _count.ToString(); });
             npcCount.Subscribe(_count => { npcCountField.text = _count.ToString(); });
             width.Subscribe(_count => { widthField.text = _count.ToString(); });
             height.Subscribe(_count => { heightField.text = _count.ToString(); });
             matchTime.Subscribe(_count => { matchTimeField.text = _count.ToString(); });
+            foodStorageCount.Subscribe(_count => { foodStorageField.text = _count.ToString(); });
+            energySupplyLocationCount.Subscribe(_count => { energySupplyLocationField.text = _count.ToString(); });
             isPrivate.Subscribe(_isPrivate => {
                 trueText.gameObject.SetActive(_isPrivate);
                 falseText.gameObject.SetActive(!_isPrivate);
@@ -83,6 +95,10 @@ namespace AoAndSugi
             heightPrev.onClick.AddListener(() => height.Value--);
             matchTimeNext.onClick.AddListener(() => matchTime.Value++);
             matchTimePrev.onClick.AddListener(() => matchTime.Value--);
+            foodStorageCountNext.onClick.AddListener(() => foodStorageCount.Value++);
+            foodStorageCountPrev.onClick.AddListener(() => foodStorageCount.Value--);
+            energySupplyLocationCountNext.onClick.AddListener(() => energySupplyLocationCount.Value++);
+            energySupplyLocationCountPrev.onClick.AddListener(() => energySupplyLocationCount.Value--);
             isPrivateButton.onClick.AddListener(() => isPrivate.Value = !isPrivate.Value);
         }
         
@@ -108,7 +124,9 @@ namespace AoAndSugi
                 && (playerCount.Value + npcCount.Value) <= MaxPlayerCount
                 && 1 <= width.Value && width.Value <= 2000000000
                 && 1 <= height.Value && height.Value <= 2000000000
-                && 1 <= matchTime.Value && matchTime.Value <= 2000000000);
+                && 1 <= matchTime.Value && matchTime.Value <= 2000000000
+                && 1 <= foodStorageCount.Value && foodStorageCount.Value <= 2000000000
+                && 1 <= energySupplyLocationCount.Value && energySupplyLocationCount.Value <= 2000000000);
         } 
 
         private void CreateNewRoom(string roomName)
@@ -124,6 +142,8 @@ namespace AoAndSugi
                     { "NpcCount", new MaxTeamCount(){ Value = (int)(npcCount.Value) } },
                     { "BordSize", new BoardSize(){ Value = new int2(){ x = width.Value, y = height.Value }} },
                     { "MatchTime", new MatchTime(){ Value = matchTime.Value } },
+                    { "FoodStorageCount", foodStorageCount.Value },
+                    { "EnergySupplyLocationCount", energySupplyLocationCount.Value },
                    },
                 CustomRoomPropertiesForLobby = new[] {
                     "DisplayName",
@@ -131,6 +151,8 @@ namespace AoAndSugi
                     "NpcCount",
                     "BordSize",
                     "MatchTime",
+                    "FoodStorageCount",
+                    "EnergySupplyLocationCount",
                 }
             };
 
@@ -213,6 +235,18 @@ namespace AoAndSugi
         {
             var count = inputValidation.CheckInputNumber(matchTimeField.text, this.gameObject);
             matchTime.Value = count;
+        }
+
+        public void OnFoodStorageCountValueChanged()
+        {
+            var count = inputValidation.CheckInputNumber(foodStorageField.text, this.gameObject);
+            foodStorageCount.Value = (uint)count;
+        }
+
+        public void OnEnergySupplyLocationCountValueChanged()
+        {
+            var count = inputValidation.CheckInputNumber(energySupplyLocationField.text, this.gameObject);
+            energySupplyLocationCount.Value = (uint)count;
         }
     }
 }
