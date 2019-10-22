@@ -45,56 +45,13 @@ namespace AoAndSugi
 
         public int CheckInputNumber(string inputText, GameObject deployer, bool isNpcCount = false)
         {
-            var correctCount = isNpcCount ? 0 : 1;
-            if (string.IsNullOrEmpty(inputText))
+            var number = isNpcCount ? 0 : 1;
+            var isSuccess = Int32.TryParse(inputText, out number);
+            if (!isSuccess || number < 0)
             {
-                return correctCount;
-            }
-
-            var firstLength = inputText.Length;
-            var pattern = new Regex(@"^[0-9]+$");
-            var match = pattern.Match(inputText);
-            Debug.Log("inputText");
-            Debug.Log(inputText);
-            if (10 < match.Length)
-            {
-                Debug.Log("大きい");
-                correctCount = isNpcCount ? 0 : 1;
                 SetCautionNumber(deployer);
-            } else if (10 == match.Length)
-            {
-                var str = match.ToString().ToCharArray();
-                var isOk = true; 
-                for (int i = 0; i < 10; ++i)
-                {
-                    if(i == 0)
-                    {
-                        isOk = (str[0] <= '2' && '1' <= str[0]);
-                    }
-                    else
-                    {
-                        if(str[i] != '0')isOk = false;
-                    }
-                }
-                if (!isOk)
-                {
-                    correctCount = isNpcCount ? 0 : 1;
-                    SetCautionNumber(deployer);
-                }
-                else
-                {
-                    correctCount = Int32.Parse(match.ToString());
-                }
             }
-            else
-            {
-                Debug.Log("Match");
-                Debug.Log($"{match.ToString()}");
-                correctCount = Int32.Parse(match.ToString());
-            }
-            Debug.Log("返すよ");
-            Debug.Log(correctCount);
-            return correctCount;
+            return number;
         }
 
         private void SetCautionNumber(GameObject deployer)
@@ -102,7 +59,7 @@ namespace AoAndSugi
             if(_messagePanel == null)
             {
                 _messagePanel = Instantiate(messagePanel, deployer.transform);
-                _messagePanel.Initialized("Number : Minimum 1 Maximum 2000000000", null);
+                _messagePanel.Initialized("Number : Minimum 1 Maximum 2147483647", null);
             }
         }
     }

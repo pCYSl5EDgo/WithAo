@@ -8561,7 +8561,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'FoodStorageCount,EnergySupplyLocactionCount,
 
-    Width,Height,MatchTime : Minimum 1 Maximum 2000000000'
+    Width,Height,MatchTime : Minimum 1 Maximum 2147483647'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -9403,7 +9403,6 @@ MonoBehaviour:
   npcCountField: {fileID: 1469857795026173183}
   widthField: {fileID: 2218509881909327015}
   heightField: {fileID: 1303489838871360355}
-  foodStorageField: {fileID: 0}
   energySupplyLocationField: {fileID: 1829333422899502031}
   matchTimeField: {fileID: 4025200897948181802}
   trueText: {fileID: 8764974471436752457}
@@ -9418,8 +9417,6 @@ MonoBehaviour:
   heightPrev: {fileID: 5603427448463049557}
   matchTimeNext: {fileID: 9216588598550084693}
   matchTimePrev: {fileID: 4854246504547974099}
-  foodStorageCountNext: {fileID: 0}
-  foodStorageCountPrev: {fileID: 0}
   energySupplyLocationCountNext: {fileID: 8216034321420930553}
   energySupplyLocationCountPrev: {fileID: 6289834124912010904}
   isPrivateButton: {fileID: 2674158376684621791}
