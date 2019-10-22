@@ -4,12 +4,15 @@ using Zenject;
 using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
+using System.Collections;
 
 namespace AoAndSugi
 {
     public sealed class WaitPanel : MonoBehaviour
     {
         [Inject] private ZenjectSceneLoader sceneLoader;
+
+        [Inject] private ConnectingPanel connectingPanel;
 
         [SerializeField] TextMeshProUGUI count;
             
@@ -27,10 +30,21 @@ namespace AoAndSugi
 
         public void OnClickLeave()
         {
-            if (PhotonNetwork.InRoom)
+            StartCoroutine(LeaveRoom());
+        }
+
+        private IEnumerator LeaveRoom()
+        {
+            if (!PhotonNetwork.InRoom)
             {
-                PhotonNetwork.LeaveRoom();
+                connectingPanel.gameObject.SetActive(true);
+                while (!PhotonNetwork.InRoom)
+                {
+                    yield return null;
+                }
+                connectingPanel.gameObject.SetActive(false);
             }
+            PhotonNetwork.LeaveRoom();
             this.gameObject.SetActive(false);
         }
     }

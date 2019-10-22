@@ -22,14 +22,16 @@ namespace AoAndSugi
 
         [SerializeField] TMP_InputField field;
 
+        [SerializeField] MessagePanel messagePanel;
+        MessagePanel _messagePanel;
+
         public void OnClickClose() => gameObject.SetActive(false);
 
         private void Start()
         {
             field.ActivateInputField();
         }
-
-        //TODO:後でまとめる
+        
         public void OnEndEdit()
         {
             var correctText = inputValidation.CheckInputString(field.text, this.gameObject);
@@ -50,8 +52,19 @@ namespace AoAndSugi
                 }
                 connectingPanel.gameObject.SetActive(false);
             }
-            PhotonNetwork.JoinRoom(roomName);
-            waitPanel.gameObject.SetActive(true);
+            var isSuccess = PhotonNetwork.JoinRoom(roomName);
+            if (isSuccess)
+            {
+                waitPanel.gameObject.SetActive(true);
+            }
+            else
+            {
+                if(_messagePanel == null)
+                {
+                    _messagePanel = Instantiate(messagePanel, this.gameObject.transform);
+                    _messagePanel.Initialized("Failed to enter room", null);
+                }
+            }
         }
     }
 }

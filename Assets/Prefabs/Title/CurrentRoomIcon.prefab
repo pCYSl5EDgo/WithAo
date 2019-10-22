@@ -2362,6 +2362,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3794dd8421ac80f4687f7cbf0d4dd332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  messagePanel: {fileID: 6781583297177498062, guid: 8304abf8673d2e24a9eab48ef1b9e9c4,
+    type: 3}
   rectTransform: {fileID: 2035512110360926803}
   roomName: {fileID: 7774334460441337113}
   mapSize: {fileID: 1963285788058098480}

@@ -18,6 +18,9 @@ namespace AoAndSugi
 
         [Inject] private ConnectingPanel connectingPanel;
 
+        [SerializeField] MessagePanel messagePanel;
+        MessagePanel _messagePanel;
+
         [SerializeField] RectTransform rectTransform;
         [SerializeField] TextMeshProUGUI roomName;
         [SerializeField] TextMeshProUGUI mapSize;
@@ -42,8 +45,19 @@ namespace AoAndSugi
                 }
                 connectingPanel.gameObject.SetActive(false);
             }
-            PhotonNetwork.JoinRoom(roomName.text);
-            waitPanel.gameObject.SetActive(true);
+            var isSuccess = PhotonNetwork.JoinRoom(roomName.text);
+            if (isSuccess)
+            {
+                waitPanel.gameObject.SetActive(true);
+            }
+            else
+            {
+                if (_messagePanel == null)
+                {
+                    _messagePanel = Instantiate(messagePanel, this.gameObject.transform);
+                    _messagePanel.Initialized("Failed to enter room", null);
+                }
+            }
         }
 
         public void Activate(RoomInfo info)

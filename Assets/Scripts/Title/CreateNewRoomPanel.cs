@@ -110,9 +110,12 @@ namespace AoAndSugi
             {
                 if (!IsEnabelCreate())
                 {
-                    _messagePanel = Instantiate(messagePanel, this.gameObject.transform);
-                    _messagePanel.Initialized("PlayerCount And NpcCount → Number : Up to 20 in total \n Other → Number: Minimum 1 Maximum 2000000000", null);
-                    return;
+                    if(_messagePanel == null)
+                    {
+                        _messagePanel = Instantiate(messagePanel, this.gameObject.transform);
+                        _messagePanel.Initialized("PlayerCount And NpcCount → Number : Up to 20 in total \n Other → Number: Minimum 1 Maximum 2000000000", null);
+                        return;
+                    }
                 }
                 CreateNewRoom(correctText);
             }
@@ -174,8 +177,11 @@ namespace AoAndSugi
             var isSuccess = PhotonNetwork.CreateRoom(roomName, option);
             if (!isSuccess)
             {
-                _messagePanel = Instantiate(messagePanel, this.gameObject.transform);
-                _messagePanel.Initialized("Failed to create room. \n Try a different room name", null);
+                if (_messagePanel == null)
+                {
+                    _messagePanel = Instantiate(messagePanel, this.gameObject.transform);
+                    _messagePanel.Initialized("Failed to create room. \n Try a different room name", null);
+                }
             }
             else
             {
@@ -190,7 +196,6 @@ namespace AoAndSugi
             {
                 playerCountField.enabled = false;
                 count = MaxPlayerCount - npcCount.Value;
-                //playerCount.Value = 20;//一度別の値を入れないと値が正常に反映されないことがある
                 playerCount.Value = (byte)(count);
                 if (_messagePanel == null)
                 {
@@ -203,7 +208,6 @@ namespace AoAndSugi
             }
             else
             {
-                //playerCount.Value = 20;//一度別の値を入れないと値が正常に反映されないことがある
                 playerCount.Value = (byte)(count);
             }
         }
