@@ -21,6 +21,8 @@ namespace AoAndSugi
         [SerializeField] TextMeshProUGUI playerCount;
         [SerializeField] TextMeshProUGUI npcCount;
         [SerializeField] TextMeshProUGUI matchTime;
+        [SerializeField] TextMeshProUGUI foodStorageCount;
+        [SerializeField] TextMeshProUGUI energySupplyLocationCount;
 
         public void OnClickButton() {
             PhotonNetwork.JoinRoom(roomName.text);
@@ -49,6 +51,18 @@ namespace AoAndSugi
             {
                 int time = ((MatchTime)value).Value;
                 matchTime.text = $"{ time }";
+            }
+            value = null;
+            if (info.CustomProperties.TryGetValue("FoodStorageCount", out value))
+            {
+                uint count = (uint)value;
+                foodStorageCount.text = $"{ count }";
+            }
+            value = null;
+            if (info.CustomProperties.TryGetValue("EnergySupplyLocationCount", out value))
+            {
+                uint count = (uint)value;
+                energySupplyLocationCount.text = $"{ count }";
             }
         }
 
