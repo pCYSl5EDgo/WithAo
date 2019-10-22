@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Zenject;
-using System.Collections.Generic;
+using System.Collections;
 using UniRx;
 using Unity.Mathematics;
 using AoAndSugi.Game.Models;
@@ -18,7 +18,12 @@ namespace AoAndSugi
 
         [Inject] private InputValidation inputValidation;
 
+        [Inject] private ConnectingPanel connectingPanel;
+
         [SerializeField] TMP_InputField field;
+
+        [SerializeField] MessagePanel messagePanel;
+        MessagePanel _messagePanel;
 
         public void OnClickClose() => gameObject.SetActive(false);
 
@@ -26,28 +31,40 @@ namespace AoAndSugi
         {
             field.ActivateInputField();
         }
-
-        //TODO:後でまとめる
+        
         public void OnEndEdit()
         {
             var correctText = inputValidation.CheckInputString(field.text, this.gameObject);
             if (!string.IsNullOrEmpty(correctText))
             {
-                EnterPrivateRoom(correctText);
+                StartCoroutine(EnterPrivateRoom(correctText));
             }
         }
 
-        private void EnterPrivateRoom(string roomName)
+        private IEnumerator EnterPrivateRoom(string roomName)
         {
-            PhotonNetwork.JoinRoom(roomName);
-
-            waitPanel.gameObject.SetActive(true);
-        }
-
-        public void OnClickLeave()
-        {
-            Debug.Log("部屋を出ます");
-            PhotonNetwork.LeaveRoom();
+            if (!PhotonNetwork.InLobby)
+            {
+                connectingPanel.gameObject.SetActive(true);
+                while (!PhotonNetwork.InLobby)
+                {
+                    yield return null;
+                }
+                connectingPanel.gameObject.SetActive(false);
+            }
+            var isSuccess = PhotonNetwork.JoinRoom(roomName);
+            if (isSuccess)
+            {
+                waitPanel.gameObject.SetActive(true);
+            }
+            else
+            {
+                if(_messagePanel == null)
+                {
+                    _messagePanel = Instantiate(messagePanel, this.gameObject.transform);
+                    _messagePanel.Initialized("Failed to enter room", null);
+                }
+            }
         }
     }
 }

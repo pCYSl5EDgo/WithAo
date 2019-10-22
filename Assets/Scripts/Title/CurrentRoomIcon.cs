@@ -8,6 +8,7 @@ using System;
 using Zenject;
 using AoAndSugi.Game.Models;
 using Unity.Mathematics;
+using System.Collections;
 
 namespace AoAndSugi
 {
@@ -15,16 +16,48 @@ namespace AoAndSugi
     {
         [Inject] private WaitPanel waitPanel;
 
+        [Inject] private ConnectingPanel connectingPanel;
+
+        [SerializeField] MessagePanel messagePanel;
+        MessagePanel _messagePanel;
+
         [SerializeField] RectTransform rectTransform;
         [SerializeField] TextMeshProUGUI roomName;
         [SerializeField] TextMeshProUGUI mapSize;
         [SerializeField] TextMeshProUGUI playerCount;
         [SerializeField] TextMeshProUGUI npcCount;
         [SerializeField] TextMeshProUGUI matchTime;
+        [SerializeField] TextMeshProUGUI foodStorageCount;
+        [SerializeField] TextMeshProUGUI energySupplyLocationCount;
 
         public void OnClickButton() {
-            PhotonNetwork.JoinRoom(roomName.text);
-            waitPanel.gameObject.SetActive(true);
+            StartCoroutine(EnterRoom());
+        }
+
+        private IEnumerator EnterRoom()
+        {
+            if (!PhotonNetwork.InLobby)
+            {
+                connectingPanel.gameObject.SetActive(true);
+                while (!PhotonNetwork.InLobby)
+                {
+                    yield return null;
+                }
+                connectingPanel.gameObject.SetActive(false);
+            }
+            var isSuccess = PhotonNetwork.JoinRoom(roomName.text);
+            if (isSuccess)
+            {
+                waitPanel.gameObject.SetActive(true);
+            }
+            else
+            {
+                if (_messagePanel == null)
+                {
+                    _messagePanel = Instantiate(messagePanel, this.gameObject.transform);
+                    _messagePanel.Initialized("Failed to enter room", null);
+                }
+            }
         }
 
         public void Activate(RoomInfo info)
@@ -49,6 +82,18 @@ namespace AoAndSugi
             {
                 int time = ((MatchTime)value).Value;
                 matchTime.text = $"{ time }";
+            }
+            value = null;
+            if (info.CustomProperties.TryGetValue("FoodStorageCount", out value))
+            {
+                uint count = (uint)value;
+                foodStorageCount.text = $"{ count }";
+            }
+            value = null;
+            if (info.CustomProperties.TryGetValue("EnergySupplyLocationCount", out value))
+            {
+                uint count = (uint)value;
+                energySupplyLocationCount.text = $"{ count }";
             }
         }
 

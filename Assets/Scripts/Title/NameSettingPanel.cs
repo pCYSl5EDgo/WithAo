@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 using Zenject;
+using System.Collections;
 
 namespace AoAndSugi
 {
@@ -15,19 +16,30 @@ namespace AoAndSugi
 
         [Inject] private InputValidation inputValidation;
 
+        [Inject] private ConnectingPanel connectingPanel;
+
         [SerializeField] TMP_InputField field;
 
         public void OnClickClose() => gameObject.SetActive(false);
 
         public void OnClickNext() {
-            OnEndEdit();
+            StartCoroutine(OnEndEdit());
         }
         
-        public void OnEndEdit()
+        public IEnumerator OnEndEdit()
         {
             var correctText = inputValidation.CheckInputString(field.text, this.gameObject);
             if (!(string.IsNullOrEmpty(correctText)))
             {
+                if (!PhotonNetwork.IsConnected)
+                {
+                    connectingPanel.gameObject.SetActive(true);
+                    while (!PhotonNetwork.IsConnected)
+                    {
+                        yield return null;
+                    }
+                    connectingPanel.gameObject.SetActive(false);
+                }
                 PhotonNetwork.LocalPlayer.NickName = correctText;
                 matchingPanel.gameObject.SetActive(true);
             }

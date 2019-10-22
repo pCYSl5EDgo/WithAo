@@ -4,6 +4,7 @@ using Zenject;
 using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
+using System.Collections;
 
 namespace AoAndSugi
 {
@@ -11,21 +12,14 @@ namespace AoAndSugi
     {
         [Inject] private ZenjectSceneLoader sceneLoader;
 
+        [Inject] private ConnectingPanel connectingPanel;
+
         [SerializeField] TextMeshProUGUI count;
             
         public void OnClickClose() => gameObject.SetActive(false);
 
-        //自分が入ってきたとき
-        private void Start()
-        {
-            //UpdatePlayerCount();
-        }
-
         public void UpdatePlayerCount()
         {
-            var a = count.text;
-            var b = PhotonNetwork.CurrentRoom.PlayerCount;
-            var c = PhotonNetwork.CurrentRoom.MaxPlayers;
             count.text = $"{PhotonNetwork.CurrentRoom.PlayerCount}/{PhotonNetwork.CurrentRoom.MaxPlayers}";
             if(PhotonNetwork.CurrentRoom.MaxPlayers <= PhotonNetwork.CurrentRoom.PlayerCount)
             {
@@ -36,8 +30,20 @@ namespace AoAndSugi
 
         public void OnClickLeave()
         {
+            StartCoroutine(LeaveRoom());
+        }
 
-            Debug.Log("部屋を出ます");
+        private IEnumerator LeaveRoom()
+        {
+            if (!PhotonNetwork.InRoom)
+            {
+                connectingPanel.gameObject.SetActive(true);
+                while (!PhotonNetwork.InRoom)
+                {
+                    yield return null;
+                }
+                connectingPanel.gameObject.SetActive(false);
+            }
             PhotonNetwork.LeaveRoom();
             this.gameObject.SetActive(false);
         }

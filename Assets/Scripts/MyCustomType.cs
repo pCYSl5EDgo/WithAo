@@ -8,13 +8,15 @@ public static class MyCustomType
     public static readonly byte[] bufferMaxTeamCount = new byte[4];
     public static readonly byte[] bufferMatchTime = new byte[4];
     public static readonly byte[] bufferBoardSize = new byte[8];
+    public static readonly byte[] bufferUint = new byte[4];
 
     // カスタムタイプを登録するメソッド（起動時に一度だけ呼び出す）
     public static void Register()
     {
         PhotonPeer.RegisterType(typeof(MaxTeamCount), 1, SerializeMaxTeamCount, DeserializeMaxTeamCount);
-        PhotonPeer.RegisterType(typeof(MatchTime), 1, SerializeMatchTime, DeserializeMatchTime);
-        PhotonPeer.RegisterType(typeof(BoardSize), 2, SerializeBoardSize, DeserializeBoardSize);
+        PhotonPeer.RegisterType(typeof(MatchTime), 2, SerializeMatchTime, DeserializeMatchTime);
+        PhotonPeer.RegisterType(typeof(BoardSize), 3, SerializeBoardSize, DeserializeBoardSize);
+        PhotonPeer.RegisterType(typeof(uint), 4, SerializeUint, DeserializeUint);
     }
 
     // バイト列に変換して送信データに書き込むメソッド
@@ -39,6 +41,19 @@ public static class MyCustomType
         {
             Protocol.Serialize(matchTime.Value, bufferMatchTime, ref index);
             outStream.Write(bufferMatchTime, 0, index);
+        }
+        return (short)index; // 書き込んだバイト数を返す
+    }
+
+    // バイト列に変換して送信データに書き込むメソッド
+    private static short SerializeUint(StreamBuffer outStream, object customObject)
+    {
+        uint value = (uint)customObject;
+        int index = 0;
+        lock (bufferUint)
+        {
+            MyProtocol.Serialize(value, bufferUint, ref index);
+            outStream.Write(bufferUint, 0, index);
         }
         return (short)index; // 書き込んだバイト数を返す
     }
@@ -81,6 +96,19 @@ public static class MyCustomType
             Protocol.Deserialize(out value, bufferMatchTime, ref index);
         }
         return new MatchTime { Value = value };
+    }
+
+    // 受信データからバイト列を読み込んで変換するメソッド
+    private static object DeserializeUint(StreamBuffer inStream, short length)
+    {
+        uint value;
+        int index = 0;
+        lock (bufferUint)
+        {
+            inStream.Read(bufferUint, 0, length);
+            MyProtocol.Deserialize(out value, bufferUint, ref index);
+        }
+        return value;
     }
 
     // 受信データからバイト列を読み込んで変換するメソッド
