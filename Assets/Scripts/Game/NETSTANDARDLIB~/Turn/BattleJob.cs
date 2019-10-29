@@ -1,12 +1,12 @@
 ﻿using System;
 using AoAndSugi.Game.Models.Unit;
+using Unity.Burst;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
-using Unity.Mathematics;
-using UnityEngine;
 
 namespace AoAndSugi.Game.Models
 {
+    [BurstCompile]
     public unsafe struct BattleJob : IJob
     {
         [NativeDisableUnsafePtrRestriction] private readonly GameMasterData* master;

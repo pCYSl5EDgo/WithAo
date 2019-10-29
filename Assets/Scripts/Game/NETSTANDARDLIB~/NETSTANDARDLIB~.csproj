@@ -5,6 +5,7 @@
     <RootNamespace>AoAndSugi</RootNamespace>
     <LangVersion>8</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <AssemblyName>AoAndSugi.Game.Model</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +20,10 @@
 
     <Reference Include="Unity.Collections">
       <HintPath>$(ProjectDir)Unity.Collections.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Unity.Burst">
+      <HintPath>$(ProjectDir)Unity.Burst.dll</HintPath>
     </Reference>
 
     <Reference Include="UniNativeLinqDll">
