@@ -13,7 +13,7 @@
     "precompiledReferences": [
         "AoAndSugi.Game.Model.dll",
         "Zenject-usage.dll",
-        "UniNativeLinqDll.dll"
+        "UniNativeLinq.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": []

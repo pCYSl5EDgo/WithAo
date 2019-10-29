@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "uninativelinq": "https://github.com/pCYSl5EDgo/UniNativeLinq-EditorExtension.git",
     "com.unity.ads": "2.0.8",
     "com.unity.analytics": "3.2.2",
     "com.unity.burst": "1.1.2",
@@ -11,6 +10,7 @@
     "com.unity.render-pipelines.lightweight": "4.10.0-preview",
     "com.unity.textmeshpro": "1.4.1",
     "unienumextension": "https://github.com/pCYSl5EDgo/UniEnumExtension.git",
+    "uninativelinq": "https://github.com/pCYSl5EDgo/UniNativeLinq-EditorExtension.git",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
     "com.unity.modules.assetbundle": "1.0.0",
@@ -48,7 +48,7 @@
       "revision": "HEAD"
     },
     "uninativelinq": {
-      "hash": "c5e502b0777e8ec4fcb7fddd1d283e8dce929e6c",
+      "hash": "a861c6a3c0da86424c3fdb9d2cc209e93e1ecc0f",
       "revision": "HEAD"
     }
   }

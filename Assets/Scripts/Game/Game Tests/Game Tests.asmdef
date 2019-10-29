@@ -16,7 +16,7 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "AoAndSugi.Game.Model.dll",
-        "UniNativeLinqDll.dll"
+        "UniNativeLinq.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": []
