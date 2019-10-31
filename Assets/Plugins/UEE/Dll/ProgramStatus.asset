@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb9cba46fcce6a349aa9d4bbf503a7f7, type: 3}
+  m_Name: ProgramStatus
+  m_EditorClassIdentifier: 
+  ShouldProcessAllAssemblies: 0
+  Enables: 01010101000001010101010100000101010101
+  Names:
+  - Unity.Postprocessing.Runtime
+  - Zenject
+  - Assembly-CSharp
+  - UniRx
+  - PhotonUnityNetworking.Demos
+  - PhotonUnityNetworking.Utilities
+  - Unity.TextMeshPro
+  - Unity.RenderPipelines.Lightweight.Runtime
+  - Unity.Mathematics
+  - Unity.RenderPipelines.Core.Runtime
+  - PhotonChat
+  - Unity.Analytics.DataPrivacy
+  - PhotonUnityNetworking
+  - PhotonRealtime
+  - AoAndSugi.Game.Logic
+  - AoAndSugi.Game.Models.ScriptableObjects
+  - PhotonWebSocket
+  - AoAndSugi.Game.IO
+  - Unity.RenderPipelines.Core.ShaderLibrary
+  OutputPaths:
+  - Library/ScriptAssemblies/Unity.Postprocessing.Runtime.dll
+  - Library/ScriptAssemblies/Zenject.dll
+  - Library/ScriptAssemblies/Assembly-CSharp.dll
+  - Library/ScriptAssemblies/UniRx.dll
+  - Library/ScriptAssemblies/PhotonUnityNetworking.Demos.dll
+  - Library/ScriptAssemblies/PhotonUnityNetworking.Utilities.dll
+  - Library/ScriptAssemblies/Unity.TextMeshPro.dll
+  - Library/ScriptAssemblies/Unity.RenderPipelines.Lightweight.Runtime.dll
+  - Library/ScriptAssemblies/Unity.Mathematics.dll
+  - Library/ScriptAssemblies/Unity.RenderPipelines.Core.Runtime.dll
+  - Library/ScriptAssemblies/PhotonChat.dll
+  - Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll
+  - Library/ScriptAssemblies/PhotonUnityNetworking.dll
+  - Library/ScriptAssemblies/PhotonRealtime.dll
+  - Library/ScriptAssemblies/AoAndSugi.Game.Logic.dll
+  - Library/ScriptAssemblies/AoAndSugi.Game.Models.ScriptableObjects.dll
+  - Library/ScriptAssemblies/PhotonWebSocket.dll
+  - Library/ScriptAssemblies/AoAndSugi.Game.IO.dll
+  - Library/ScriptAssemblies/Unity.RenderPipelines.Core.ShaderLibrary.dll

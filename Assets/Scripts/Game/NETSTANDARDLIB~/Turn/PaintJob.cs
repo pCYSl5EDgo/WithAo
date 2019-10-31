@@ -1,10 +1,8 @@
-﻿using Unity.Burst;
-using Unity.Collections.LowLevel.Unsafe;
+﻿using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 
 namespace AoAndSugi.Game.Models
 {
-    [BurstCompile]
     public unsafe struct PaintJob : IJob
     {
         [NativeDisableUnsafePtrRestriction] private readonly GameMasterData* master;

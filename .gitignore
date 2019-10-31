@@ -8,7 +8,8 @@
 .idea/*
 .vscode/*
 
-Assets/Plugins/Editor/JetBrains*
+Assets/Plugins/Editor/*
+Assets/Plugins/Editor.meta
 Assets/Scripts/Game/NETSTANDARDLIB~/.idea/
 Assets/Scripts/Game/NETSTANDARDLIB~/.vs/
 Assets/Scripts/Game/NETSTANDARDLIB~/.vscode/

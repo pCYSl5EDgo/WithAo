@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e251f83c3224543909f1570b4622780, type: 3}
+  m_Name: ManagedPluginSettings
+  m_EditorClassIdentifier: 
+  Tuples:
+  - ManagedPluginPath: Assets/Photon/PhotonLibs/Metro/Photon3Unity3D.dll
+    ByteSize: 135680
+    ShouldAutoProcess: 0
+  - ManagedPluginPath: Assets/Photon/PhotonLibs/Photon3Unity3D.dll
+    ByteSize: 184320
+    ShouldAutoProcess: 0
+  - ManagedPluginPath: Assets/Photon/PhotonLibs/WebSocket/websocket-sharp.dll
+    ByteSize: 250368
+    ShouldAutoProcess: 0
+  - ManagedPluginPath: Assets/Plugins/Editor/JetBrains/JetBrains.Rider.Unity.Editor.Plugin.Repacked.dll
+    ByteSize: 1330272
+    ShouldAutoProcess: 0
+  - ManagedPluginPath: Assets/Plugins/UNL/Settings/UniNativeLinq.dll
+    ByteSize: 389120
+    ShouldAutoProcess: 0
+  - ManagedPluginPath: Assets/Plugins/Zenject/OptionalExtras/ReflectionBaking/Lib/Zenject.ReflectionBaking.Mono.Cecil.Mdb.dll
+    ByteSize: 44032
+    ShouldAutoProcess: 0
+  - ManagedPluginPath: Assets/Plugins/Zenject/OptionalExtras/ReflectionBaking/Lib/Zenject.ReflectionBaking.Mono.Cecil.Pdb.dll
+    ByteSize: 79872
+    ShouldAutoProcess: 0
+  - ManagedPluginPath: Assets/Plugins/Zenject/OptionalExtras/ReflectionBaking/Lib/Zenject.ReflectionBaking.Mono.Cecil.Rocks.dll
+    ByteSize: 23552
+    ShouldAutoProcess: 0
+  - ManagedPluginPath: Assets/Plugins/Zenject/OptionalExtras/ReflectionBaking/Lib/Zenject.ReflectionBaking.Mono.Cecil.dll
+    ByteSize: 269312
+    ShouldAutoProcess: 0
+  - ManagedPluginPath: Assets/Plugins/Zenject/Source/Usage/Zenject-usage.dll
+    ByteSize: 23040
+    ShouldAutoProcess: 0
+  - ManagedPluginPath: Assets/Scripts/Game/AoAndSugi.Game.Model.dll
+    ByteSize: 48640
+    ShouldAutoProcess: 0
+  - ManagedPluginPath: Packages/com.unity.ads/Editor/UnityEditor.Advertisements.dll
+    ByteSize: 9728
+    ShouldAutoProcess: 0
+  - ManagedPluginPath: Packages/com.unity.ads/UnityEngine.Advertisements.dll
+    ByteSize: 47616
+    ShouldAutoProcess: 0
+  - ManagedPluginPath: Packages/com.unity.analytics/Unity.Analytics.Editor.dll
+    ByteSize: 53248
+    ShouldAutoProcess: 0
+  - ManagedPluginPath: Packages/com.unity.analytics/Unity.Analytics.StandardEvents.dll
+    ByteSize: 32256
+    ShouldAutoProcess: 0
+  - ManagedPluginPath: Packages/com.unity.analytics/Unity.Analytics.Tracker.dll
+    ByteSize: 19456
+    ShouldAutoProcess: 0

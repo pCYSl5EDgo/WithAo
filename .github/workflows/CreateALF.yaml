@@ -40,7 +40,14 @@ jobs:
       with:
         dotnet-version: 3.0.100
 
-    - name: Warm Up
+    - id: restore-cache
+      uses: actions/cache@preview
+      with:
+        path: WithAo/Library
+        key: ${{ matrix.unity-tag }}
+
+    - if: steps.restore-cache.outputs.cache-hit != 'true'
+      name: Warm Up
       run: /opt/Unity/Editor/Unity -quit -batchMode -noGraphics -logFile -projectPath WithAo || exit 0
 
     - name: Build .NET Standard 2.0 project

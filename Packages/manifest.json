@@ -2,8 +2,6 @@
   "dependencies": {
     "com.unity.ads": "2.0.8",
     "com.unity.analytics": "3.2.2",
-    "com.unity.burst": "1.1.2",
-    "com.unity.collections": "0.0.9-preview.12",
     "com.unity.mathematics": "1.1.0",
     "com.unity.package-manager-ui": "2.0.8",
     "com.unity.quicksearch": "1.4.1",
@@ -44,11 +42,11 @@
   },
   "lock": {
     "unienumextension": {
-      "hash": "a8972567b8865c247e72edae2eed243412dc367e",
+      "hash": "b645c4634c74d14b36748ad830e480426f8b9fa1",
       "revision": "HEAD"
     },
     "uninativelinq": {
-      "hash": "a861c6a3c0da86424c3fdb9d2cc209e93e1ecc0f",
+      "hash": "c7c11b42f3a79ea13aea05c6e9a37d21c1c88de8",
       "revision": "HEAD"
     }
   }
