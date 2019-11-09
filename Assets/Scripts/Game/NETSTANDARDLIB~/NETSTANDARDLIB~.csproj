@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath Condition="Exists('C:\Program Files\Unity\Hub\Editor\2018.4.9f1\Editor\Data\Managed\UnityEngine')">C:\Program Files\Unity\Hub\Editor\2018.4.9f1\Editor\Data\Managed\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath Condition="Exists('C:\Program Files\Unity\Hub\Editor\2018.4.12f1\Editor\Data\Managed\UnityEngine')">C:\Program Files\Unity\Hub\Editor\2018.4.12f1\Editor\Data\Managed\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
       <HintPath Condition="Exists('/opt/Unity/Editor/Data/Managed/UnityEngine')">/opt/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll</HintPath>
     </Reference>
 
@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy $(TargetPath) $(ProjectDir)..\AoAndSugi.Game.Model.dll" Condition="Exists('C:\Program Files\Unity\Hub\Editor\2018.4.9f1\Editor\Data\Managed\UnityEngine')" />
+    <Exec Command="copy $(TargetPath) $(ProjectDir)..\AoAndSugi.Game.Model.dll" Condition="Exists('C:\Program Files\Unity\Hub\Editor\2018.4.12f1\Editor\Data\Managed\UnityEngine')" />
     <Exec Command="cp -f $(TargetPath) $(ProjectDir)../AoAndSugi.Game.Models.dll" Condition="Exists('/opt/Unity/Editor/Data/Managed/UnityEngine')" />
   </Target>
 
